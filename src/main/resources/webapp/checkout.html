@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - WeedTlan</title>
+    <!-- Font Icons -->
+    <link rel="stylesheet" href="assets/vendors/themify-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="assets/vendors/animate/animate.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/themify-icons/0.1.2/css/themify-icons.css">
+    <!-- Bootstrap + FoodHut main styles -->
+    <link rel="stylesheet" href="assets/css/foodhut.css">
+    <style>
+        body {
+            background-color: #212529; /* Fondo oscuro */
+            color: #ffffff; /* Texto blanco */
+        }
+        header, footer {
+            background-color: #343a40; /* Fondo gris oscuro */
+            color: #ffffff; /* Letras blancas */
+        }
+        .form-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #343a40; /* Fondo oscuro */
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            color: #ffffff; /* Texto blanco */
+        }
+        .form-container h3 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+        .form-container .form-label {
+            font-size: 0.9rem;
+            color: #cccccc; /* Color claro para las etiquetas */
+        }
+        .form-container input,
+        .form-container textarea {
+            font-size: 0.9rem;
+            padding: 8px;
+            background-color: #495057; /* Fondo de los inputs oscuro */
+            border: 1px solid #ced4da;
+            color: #ffffff; /* Texto blanco en los inputs */
+        }
+        .form-container input:focus,
+        .form-container textarea:focus {
+            border-color: #28a745; /* Color verde al hacer focus */
+            box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); /* Sombra verde */
+        }
+        .form-container .btn {
+            width: 100%;
+            font-size: 1rem;
+        }
+        /* Spinner de carga */
+        .spinner-border {
+            display: none; /* Oculto por defecto */
+            width: 3rem;
+            height: 3rem;
+            margin: 0 auto;
+            border: 0.25rem solid rgba(0, 0, 0, 0.1);
+            border-top-color: #28a745; /* Color verde */
+        }
+        .spinner-border[aria-live="assertive"] {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cabecera -->
+    <header class="text-center py-4">
+        <a class="navbar-brand m-auto" href="#">
+            <img src="assets/imgs/logo.png" class="brand-img" alt="">
+            <span class="brand-txt">WeedTitlan</span>
+        </a>
+    </header>
+
+    <!-- Contenido principal -->
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Resumen de tu Compra</h2>
+        <div id="checkoutProducts" class="mb-4">
+            <!-- Aquí se generará dinámicamente la lista de productos -->
+        </div>
+        <div class="d-flex justify-content-between p-3 border-top">
+            <h4>Total a pagar:</h4>
+            <h4 id="checkoutTotal" class="text-success">$0.00</h4>
+        </div>
+
+        <!-- Formulario centrado -->
+        <div class="form-container">
+            <h3>Datos del Cliente</h3>
+            <form id="customerDetailsForm">
+                <div class="mb-3">
+                    <label for="fullName" class="form-label">Nombre completo</label>
+                    <input type="text" class="form-control" id="fullName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Correo electrónico</label>
+                    <input type="email" class="form-control" id="email" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Correo electrónico inválido">
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Teléfono</label>
+                    <input type="tel" class="form-control" id="phone" required pattern="\d{10}" title="Debe tener 10 dígitos">
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Dirección de envío</label>
+                    <textarea class="form-control" id="address" rows="3" required></textarea>
+                </div>
+            </form>
+
+            <!-- Spinner de carga -->
+            <div id="loadingSpinner" class="spinner-border text-primary" role="status" aria-live="assertive">
+                <span class="sr-only">Cargando...</span>
+            </div>
+
+            <!-- Botón para finalizar la compra -->
+            <button class="btn btn-success btn-lg mt-3" id="finalizePurchaseButton">Finalizar Compra</button>
+        </div>
+    </div>
+
+    <!-- Pie de página -->
+    <footer class="text-center py-3 mt-5">
+        <p>&copy; 2024 WeedTitlan. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        // Recuperar los datos del carrito desde localStorage
+        function loadCartFromLocalStorage() {
+            const cartData = JSON.parse(localStorage.getItem('cartData')) || { products: [], total: 0 };
+            return cartData;
+        }
+
+        // Renderizar el carrito en el checkout
+        function renderCheckoutCart() {
+            const cartData = loadCartFromLocalStorage();
+            const cartItemsContainer = document.getElementById('checkoutProducts');
+            const cartTotalElement = document.getElementById('checkoutTotal');
+
+            cartItemsContainer.innerHTML = ''; // Limpiar el contenedor
+            let total = 0;
+
+            cartData.products.forEach(product => {
+                const productDiv = document.createElement('div');
+                productDiv.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'mb-3', 'border-bottom', 'pb-2');
+
+                productDiv.innerHTML = `
+                    <div>
+                        <h5>${product.name}</h5>
+                        <p>$${product.price} x ${product.quantity}</p>
+                    </div>
+                    <h5>$${(product.price * product.quantity).toFixed(2)}</h5>
+                `;
+                cartItemsContainer.appendChild(productDiv);
+                total += product.price * product.quantity;
+            });
+
+            cartTotalElement.textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Finalizar compra y enviar datos al servidor
+        document.getElementById('finalizePurchaseButton').addEventListener('click', () => {
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+
+            if (!fullName || !email || !phone || !address) {
+                alert('Por favor, completa todos los campos para continuar.');
+                return;
+            }
+
+            const customerData = {
+                fullName,
+                email,
+                phone,
+                address
+            };
+
+            // Mostrar el spinner mientras se procesa
+            document.getElementById('loadingSpinner').style.display = 'block';
+            
+            // Enviar los datos al servidor
+            fetch('/api/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(customerData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al procesar la compra');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('¡Gracias por tu compra! Tu pedido se está procesando.');
+                console.log('Respuesta del servidor:', data);
+                localStorage.removeItem('cartData'); // Vaciar el carrito
+                window.location.href = 'index.html'; // Redirigir al inicio o a otra página
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un problema al procesar tu compra. Por favor, intenta nuevamente.');
+            })
+            .finally(() => {
+                // Ocultar el spinner cuando se termine el proceso
+                document.getElementById('loadingSpinner').style.display = 'none';
+            });
+        });
+        // Inicializar la página de checkout
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCheckoutCart();
+        });
+    </script>
+</body>
+</html>

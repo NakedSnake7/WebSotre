@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Start your development with FoodHut landing page.">
+    <meta name="keywords" content="WeedTitlan, productos, suplementos, México">
+    <meta name="author" content="WeedTitlan">
+    <title>WeedTlanMx</title>
+
+    <!-- font icons -->
+    <link rel="stylesheet" href="assets/vendors/themify-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="assets/vendors/animate/animate.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/themify-icons/0.1.2/css/themify-icons.css">
+    
+    <!-- Bootstrap + FoodHut main styles -->
+    <link rel="stylesheet" href="assets/css/foodhut.css">
+    <!-- Custom styles -->
+<link rel="stylesheet" href="assets/css/custom-styles.css">
+   
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="custom-navbar navbar navbar-expand-lg navbar-dark fixed-top" data-spy="affix" data-offset-top="10" style="z-index: 1040;">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#gallary">Productos</a>
+                </li>
+            </ul>
+            <a class="navbar-brand m-auto" href="#">
+                <img src="assets/imgs/logo.png" class="brand-img" alt="">
+                <span class="brand-txt">WeedTitlanMx</span>
+            </a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#testmonial">Reviews</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#contact">Contact Us</a>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#registerModal">Registro</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Modal de Registro -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Registro</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="userName">Usuario</label>
+                            <input type="text" class="form-control" id="userName" placeholder="Ingresa tu nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userEmail">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="userEmail" placeholder="Ingresa tu correo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userPassword">Contraseña</label>
+                            <input type="password" class="form-control" id="userPassword" placeholder="Ingresa tu contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">Registrarse</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+
+    <!-- Botón del carrito sobre el Navbar -->
+    <div id="cartButtonContainer">
+      <button id="cartButton" class="btn btn-primary" aria-label="Abrir carrito">
+       <i class="ti-shopping-cart"></i> Carrito
+       </button>
+
+    </div>
+
+    <!-- Contenedor del carrito -->
+   <div id="cartDropdown" class="cart-dropdown" style="display:none;">
+    <h4>Productos en el Carrito</h4>
+    <ul id="cartItems"></ul>
+    <div class="d-flex justify-content-between mt-3">
+        <span><b>Total a pagar:</b></span>
+        <span id="cartTotal" class="font-weight-bold">$0</span>
+    </div>
+        <button id="checkoutButton" class="btn btn-success mt-3">Ir al pago</button>
+    
+     </div>
+
+    <!-- header -->
+    <header id="home" class="header">
+        <div class="overlay text-white text-center">
+            <h1 class="display-2 font-weight-bold my-3">WeedTitlan Mexico</h1>
+            <h2 class="display-4 mb-5">"Calidad en cada entrega"</h2>
+            <a class="btn btn-lg btn-primary" href="#gallary">Nuestros Productos</a>
+        </div>
+    </header>
+
+    <!-- Botón de WhatsApp -->
+    <div id="whatsappButton">
+        <a target="_blank" 
+           class="btn btn-success">
+            
+        </a>
+    </div>
+
+   <script>
+   
+   const whatsappButton = document.getElementById('whatsappButton');
+   const phoneNumber = "525512345678"; // Número dinámico, puedes cambiar esto según el usuario
+   const message = "Hola, necesito ayuda con mi compra en WeedTitlan";
+
+   whatsappButton.innerHTML = `
+       <a href="https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}" target="_blank" class="btn btn-success">
+           <i class="ti-whatsapp" style="font-size: 24px; color: #25D366;"></i> WhatsApp
+       </a>
+   `;
+   
+  // Obtener el formulario de registro
+const registerForm = document.getElementById('registerForm');
+
+// Escuchar el evento de envío del formulario
+registerForm.addEventListener('submit', function(event) {
+    // Prevenir el comportamiento por defecto de enviar el formulario
+    event.preventDefault();
+
+    // Obtener los valores de los campos del formulario
+    const userName = document.getElementById('userName').value;
+    const userEmail = document.getElementById('userEmail').value;
+    const userPassword = document.getElementById('userPassword').value;
+
+    // Validaciones adicionales
+    if (userName.trim() === '' || userEmail.trim() === '' || userPassword.trim() === '') {
+        alert('Todos los campos son obligatorios.');
+        return;
+    }
+    if (!/\S+@\S+\.\S+/.test(userEmail)) {
+        alert('Por favor, introduce un correo válido.');
+        return;
+    }
+
+    // Proceso de envío
+    const formData = { name: userName, email: userEmail, password: userPassword };
+
+    // Usar Fetch API para enviar los datos al servidor
+    fetch('http://localhost:8080/api/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)  // Convertir los datos a formato JSON
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errData => {
+                throw new Error(errData.message || 'Error en el servidor');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Registro exitoso', data);
+        // Aquí podrías manejar la respuesta del servidor, mostrar un mensaje o redirigir
+        alert('Registro exitoso');
+        // Opcional: redirigir al usuario a otra página, por ejemplo:
+        // window.location.href = '/login'; // Redirigir al login
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Mostrar un mensaje de error al usuario
+        alert('Hubo un problema al registrar el usuario: ' + error.message);
+    });
+});
+
+   
+   const cartButton = document.getElementById('cartButton');
+   const cartDropdown = document.getElementById('cartDropdown');
+   const cartItems = document.getElementById('cartItems');
+   const cartTotal = document.getElementById('cartTotal');
+
+   let selectedProducts = [];
+   //Al inicializar la página, verifica si no hay productos en el carrito y muestra un mensaje adecuado:
+   if (selectedProducts.length === 0) {
+	    cartItems.innerHTML = '<p class="text-center">El carrito está vacío.</p>';
+	}
+   // Función para agregar productos al carrito
+   function addToCart(name, price) {
+       const quantityInput = document.getElementById('quantity');
+       const quantity = parseInt(quantityInput.value);
+       
+       if (!quantity || quantity <= 0) {
+           alert('Por favor, introduce una cantidad válida.');
+           return;
+       }
+       // Verificar si el producto ya está en el carrito
+       const existingProduct = selectedProducts.find(product => product.name === name);
+       if (existingProduct) {
+           existingProduct.quantity += quantity;
+       } else {
+           selectedProducts.push({ name, price, quantity });
+       }
+
+       updateCart();
+   }
+   
+   // Función para actualizar la visualización del carrito
+   function updateCart() {
+       cartItems.innerHTML = '';
+       let total = 0;
+
+       selectedProducts.forEach(product => {
+           total += product.price * product.quantity; // Calcular el total acumulado
+
+           const li = document.createElement('li');
+           li.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'mb-2');
+           
+           li.innerHTML = `
+               <div>
+                   <span><b>${product.name}</b> - $${product.price} x ${product.quantity}</span>
+               </div>
+               <div class="d-flex align-items-center">
+                   <input type="number" id="removeQuantity-${product.name}" min="1" max="${product.quantity}" value="1" style="width: 3rem; text-align: center; margin-right: 5px;">
+                   <button class="btn btn-danger btn-sm" onclick="handleRemove('${product.name}')">Eliminar</button>
+               </div>
+           `;
+           
+           cartItems.appendChild(li);
+       });
+
+       // Actualizar el total
+       cartTotal.textContent = `$${total.toFixed(2)}`;
+
+       // Guardar en localStorage
+       saveCartToLocalStorage();
+
+       // Mostrar el carrito si tiene productos
+       cartDropdown.style.display = selectedProducts.length > 0 ? 'block' : 'none';
+   }
+
+   // Manejador para el botón de eliminar con cantidad específica
+   function handleRemove(name) {
+       const removeInput = document.getElementById(`removeQuantity-${name}`);
+       const removeQuantity = parseInt(removeInput.value);
+
+       if (removeQuantity > 0) {
+           removeFromCart(name, removeQuantity);
+       } else {
+           alert('Por favor, introduce una cantidad válida para eliminar.');
+       }
+   }
+   // Función para eliminar una cantidad específica de un producto
+   function removeFromCart(name, removeQuantity) {
+       const product = selectedProducts.find(p => p.name === name);
+       if (product) {
+           product.quantity -= removeQuantity;
+           if (product.quantity <= 0) {
+               selectedProducts = selectedProducts.filter(p => p.name !== name);
+           }
+       }
+       updateCart();
+   }
+
+   // Función para guardar el carrito en localStorage
+   function saveCartToLocalStorage() {
+       const cartData = {
+           products: selectedProducts,
+           total: selectedProducts.reduce((sum, product) => sum + product.price * product.quantity, 0),
+       };
+       localStorage.setItem('cartData', JSON.stringify(cartData));
+   }
+// Función para Cargar el carrito desde localStorage
+   function loadCartFromLocalStorage() {
+	    const savedCart = localStorage.getItem('cartData');
+	    if (savedCart) {
+	        const cartData = JSON.parse(savedCart);
+	        selectedProducts = cartData.products || [];
+	        updateCart(); // Actualiza la interfaz del carrito
+	    }
+	}
+
+	// Llama a esta función cuando se cargue la página
+	loadCartFromLocalStorage();
+
+   // Mostrar u ocultar el carrito al hacer clic en el botón del carrito
+   cartButton.addEventListener('click', () => {
+	   const isVisible = cartDropdown.style.display === 'block';
+	    cartDropdown.style.display = isVisible ? 'none' : 'block';
+	});
+
+   // Manejador de evento para el botón "Ir al pago"
+   document.getElementById('checkoutButton').addEventListener('click', () => {
+       // Redirige al usuario a checkout.html
+       window.location.href = 'checkout.html';
+   });
+   
+</script>
+</body>
+
+    <!--  About Section  -->
+    <div id="about" class="container-fluid wow fadeIn" id="about"data-wow-duration="1.5s">
+        <div class="row">
+            <div class="col-lg-6 has-img-bg"></div>
+            <div class="col-lg-6">
+                <div class="row justify-content-center">
+                    <div class="col-sm-8 py-5 my-5">
+                        <h2 class="mb-4">About Us</h2>
+                        <p>En WeedTitlan, nos enorgullece ser tu opción confiable para adquirir productos de la más alta calidad. Nos dedicamos a ofrecer una experiencia de compra excepcional, con un enfoque en la excelencia, la innovación y la satisfacción de nuestros clientes.<br><br>Nuestro compromiso es llevar hasta la puerta de tu hogar productos cuidadosamente seleccionados que cumplen con los estándares más exigentes. Desde el primer momento, trabajamos para garantizar que cada artículo en nuestra tienda sea sinónimo de durabilidad, calidad y diseño superior.<br>Con alcance en toda la República Mexicana, hacemos que la calidad esté al alcance de todos. Valoramos la confianza que depositas en nosotros, y nos esforzamos cada día para ser tu tienda online de confianza, entregando no solo productos, sino también un servicio excepcional que respalda cada compra.</p>
+                        <p><b>En WeedTitlan, la calidad no es solo un objetivo, es nuestra promesa.</b></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+      <!--  MenuSection  -->
+    <div id="gallary" class="text-center bg-dark text-light has-height-md middle-items wow fadeIn">
+        <h2 class="section-title">MENU</h2>
+    </div>
+        <div class="row justify-content-center">
+            <div class="col-sm-7 col-md-4 mb-5">
+                <ul class="nav nav-pills nav-justified mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#foods" role="tab" aria-controls="pills-home" aria-selected="true">vaporizadores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#juices" role="tab" aria-controls="pills-profile" aria-selected="false">cuadros</a>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#juices" role="tab" aria-controls="pills-profile" aria-selected="false">Otros</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="foods" role="tabpanel" aria-labelledby="pills-home-tab">
+                <div class="row">
+                    <div class="col-md-4">
+    <div class="card bg-transparent border my-3 my-md-0">
+        <img src="assets/imgs/blog-1.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
+        <div class="card-body">
+            <h1 class="text-center mb-4">
+                <a href="#" class="badge badge-primary">$777</a>
+            </h1>
+            <h4 class="pt20 pb20">Reiciendis Laborum </h4>
+            <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
+
+            <!-- Selector de cantidad  -->
+            <div class="mb-3 d-flex align-items-center">
+                <label for="quantity" class="text-white mr-2">Cantidad:</label>
+                <input type="number" id="quantity" name="quantity" class="form-control-modern" min="1" value="1" style="width: 2.5rem; text-align: center;">
+            </div>
+
+            <!-- Botón de agregar al carrito -->
+            <div class="text-center">
+                <button class="btn btn-primary btn-sm px-3" onclick="addToCart('Reiciendis Laborum', 5)">Agregar al carrito</button>
+            </div>
+        </div>
+    </div>
+</div>
+                    <div class="col-md-4">
+                        <div class="card bg-transparent border my-3 my-md-0">
+                            <img src="assets/imgs/blog-1.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
+                            <div class="card-body">
+                                <h1 class="text-center mb-4"><a href="#" class="badge badge-primary">$12</a></h1>
+                                <h4 class="pt20 pb20">Adipisci Totam</h4>
+                                <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-transparent border my-3 my-md-0">
+                            <img src="assets/imgs/blog-3.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
+                            <div class="card-body">
+                                <h1 class="text-center mb-4"><a href="#" class="badge badge-primary">$8</a></h1>
+                                <h4 class="pt20 pb20">Dicta Deserunt</h4>
+                                <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="juices" role="tabpanel" aria-labelledby="pills-profile-tab">
+                <div class="row">
+                    <div class="col-md-4 my-3 my-md-0">
+                        <div class="card bg-transparent border">
+                            <img src="assets/imgs/blog-3.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
+                            <div class="card-body">
+                                <h1 class="text-center mb-4"><a href="#" class="badge badge-primary">$15</a></h1>
+                                <h4 class="pt20 pb20">Consectetur Adipisicing Elit</h4>
+                                <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 my-3 my-md-0">
+                        <div class="card bg-transparent border">
+                            <img src="assets/imgs/blog-1.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
+                            <div class="card-body">
+                                <h1 class="text-center mb-4"><a href="#" class="badge badge-primary">$29</a></h1>
+                                <h4 class="pt20 pb20">Ullam Laboriosam</h4>
+                                <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 my-3 my-md-0">
+                        <div class="card bg-transparent border">
+                            <img src="assets/imgs/blog-3.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
+                            <div class="card-body">
+                                <h1 class="text-center mb-4"><a href="#" class="badge badge-primary">$3</a></h1>
+                                <h4 class="pt20 pb20">Fugit Ipsam</h4>
+                                <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+   
+    <!-- REVIEWS Section  -->
+    <div id="testmonial" class="container-fluid wow fadeIn bg-dark text-light has-height-lg middle-items">
+        <h2 class="section-title my-5 text-center">REVIEWS</h2>
+        <div class="row mt-3 mb-5">
+            <div class="col-md-4 my-3 my-md-0">
+                <div class="testmonial-card">
+                    <h3 class="testmonial-title">Ana Castillo</h3>
+                    <div class="testmonial-body">
+                        <p>"Desde la primera compra, quedé encantada. El proceso fue súper sencillo, el envío rápido y los productos de excelente calidad. ¡Sin duda seguiré comprando aquí!"</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 my-3 my-md-0">
+                <div class="testmonial-card">
+                    <h3 class="testmonial-title">José Aguilar</h3>
+                    <div class="testmonial-body">
+                        <p>"Me sorprendió la atención al cliente, siempre disponibles para resolver dudas. Recibí mi pedido perfectamente embalado y en tiempo récord. Totalmente recomendado."</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 my-3 my-md-0">
+                <div class="testmonial-card">
+                    <h3 class="testmonial-title">María Luna</h3>
+                    <div class="testmonial-body">
+                        <p>"La calidad de los productos es insuperable. Se nota el cuidado en cada detalle, desde la selección hasta la entrega. Estoy muy satisfecha con mi experiencia."</p>
+                    </div>
+                </div>
+            </div>
+              <div class="col-md-4 my-3 my-md-0">
+                <div class="testmonial-card">
+                    <h3 class="testmonial-title">Carlos Mendoza</h3>
+                    <div class="testmonial-body">
+                        <p>"No solo tienen productos increíbles, también su equipo es muy profesional. Me ayudaron a elegir justo lo que necesitaba. ¡Una experiencia de compra 10 de 10!"</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 my-3 my-md-0">
+                <div class="testmonial-card">
+                    <h3 class="testmonial-title">Lucía Ramírez</h3>
+                    <div class="testmonial-body">
+                        <p>"El seguimiento del pedido es impecable. ¡Los recomiendo muchísimo!"</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 my-3 my-md-0">
+                <div class="testmonial-card">
+                    <h3 class="testmonial-title">Juan Morales</h3>
+            	        <div class="testmonial-body">
+                        <p>"La experiencia fue genial de principio a fin. La página es fácil de usar, los precios justos y la calidad de los productos superó mis expectativas. Definitivamente volveré a comprar."</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- CONTACT Section  -->
+    <div id="contact" class="container-fluid bg-dark text-light border-top wow fadeIn">
+        <div class="row">
+          
+            <div class="col-md-6 px-5 has-height-lg middle-items">
+                <h3>Contacto y Atencion</h3>
+                <p>¡Tu compra está en buenas manos!
+En WeedTitlan, nos comprometemos a garantizar que cada una de tus compras sea segura y satisfactoria. Nuestro equipo está aquí para resolver todas tus dudas y ofrecerte el mejor servicio. Puedes contactarnos en cualquier momento a través de los siguientes medios:</p>
+                <div class="text-muted">
+                    <p><span class="ti-support pr-3"></span> (123) 456-7890</p>
+                    <p><span class="ti-email pr-3"></span>info@website.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- page footer  -->
+   
+    <div class="bg-dark text-light text-center border-top wow fadeIn">
+        <p class="mb-0 py-3 text-muted small">&copy; Copyright <script>document.write(new Date().getFullYear())</script> WeedTitlan Mexico <i class="ti-heart text-danger"></i> </p>
+    </div>
+    <!-- end of page footer -->
+
+	<!-- core  -->
+    <script src="assets/vendors/jquery/jquery-3.4.1.js"></script>
+    <script src="assets/vendors/bootstrap/bootstrap.bundle.js"></script>
+
+    <!-- bootstrap affix -->
+    <script src="assets/vendors/bootstrap/bootstrap.affix.js"></script>
+    <!-- wow.js -->
+    <script src="assets/vendors/wow/wow.js"></script>
+    <!-- FoodHut js -->
+    <script src="assets/js/foodhut.js"></script>
+
+</body>
+</html>
