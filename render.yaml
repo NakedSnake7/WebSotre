@@ -2,6 +2,8 @@ services:
   - type: web
     name: weedtlan
     branch: main
+    buildCommand: ""
+    startCommand: ""
     dockerfilePath: Dockerfile
     envVars:
       - key: PORT
