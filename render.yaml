@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: weedtlan
+    branch: main
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: PORT
+        value: 8080
