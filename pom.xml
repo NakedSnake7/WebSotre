@@ -50,8 +50,8 @@
 
         <!-- Dependencia para la base de datos MySQL -->
         <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
+          <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
 

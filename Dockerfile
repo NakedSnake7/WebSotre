@@ -1,27 +1,15 @@
-# Imagen base con OpenJDK 21
-FROM eclipse-temurin:21-jdk AS build
+# Usa una imagen base con Java (por ejemplo, OpenJDK 21)
+FROM openjdk:21-jdk-slim
 
-# Define el directorio de trabajo
+# Configura JAVA_HOME
+ENV JAVA_HOME=/usr/local/openjdk-21
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Directorio de trabajo
 WORKDIR /app
 
-# Copia todo el proyecto
-COPY . .
-
-# Construye el proyecto
-RUN ./mvnw clean package -DskipTests
-
-# Imagen ligera para ejecutar el JAR
-FROM eclipse-temurin:21-jdk-jammy
-
-# Define el directorio de trabajo
-WORKDIR /app
-
-# Copia el archivo JAR generado
-COPY --from=build /app/target/*.jar app.jar
-
-# Expone el puerto (Render asignará el correcto dinámicamente)
-EXPOSE 8080
+# Copia el archivo JAR de tu aplicación
+COPY target/server-0.0.1-SNAPSHOT.jar /app/server.jar
 
 # Comando para ejecutar la aplicación
-CMD ["java", "-jar", "app.jar"]
-
+CMD ["java", "-jar", "server.jar"]
