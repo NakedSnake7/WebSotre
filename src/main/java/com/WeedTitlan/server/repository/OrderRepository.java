@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.repository;
 
-import com.WeedTitlan.server.Order;
+import com.WeedTitlan.server.Order; 
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

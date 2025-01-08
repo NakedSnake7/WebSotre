@@ -6,6 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -30,6 +32,7 @@ public class Order {
     private Double total;
 
     @NotNull(message = "El estado de la orden no puede estar vacío")
+    @Enumerated(EnumType.STRING)  // Asegúrate de que el Enum se guarde como un String en la base de datos
     private OrderStatus status;  // Usando Enum para el estado
 
     @NotNull(message = "La fecha de la orden no puede ser nula")
