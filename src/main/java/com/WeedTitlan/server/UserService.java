@@ -1,7 +1,6 @@
 package com.WeedTitlan.server;
 
-import com.WeedTitlan.server.repository.UserRepository; 
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.WeedTitlan.server.repository.UserRepository;  
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.WeedTitlan.server.exceptions.UserNotFoundException;
@@ -12,13 +11,11 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository; 
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
-    // Constructor con ambas dependencias
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    // Constructor con la dependencia del repositorio
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     // Verifica si el email ya existe en la base de datos
@@ -26,7 +23,7 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    // Guardar un usuario
+    // Guardar un usuario (solo nombre y correo)
     @Transactional  
     public User saveUser(User user) {
         // Verificar si el email ya está registrado
@@ -34,8 +31,7 @@ public class UserService {
             throw new EmailAlreadyExistsException("El correo electrónico ya está registrado.");
         }
 
-        // Codificar la contraseña antes de guardar el usuario
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // Guardar el usuario en la base de datos
         return userRepository.save(user);
     }
 

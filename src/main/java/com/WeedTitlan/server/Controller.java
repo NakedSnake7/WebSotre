@@ -1,9 +1,8 @@
 package com.WeedTitlan.server;
 
-import jakarta.validation.Valid; 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,73 +12,93 @@ import org.springframework.web.bind.annotation.*;
 public class Controller {
 
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
     private final OrderService orderService;
 
-    public Controller(UserService userService, PasswordEncoder passwordEncoder, OrderService orderService) {
+    public Controller(UserService userService, OrderService orderService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
         this.orderService = orderService;
     }
-    
-    // Método para procesar el checkout
+
+    // Endpoint para suscribir usuarios
+    @PostMapping("/subscribe")
+    public ResponseEntity<?> subscribe(@Valid @RequestBody SubscriptionRequest request, BindingResult result) {
+        // Validar errores en la solicitud
+        if (result.hasErrors()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(buildValidationErrorResponse(result));
+        }
+
+        // Verificar si el correo ya está registrado
+        if (userService.existsByEmail(request.getEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT) // Cambiado a 409 CONFLICT
+                    .body(new ResponseMessage("El correo electrónico ya está registrado.", null));
+        }
+
+        try {
+            // Crear y guardar el usuario
+            User newUser = new User(request.getName(), request.getEmail());
+            userService.saveUser(newUser);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ResponseMessage("Suscripción exitosa", newUser));
+        } catch (Exception e) {
+            // Registrar la excepción para diagnóstico
+            System.err.println("Error al guardar el usuario: " + e.getMessage()); // Cambiar a un logger en producción
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Ocurrió un error interno. Intente nuevamente más tarde.", null));
+        }
+    }
+
+    // Método para construir mensajes de error de validación
+    private ResponseMessage buildValidationErrorResponse(BindingResult result) {
+        StringBuilder errorMessage = new StringBuilder();
+        result.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append(". "));
+        return new ResponseMessage("Error en la validación", errorMessage.toString().trim());
+    }
+
+    // Endpoint para procesar checkout
     @PostMapping("/checkout")
     public ResponseEntity<?> processCheckout(@Valid @RequestBody Order order, BindingResult result) {
-        // Validar datos de la orden
         if (result.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildErrorMessage(result));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(buildValidationErrorResponse(result));
         }
 
-        // Guardar la orden
         try {
             Order savedOrder = orderService.saveOrder(order);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    new ResponseMessage("Orden procesada exitosamente", savedOrder)
-            );
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ResponseMessage("Orden procesada exitosamente", savedOrder));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar la orden: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error al procesar la orden", e.getMessage()));
         }
     }
 
-    // Método para registrar un usuario
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody User user, BindingResult result) {
-        // Validación de errores
-        if (result.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildErrorMessage(result));
+    // Clase interna para manejar solicitudes de suscripción
+    public static class SubscriptionRequest {
+        private String name;
+        private String email;
+
+        public String getName() {
+            return name;
         }
 
-        // Verificar si el correo electrónico ya está registrado
-        if (userService.existsByEmail(user.getEmail())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El correo electrónico ya está registrado.");
+        public void setName(String name) {
+            this.name = name;
         }
 
-        // Cifrar la contraseña antes de guardarla
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
+        public String getEmail() {
+            return email;
+        }
 
-        // Guardar el usuario
-        try {
-            User savedUser = userService.saveUser(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    new ResponseMessage("Registro exitoso", savedUser)
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al registrar el usuario: " + e.getMessage());
+        public void setEmail(String email) {
+            this.email = email;
         }
     }
 
-    // Método para construir el mensaje de error
-    private String buildErrorMessage(BindingResult result) {
-        StringBuilder errorMessage = new StringBuilder();
-        result.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append(" "));
-        return errorMessage.toString();
-    }
-
-    // Clase interna ResponseMessage
+    // Clase para las respuestas personalizadas
     public static class ResponseMessage {
         private String message;
-        private Object data;  // Puede ser User u Order u otros tipos de datos
+        private Object data;
 
         public ResponseMessage(String message, Object data) {
             this.message = message;

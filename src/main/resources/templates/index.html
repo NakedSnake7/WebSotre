@@ -8,16 +8,17 @@
     <meta name="author" content="WeedTitlan">
     <title>WeedTlanMx</title>
 
-    <!-- font icons -->
-    <link rel="stylesheet" href="assets/vendors/themify-icons/css/themify-icons.css">
-    <link rel="stylesheet" href="assets/vendors/animate/animate.css">
+    <!-- iconos de fuente -->
+    <link rel="stylesheet" href="/assets/vendors/themify-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="/assets/vendors/animate/animate.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/themify-icons/0.1.2/css/themify-icons.css">
-    
-    <!-- Bootstrap + FoodHut main styles -->
-    <link rel="stylesheet" href="assets/css/foodhut.css">
-    <!-- Custom styles -->
-<link rel="stylesheet" href="assets/css/custom-styles.css">
-   
+
+     <!-- Bootstrap + Estilos principales de FoodHut -->
+    <link rel="stylesheet" href="/assets/css/foodhut.css">
+
+    <!-- Estilos personalizados --> 
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+
 </head>
 <body>
     <!-- Navbar -->
@@ -49,37 +50,33 @@
                     <a class="nav-link" href="#contact">Contact Us</a>
                 </li>
                 <li class="nav-item">
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#registerModal">Registro</button>
-                </li>
+                 <button class="btn custom-register-btn" data-toggle="modal" data-target="#inscripcionModal">Inscribirse</button>
+                 </li>
             </ul>
         </div>
     </nav>
 
-    <!-- Modal de Registro -->
-    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <!-- Modal de inscripcion -->
+    <div class="modal fade" id="inscripcionModal" tabindex="-1" aria-labelledby="#inscripcionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark text-light">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="registerModalLabel">Registro</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h5 class="modal-title" id="inscripcionModalLabel">Inscribirse</h5>
+                    <button type="button" class="close unique-close-btn" data-dismiss="modal" aria-label="Close">
+                       <span aria-hidden="true">&times;</span>
+                        </button>
                 </div>
                 <div class="modal-body">
-                    <form id="registerForm">
+                    <form id="inscriptionForm">
                         <div class="form-group">
-                            <label for="userName">Usuario</label>
+                            <label for="userName">Nombre</label>
                             <input type="text" class="form-control" id="userName" placeholder="Ingresa tu nombre" required>
                         </div>
                         <div class="form-group">
                             <label for="userEmail">Correo Electrónico</label>
                             <input type="email" class="form-control" id="userEmail" placeholder="Ingresa tu correo" required>
                         </div>
-                        <div class="form-group">
-                            <label for="userPassword">Contraseña</label>
-                            <input type="password" class="form-control" id="userPassword" placeholder="Ingresa tu contraseña" required>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-block">Registrarse</button>
+                        <button type="submit" class="btn btn-success btn-block">Recibir ofrtas</button>
                     </form>
                 </div>
             </div>
@@ -135,22 +132,19 @@
            <i class="ti-whatsapp" style="font-size: 24px; color: #25D366;"></i> WhatsApp
        </a>
    `;
-   
-  // Obtener el formulario de registro
-const registerForm = document.getElementById('registerForm');
+// Obtener el formulario de inscripción
+const inscriptionForm = document.getElementById('inscriptionForm');
 
 // Escuchar el evento de envío del formulario
-registerForm.addEventListener('submit', function(event) {
-    // Prevenir el comportamiento por defecto de enviar el formulario
-    event.preventDefault();
+inscriptionForm.addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevenir envío por defecto
 
     // Obtener los valores de los campos del formulario
-    const userName = document.getElementById('userName').value;
-    const userEmail = document.getElementById('userEmail').value;
-    const userPassword = document.getElementById('userPassword').value;
+    const userName = document.getElementById('userName').value.trim();
+    const userEmail = document.getElementById('userEmail').value.trim();
 
     // Validaciones adicionales
-    if (userName.trim() === '' || userEmail.trim() === '' || userPassword.trim() === '') {
+    if (userName === '' || userEmail === '') {
         alert('Todos los campos son obligatorios.');
         return;
     }
@@ -159,37 +153,55 @@ registerForm.addEventListener('submit', function(event) {
         return;
     }
 
-    // Proceso de envío
-    const formData = { name: userName, email: userEmail, password: userPassword };
+    // Deshabilitar el botón y mostrar indicador de carga
+    const submitButton = inscriptionForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Enviando...';
+    submitButton.setAttribute('aria-busy', 'true'); // Mejora de accesibilidad
 
-    // Usar Fetch API para enviar los datos al servidor
-    fetch('http://localhost:8080/api/register', {
+    // Proceso de envío
+    const formData = { name: userName, email: userEmail };
+
+    fetch('http://localhost:8080/api/subscribe', {  // Cambié aquí la URL a '/api/subscribe'
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)  // Convertir los datos a formato JSON
+        body: JSON.stringify(formData), // Convertir datos a JSON
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(errData => {
-                throw new Error(errData.message || 'Error en el servidor');
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Registro exitoso', data);
-        // Aquí podrías manejar la respuesta del servidor, mostrar un mensaje o redirigir
-        alert('Registro exitoso');
-        // Opcional: redirigir al usuario a otra página, por ejemplo:
-        // window.location.href = '/login'; // Redirigir al login
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Mostrar un mensaje de error al usuario
-        alert('Hubo un problema al registrar el usuario: ' + error.message);
-    });
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errData => {
+                    throw new Error(errData.message || 'Error en el servidor');
+                }).catch(() => {
+                    throw new Error('Error inesperado en el servidor.');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Registro exitoso', data);
+            alert('¡Registro completado con éxito!');
+            
+            // Limpiar el formulario
+            inscriptionForm.reset();
+
+            // Cerrar el modal si existe
+            const modal = document.getElementById('inscripcionModal');
+            if (modal) {
+                $('#inscripcionModal').modal('hide');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Hubo un problema al registrar el usuario: ' + error.message);
+        })
+        .finally(() => {
+            // Restaurar el botón a su estado inicial
+            submitButton.disabled = false;
+            submitButton.textContent = 'Recibir ofertas';
+            submitButton.removeAttribute('aria-busy');
+        });
 });
 
    
@@ -317,7 +329,7 @@ registerForm.addEventListener('submit', function(event) {
 </body>
 
     <!--  About Section  -->
-    <div id="about" class="container-fluid wow fadeIn" id="about"data-wow-duration="1.5s">
+    <div id="about" class="container-fluid wow fadeIn" data-wow-duration="1.5s">
         <div class="row">
             <div class="col-lg-6 has-img-bg"></div>
             <div class="col-lg-6">
