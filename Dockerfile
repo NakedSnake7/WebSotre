@@ -1,6 +1,11 @@
-# Usa una imagen base con Maven y Java
+# Usa una imagen base con Java (por ejemplo, OpenJDK 21)
 FROM openjdk:21-jdk-slim
-# Configura el directorio de trabajo
+
+# Configura JAVA_HOME
+ENV JAVA_HOME=/usr/local/openjdk-21
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Directorio de trabajo
 WORKDIR /app
 
 # Copia todo el proyecto al contenedor
