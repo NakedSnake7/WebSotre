@@ -1,5 +1,5 @@
 # Usa una imagen base con Maven y Java para la construcción
-FROM maven:3.9-jdk-21 AS builder
+FROM maven:latest AS builder
 
 # Configura el directorio de trabajo
 WORKDIR /app
