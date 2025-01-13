@@ -1,5 +1,5 @@
 # Usa una imagen base con Maven y Java
-FROM maven:3.9-openjdk-17 AS builder
+FROM openjdk:21-jdk-slim
 # Configura el directorio de trabajo
 WORKDIR /app
 
