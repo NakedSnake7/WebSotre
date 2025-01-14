@@ -51,7 +51,7 @@ public class AppController {
         }
     }
  // Método para mostrar la página de checkout
-    @GetMapping("/checkout")
+    @GetMapping("/checkout.html")
     public String showCheckoutPage() {
         return "checkout"; // Thymeleaf buscará el archivo `checkout.html` en `src/main/resources/templates`
     }
