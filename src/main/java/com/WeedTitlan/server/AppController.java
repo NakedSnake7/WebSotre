@@ -51,19 +51,7 @@ public class AppController {
         }
     }
     
-    @GetMapping("/checkout")
-    public String showCheckoutPage() {
-        return "checkout"; // Nombre del archivo en `src/main/resources/templates/checkout.html`
-    }
-    
-
-    // Método para construir mensajes de error de validación
-    private ResponseMessage buildValidationErrorResponse(BindingResult result) {
-        StringBuilder errorMessage = new StringBuilder();
-        result.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append(". "));
-        return new ResponseMessage("Error en la validación", errorMessage.toString().trim());
-    }
-   
+  
     // Endpoint para procesar checkout
     @PostMapping("/checkout")
     public ResponseEntity<?> processCheckout(@Valid @RequestBody Order order, BindingResult result) {
@@ -80,6 +68,18 @@ public class AppController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseMessage("Error al procesar la orden", e.getMessage()));
         }
+    }
+ // Método para mostrar la página de checkout
+    @GetMapping("/checkout")
+    public String showCheckoutPage() {
+        return "checkout"; // Thymeleaf buscará el archivo `checkout.html` en `src/main/resources/templates`
+    }
+
+    // Método para construir mensajes de error de validación
+    private ResponseMessage buildValidationErrorResponse(BindingResult result) {
+        StringBuilder errorMessage = new StringBuilder();
+        result.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append(". "));
+        return new ResponseMessage("Error en la validación", errorMessage.toString().trim());
     }
 
     // Clase interna para manejar solicitudes de suscripción
