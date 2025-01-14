@@ -1,6 +1,6 @@
 package com.WeedTitlan.server;
 
-import jakarta.persistence.Entity;
+import jakarta.persistence.Entity; 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,10 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-// Enum para los posibles estados de la orden
-enum OrderStatus {
-    PENDING, PROCESSED, SHIPPED, DELIVERED
-}
+
 
 @Entity
 @Table(name = "orders") // Cambiar nombre de la tabla a "orders"
