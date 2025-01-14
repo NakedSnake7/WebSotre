@@ -103,6 +103,9 @@
         <button id="checkoutButton" class="btn btn-success mt-3">Ir al pago</button>
     
      </div>
+   
+     
+     
 
     <!-- header -->
     <header id="home" class="header">
@@ -319,11 +322,12 @@ inscriptionForm.addEventListener('submit', function(event) {
 	    cartDropdown.style.display = isVisible ? 'none' : 'block';
 	});
 
-   // Manejador de evento para el botón "Ir al pago"
+// Manejador de evento para el botón "Ir al pago"
    document.getElementById('checkoutButton').addEventListener('click', () => {
-       // Redirige al usuario a checkout.html
-       window.location.href = '/checkout';
+       console.log('Redirigiendo a checkout...');
+       window.location.href = '/checkout';  // Redirige a la vista de checkout
    });
+   
    
 </script>
 </body>
@@ -336,7 +340,7 @@ inscriptionForm.addEventListener('submit', function(event) {
                 <div class="row justify-content-center">
                     <div class="col-sm-8 py-5 my-5">
                         <h2 class="mb-4">About Us</h2>
-                        <p>En WeedTitlan, nos enorgullece ser tu opción confiable para adquirir productos de la más alta calidad. Nos dedicamos a ofrecer una experiencia de compra excepcional, con un enfoque en la excelencia, la innovación y la satisfacción de nuestros clientes.<br><br>Nuestro compromiso es llevar hasta la puerta de tu hogar productos cuidadosamente seleccionados que cumplen con los estándares más exigentes. Desde el primer momento, trabajamos para garantizar que cada artículo en nuestra tienda sea sinónimo de durabilidad, calidad y diseño superior.<br>Con alcance en toda la República Mexicana, hacemos que la calidad esté al alcance de todos. Valoramos la confianza que depositas en nosotros, y nos esforzamos cada día para ser tu tienda online de confianza, entregando no solo productos, sino también un servicio excepcional que respalda cada compra.</p>
+                        <p>En WeedTlan, nos enorgullece ser tu opción confiable para adquirir productos de la más alta calidad. Nos dedicamos a ofrecer una experiencia de compra excepcional, con un enfoque en la excelencia, la innovación y la satisfacción de nuestros clientes.<br><br>Nuestro compromiso es llevar hasta la puerta de tu hogar productos cuidadosamente seleccionados que cumplen con los estándares más exigentes. Desde el primer momento, trabajamos para garantizar que cada artículo en nuestra tienda sea sinónimo de durabilidad, calidad y diseño superior.<br>Con alcance en toda la República Mexicana, hacemos que la calidad esté al alcance de todos. Valoramos la confianza que depositas en nosotros, y nos esforzamos cada día para ser tu tienda online de confianza, entregando no solo productos, sino también un servicio excepcional que respalda cada compra.</p>
                         <p><b>En WeedTitlan, la calidad no es solo un objetivo, es nuestra promesa.</b></p>
                     </div>
                 </div>
