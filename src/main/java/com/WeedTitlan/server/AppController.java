@@ -5,16 +5,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-@RestController
+import org.springframework.stereotype.Controller;
+	
+@Controller 
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
-public class Controller {
+public class AppController {
 
     private final UserService userService;
     private final OrderService orderService;
 
-    public Controller(UserService userService, OrderService orderService) {
+    public AppController(UserService userService, OrderService orderService) {
         this.userService = userService;
         this.orderService = orderService;
     }
@@ -27,6 +28,8 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(buildValidationErrorResponse(result));
         }
+        
+        
 
         // Verificar si el correo ya está registrado
         if (userService.existsByEmail(request.getEmail())) {
@@ -47,6 +50,12 @@ public class Controller {
                     .body(new ResponseMessage("Ocurrió un error interno. Intente nuevamente más tarde.", null));
         }
     }
+    
+    @GetMapping("/checkout")
+    public String showCheckoutPage() {
+        return "checkout"; // Nombre del archivo en `src/main/resources/templates/checkout.html`
+    }
+    
 
     // Método para construir mensajes de error de validación
     private ResponseMessage buildValidationErrorResponse(BindingResult result) {
@@ -54,7 +63,7 @@ public class Controller {
         result.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append(". "));
         return new ResponseMessage("Error en la validación", errorMessage.toString().trim());
     }
-
+   
     // Endpoint para procesar checkout
     @PostMapping("/checkout")
     public ResponseEntity<?> processCheckout(@Valid @RequestBody Order order, BindingResult result) {
