@@ -380,18 +380,47 @@ function finalizePurchase() {
         return;
     }
 
-    console.log('Datos del cliente:', { fullName, email, phone, address });
+    const cartData = JSON.parse(localStorage.getItem('cartData')) || { products: [], total: 0 };
 
-    selectedProducts = [];
-    updateCart();
-    localStorage.removeItem('cartData');
-    toggleModal(false);
-    alert('¡Compra realizada con éxito!');
+    // Datos que se enviarán al servidor
+    const orderData = {
+        customer: {
+            fullName,
+            email,
+            phone,
+            address
+        },
+        cart: cartData.products,
+        totalAmount: cartData.total
+    };
+
+    // Enviar la información al backend usando fetch
+    fetch('/checkout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Si la compra fue exitosa
+            selectedProducts = [];
+            updateCart();
+            localStorage.removeItem('cartData');
+            toggleModal(false);
+            alert('¡Compra realizada con éxito!');
+        } else {
+            // Si ocurrió un error
+            alert('Hubo un problema con la compra. Intenta nuevamente.');
+        }
+    })
+    .catch(error => {
+        console.error('Error al procesar la compra:', error);
+        alert('Hubo un error en el servidor. Por favor, inténtalo más tarde.');
+    });
 }
-
-loadCartFromLocalStorage();
-
-
    
 </script>
 </body>
