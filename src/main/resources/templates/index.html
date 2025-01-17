@@ -103,6 +103,47 @@
         <button id="checkoutButton" class="btn btn-success mt-3">Ir al pago</button>
     
      </div>
+   <!-- Modal para el checkout -->
+<div id="checkoutModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Finalizar Compra</h5>
+                <button type="button" class="close" aria-label="Cerrar" onclick="toggleModal(false)">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="checkoutForm">
+                    <div class="form-group">
+                        <label for="fullName">Nombre completo</label>
+                        <input type="text" class="form-control" id="fullName" placeholder="Tu nombre completo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" class="form-control" id="email" placeholder="Tu correo electrónico" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Teléfono</label>
+                        <input type="tel" class="form-control" id="phone" placeholder="Tu teléfono (10 dígitos)" required pattern="\d{10}">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Dirección</label>
+                        <textarea class="form-control" id="address" rows="3" placeholder="Tu dirección de envío" required></textarea>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-between mt-3">
+                    <span><b>Total:</b></span>
+                    <span id="modalTotal" class="font-weight-bold">$0</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="toggleModal(false)">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="finalizePurchase()">Finalizar Compra</button>
+            </div>
+        </div>
+    </div>
+</div>
    
      
      
@@ -207,127 +248,167 @@ inscriptionForm.addEventListener('submit', function(event) {
         });
 });
 
-   
-   const cartButton = document.getElementById('cartButton');
-   const cartDropdown = document.getElementById('cartDropdown');
-   const cartItems = document.getElementById('cartItems');
-   const cartTotal = document.getElementById('cartTotal');
+const cartButton = document.getElementById('cartButton');
+const cartDropdown = document.getElementById('cartDropdown');
+const cartItems = document.getElementById('cartItems');
+const cartTotal = document.getElementById('cartTotal');
+const checkoutModal = document.getElementById('checkoutModal');
+const modalTotal = document.getElementById('modalTotal');
+const checkoutButton = document.getElementById('checkoutButton');
 
-   let selectedProducts = [];
-   //Al inicializar la página, verifica si no hay productos en el carrito y muestra un mensaje adecuado:
-   if (selectedProducts.length === 0) {
-	    cartItems.innerHTML = '<p class="text-center">El carrito está vacío.</p>';
-	}
-   // Función para agregar productos al carrito
-   function addToCart(name, price) {
-       const quantityInput = document.getElementById('quantity');
-       const quantity = parseInt(quantityInput.value);
-       
-       if (!quantity || quantity <= 0) {
-           alert('Por favor, introduce una cantidad válida.');
-           return;
-       }
-       // Verificar si el producto ya está en el carrito
-       const existingProduct = selectedProducts.find(product => product.name === name);
-       if (existingProduct) {
-           existingProduct.quantity += quantity;
-       } else {
-           selectedProducts.push({ name, price, quantity });
-       }
+let selectedProducts = [];
 
-       updateCart();
-   }
-   
-   // Función para actualizar la visualización del carrito
-   function updateCart() {
-       cartItems.innerHTML = '';
-       let total = 0;
+// Al inicializar la página, verifica si no hay productos en el carrito
+if (selectedProducts.length === 0) {
+    cartItems.innerHTML = '<p class="text-center">El carrito está vacío.</p>';
+}
 
-       selectedProducts.forEach(product => {
-           total += product.price * product.quantity; // Calcular el total acumulado
+// Función para agregar productos al carrito
+function addToCart(name, price) {
+    const quantityInput = document.getElementById('quantity');
+    const quantity = parseInt(quantityInput.value);
 
-           const li = document.createElement('li');
-           li.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'mb-2');
-           
-           li.innerHTML = `
-               <div>
-                   <span><b>${product.name}</b> - $${product.price} x ${product.quantity}</span>
-               </div>
-               <div class="d-flex align-items-center">
-                   <input type="number" id="removeQuantity-${product.name}" min="1" max="${product.quantity}" value="1" style="width: 3rem; text-align: center; margin-right: 5px;">
-                   <button class="btn btn-danger btn-sm" onclick="handleRemove('${product.name}')">Eliminar</button>
-               </div>
-           `;
-           
-           cartItems.appendChild(li);
-       });
+    if (!quantity || quantity <= 0) {
+        alert('Por favor, introduce una cantidad válida.');
+        return;
+    }
 
-       // Actualizar el total
-       cartTotal.textContent = `$${total.toFixed(2)}`;
+    // Verificar si el producto ya está en el carrito
+    const existingProduct = selectedProducts.find(product => product.name === name);
+    if (existingProduct) {
+        existingProduct.quantity += quantity;
+    } else {
+        selectedProducts.push({ name, price, quantity });
+    }
 
-       // Guardar en localStorage
-       saveCartToLocalStorage();
+    updateCart();
+}
 
-       // Mostrar el carrito si tiene productos
-       cartDropdown.style.display = selectedProducts.length > 0 ? 'block' : 'none';
-   }
+// Función para actualizar la visualización del carrito
+function updateCart() {
+    cartItems.innerHTML = '';
+    let total = 0;
 
-   // Manejador para el botón de eliminar con cantidad específica
-   function handleRemove(name) {
-       const removeInput = document.getElementById(`removeQuantity-${name}`);
-       const removeQuantity = parseInt(removeInput.value);
+    selectedProducts.forEach(product => {
+        total += product.price * product.quantity;
 
-       if (removeQuantity > 0) {
-           removeFromCart(name, removeQuantity);
-       } else {
-           alert('Por favor, introduce una cantidad válida para eliminar.');
-       }
-   }
-   // Función para eliminar una cantidad específica de un producto
-   function removeFromCart(name, removeQuantity) {
-       const product = selectedProducts.find(p => p.name === name);
-       if (product) {
-           product.quantity -= removeQuantity;
-           if (product.quantity <= 0) {
-               selectedProducts = selectedProducts.filter(p => p.name !== name);
-           }
-       }
-       updateCart();
-   }
+        const li = document.createElement('li');
+        li.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'mb-2');
 
-   // Función para guardar el carrito en localStorage
-   function saveCartToLocalStorage() {
-       const cartData = {
-           products: selectedProducts,
-           total: selectedProducts.reduce((sum, product) => sum + product.price * product.quantity, 0),
-       };
-       localStorage.setItem('cartData', JSON.stringify(cartData));
-   }
-// Función para Cargar el carrito desde localStorage
-   function loadCartFromLocalStorage() {
-	    const savedCart = localStorage.getItem('cartData');
-	    if (savedCart) {
-	        const cartData = JSON.parse(savedCart);
-	        selectedProducts = cartData.products || [];
-	        updateCart(); // Actualiza la interfaz del carrito
-	    }
-	}
+        li.innerHTML = `
+            <div>
+                <span><b>${product.name}</b> - $${product.price} x ${product.quantity}</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <input type="number" id="removeQuantity-${product.name}" min="1" max="${product.quantity}" value="1" style="width: 3rem; text-align: center; margin-right: 5px;">
+                <button class="btn btn-danger btn-sm" onclick="handleRemove('${product.name}')">Eliminar</button>
+            </div>
+        `;
 
-	// Llama a esta función cuando se cargue la página
-	loadCartFromLocalStorage();
+        cartItems.appendChild(li);
+    });
 
-   // Mostrar u ocultar el carrito al hacer clic en el botón del carrito
-   cartButton.addEventListener('click', () => {
-	   const isVisible = cartDropdown.style.display === 'block';
-	    cartDropdown.style.display = isVisible ? 'none' : 'block';
-	});
+    // Actualizar el total
+    cartTotal.textContent = `$${total.toFixed(2)}`;
 
-// Manejador de evento para el botón "Ir al pago"
-   document.getElementById('checkoutButton').addEventListener('click', () => {
-       console.log('Redirigiendo a checkout...');
-       window.location.href = '/checkout.html';  // Redirige a la vista de checkout
-   });
-   
+    // Guardar en localStorage
+    saveCartToLocalStorage();
+
+    // Mostrar u ocultar el carrito
+    cartDropdown.style.display = selectedProducts.length > 0 ? 'block' : 'none';
+}
+
+// Función para manejar la eliminación de productos
+function handleRemove(name) {
+    const removeInput = document.getElementById(`removeQuantity-${name}`);
+    const removeQuantity = parseInt(removeInput.value);
+
+    if (removeQuantity > 0) {
+        removeFromCart(name, removeQuantity);
+    } else {
+        alert('Por favor, introduce una cantidad válida para eliminar.');
+    }
+}
+
+// Función para eliminar una cantidad específica de un producto
+function removeFromCart(name, removeQuantity) {
+    const product = selectedProducts.find(p => p.name === name);
+    if (product) {
+        product.quantity -= removeQuantity;
+        if (product.quantity <= 0) {
+            selectedProducts = selectedProducts.filter(p => p.name !== name);
+        }
+    }
+    updateCart();
+}
+
+// Función para guardar el carrito en localStorage
+function saveCartToLocalStorage() {
+    const cartData = {
+        products: selectedProducts,
+        total: selectedProducts.reduce((sum, product) => sum + product.price * product.quantity, 0),
+    };
+    localStorage.setItem('cartData', JSON.stringify(cartData));
+}
+
+// Función para cargar el carrito desde localStorage
+function loadCartFromLocalStorage() {
+    const savedCart = localStorage.getItem('cartData');
+    if (savedCart) {
+        const cartData = JSON.parse(savedCart);
+        selectedProducts = cartData.products || [];
+        updateCart();
+    }
+}
+
+// Mostrar u ocultar el carrito al hacer clic en el botón del carrito
+cartButton.addEventListener('click', () => {
+    const isVisible = cartDropdown.style.display === 'block';
+    cartDropdown.style.display = isVisible ? 'none' : 'block';
+});
+
+// Mostrar/Ocultar el modal
+function toggleModal(show) {
+    checkoutModal.style.display = show ? 'block' : 'none';
+
+    if (show) {
+        // Actualizar el total en el modal
+        const cartData = JSON.parse(localStorage.getItem('cartData')) || { total: 0 };
+        modalTotal.textContent = `$${cartData.total.toFixed(2)}`;
+    }
+}
+
+// Manejador del botón "Ir al pago" para abrir el modal
+checkoutButton.addEventListener('click', () => {
+    toggleModal(true);
+});
+
+// Función para finalizar la compra
+function finalizePurchase() {
+    const fullName = document.getElementById('fullName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const address = document.getElementById('address').value.trim();
+
+    if (!fullName || !email || !phone || !address) {
+        alert('Por favor, completa todos los campos.');
+        return;
+    }
+
+    // Simular el envío de datos al servidor
+    console.log('Datos del cliente:', { fullName, email, phone, address });
+
+    // Vaciar el carrito y cerrar el modal
+    selectedProducts = [];
+    updateCart();
+    localStorage.removeItem('cartData');
+    toggleModal(false);
+    alert('¡Compra realizada con éxito!');
+}
+
+// Cargar el carrito al inicializar la página
+loadCartFromLocalStorage();
+
    
 </script>
 </body>
