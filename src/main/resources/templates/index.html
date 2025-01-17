@@ -115,7 +115,7 @@
             </div>
             <div class="modal-body">
                 <form id="checkoutForm">
-                    <div class="form-group">
+         	           <div class="form-group">
                         <label for="fullName">Nombre completo</label>
                         <input type="text" class="form-control" id="fullName" placeholder="Tu nombre completo" required>
                     </div>
@@ -248,6 +248,7 @@ inscriptionForm.addEventListener('submit', function(event) {
         });
 });
 
+
 const cartButton = document.getElementById('cartButton');
 const cartDropdown = document.getElementById('cartDropdown');
 const cartItems = document.getElementById('cartItems');
@@ -258,12 +259,10 @@ const checkoutButton = document.getElementById('checkoutButton');
 
 let selectedProducts = [];
 
-// Al inicializar la página, verifica si no hay productos en el carrito
 if (selectedProducts.length === 0) {
     cartItems.innerHTML = '<p class="text-center">El carrito está vacío.</p>';
 }
 
-// Función para agregar productos al carrito
 function addToCart(name, price) {
     const quantityInput = document.getElementById('quantity');
     const quantity = parseInt(quantityInput.value);
@@ -273,7 +272,6 @@ function addToCart(name, price) {
         return;
     }
 
-    // Verificar si el producto ya está en el carrito
     const existingProduct = selectedProducts.find(product => product.name === name);
     if (existingProduct) {
         existingProduct.quantity += quantity;
@@ -284,7 +282,6 @@ function addToCart(name, price) {
     updateCart();
 }
 
-// Función para actualizar la visualización del carrito
 function updateCart() {
     cartItems.innerHTML = '';
     let total = 0;
@@ -308,17 +305,13 @@ function updateCart() {
         cartItems.appendChild(li);
     });
 
-    // Actualizar el total
     cartTotal.textContent = `$${total.toFixed(2)}`;
 
-    // Guardar en localStorage
     saveCartToLocalStorage();
 
-    // Mostrar u ocultar el carrito
     cartDropdown.style.display = selectedProducts.length > 0 ? 'block' : 'none';
 }
 
-// Función para manejar la eliminación de productos
 function handleRemove(name) {
     const removeInput = document.getElementById(`removeQuantity-${name}`);
     const removeQuantity = parseInt(removeInput.value);
@@ -330,7 +323,6 @@ function handleRemove(name) {
     }
 }
 
-// Función para eliminar una cantidad específica de un producto
 function removeFromCart(name, removeQuantity) {
     const product = selectedProducts.find(p => p.name === name);
     if (product) {
@@ -342,7 +334,6 @@ function removeFromCart(name, removeQuantity) {
     updateCart();
 }
 
-// Función para guardar el carrito en localStorage
 function saveCartToLocalStorage() {
     const cartData = {
         products: selectedProducts,
@@ -351,7 +342,6 @@ function saveCartToLocalStorage() {
     localStorage.setItem('cartData', JSON.stringify(cartData));
 }
 
-// Función para cargar el carrito desde localStorage
 function loadCartFromLocalStorage() {
     const savedCart = localStorage.getItem('cartData');
     if (savedCart) {
@@ -361,29 +351,24 @@ function loadCartFromLocalStorage() {
     }
 }
 
-// Mostrar u ocultar el carrito al hacer clic en el botón del carrito
 cartButton.addEventListener('click', () => {
     const isVisible = cartDropdown.style.display === 'block';
     cartDropdown.style.display = isVisible ? 'none' : 'block';
 });
 
-// Mostrar/Ocultar el modal
 function toggleModal(show) {
     checkoutModal.style.display = show ? 'block' : 'none';
 
     if (show) {
-        // Actualizar el total en el modal
         const cartData = JSON.parse(localStorage.getItem('cartData')) || { total: 0 };
         modalTotal.textContent = `$${cartData.total.toFixed(2)}`;
     }
 }
 
-// Manejador del botón "Ir al pago" para abrir el modal
 checkoutButton.addEventListener('click', () => {
     toggleModal(true);
 });
 
-// Función para finalizar la compra
 function finalizePurchase() {
     const fullName = document.getElementById('fullName').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -395,10 +380,8 @@ function finalizePurchase() {
         return;
     }
 
-    // Simular el envío de datos al servidor
     console.log('Datos del cliente:', { fullName, email, phone, address });
 
-    // Vaciar el carrito y cerrar el modal
     selectedProducts = [];
     updateCart();
     localStorage.removeItem('cartData');
@@ -406,8 +389,8 @@ function finalizePurchase() {
     alert('¡Compra realizada con éxito!');
 }
 
-// Cargar el carrito al inicializar la página
 loadCartFromLocalStorage();
+
 
    
 </script>
