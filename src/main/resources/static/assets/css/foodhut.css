@@ -120,9 +120,9 @@ body {
 }
 /* General del modal */
 .modal {
+	z-index: 1060 !important; /* Asegúrate de que sea mayor al del carrito */
     display: none; /* Ocultar inicialmente */
     position: fixed;
-    z-index: 1050 !important; /* Aparece por encima del carrito */
     left: 0;
     top: 0;
     width: 100%;
@@ -135,7 +135,7 @@ body {
 .modal-dialog {
     margin: 10% auto;
     max-width: 500px;
-    background: #fff; /* Fondo blanco por accesibilidad */
+    background: #212529; /* Fondo negro o gris oscuro */
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Sombra envolvente */
     padding: 20px;
