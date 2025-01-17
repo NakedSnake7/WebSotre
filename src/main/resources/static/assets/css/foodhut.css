@@ -119,6 +119,38 @@ body {
     margin: 0; /* Asegura que el ícono esté centrado */
 }
 
+.modal {
+    display: none; /* Ocultar inicialmente */
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+}
+
+.modal-dialog {
+    margin: 10% auto;
+    max-width: 500px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+}
+
+.modal-header, .modal-body, .modal-footer {
+    margin-bottom: 15px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+
 
 [tabindex="-1"]:focus {
   outline: 0 !important;
