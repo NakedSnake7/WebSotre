@@ -8,6 +8,7 @@
 
         /* Estilo para el contenedor desplegable del carrito */
         .cart-dropdown {
+            z-index: 1040; /* Asegúrate de que el carrito tenga un índice más bajo */
             position: fixed;
             top: 130px;
             right: 10px;

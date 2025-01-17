@@ -118,38 +118,30 @@ body {
 .unique-close-btn span {
     margin: 0; /* Asegura que el ícono esté centrado */
 }
-
+/* General del modal */
 .modal {
     display: none; /* Ocultar inicialmente */
     position: fixed;
-    z-index: 1050;
+    z-index: 1050 !important; /* Aparece por encima del carrito */
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semi-transparente */
+    overflow: auto; /* Permitir scroll si el contenido es grande */
 }
 
+/* Contenedor del contenido del modal */
 .modal-dialog {
     margin: 10% auto;
     max-width: 500px;
-    background: #fff;
+    background: #fff; /* Fondo blanco por accesibilidad */
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Sombra envolvente */
     padding: 20px;
 }
 
-.modal-header, .modal-body, .modal-footer {
-    margin-bottom: 15px;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
+/* Estilo personalizado para el modal */
 .modal-content {
     background-color: #343a40; /* Fondo gris oscuro */
     border-radius: 10px; /* Bordes redondeados */
@@ -157,6 +149,7 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); /* Sombra */
 }
 
+/* Encabezado del modal */
 .modal-header {
     border-bottom: 1px solid #495057;
 }
@@ -165,23 +158,35 @@ body {
     color: #ffffff; /* Texto blanco */
 }
 
+/* Botón de cerrar estilo claro */
 .btn-close-white {
-    filter: invert(1); /* Color blanco para el botón de cerrar */
+    filter: invert(1); /* Hacer blanco el icono del botón de cerrar */
 }
 
+/* Spinner de carga dentro del modal */
 .spinner-border {
     display: none; /* Oculto inicialmente */
     margin: 1rem auto;
-}
-
-.spinner-border.d-none {
-    display: none;
 }
 
 .spinner-border[aria-live="assertive"] {
     display: block;
 }
 
+/* Pie del modal */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Ajustes para responsividad */
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 15% auto;
+        max-width: 90%; /* Ajustar ancho en pantallas pequeñas */
+    }
+}
 
 
 
