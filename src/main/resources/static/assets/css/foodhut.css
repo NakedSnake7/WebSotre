@@ -150,6 +150,39 @@ body {
     gap: 10px;
 }
 
+.modal-content {
+    background-color: #343a40; /* Fondo gris oscuro */
+    border-radius: 10px; /* Bordes redondeados */
+    color: #ffffff; /* Texto blanco */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); /* Sombra */
+}
+
+.modal-header {
+    border-bottom: 1px solid #495057;
+}
+
+.modal-title {
+    color: #ffffff; /* Texto blanco */
+}
+
+.btn-close-white {
+    filter: invert(1); /* Color blanco para el botón de cerrar */
+}
+
+.spinner-border {
+    display: none; /* Oculto inicialmente */
+    margin: 1rem auto;
+}
+
+.spinner-border.d-none {
+    display: none;
+}
+
+.spinner-border[aria-live="assertive"] {
+    display: block;
+}
+
+
 
 
 [tabindex="-1"]:focus {
