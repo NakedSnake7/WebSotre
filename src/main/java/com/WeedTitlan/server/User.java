@@ -1,6 +1,6 @@
 package com.WeedTitlan.server;
 
-import jakarta.persistence.Entity;  
+import jakarta.persistence.Entity;   
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

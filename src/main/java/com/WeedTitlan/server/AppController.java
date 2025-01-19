@@ -50,12 +50,7 @@ public class AppController {
                     .body(new ResponseMessage("Ocurrió un error interno. Intente nuevamente más tarde.", null));
         }
     }
- // Método para mostrar la página de checkout
-    @GetMapping("/checkout.html")
-    public String showCheckoutPage() {
-        return "checkout"; // Thymeleaf buscará el archivo `checkout.html` en `src/main/resources/templates`
-    }
-  
+ 
     // Endpoint para procesar checkout
     @PostMapping("/checkout")
     public ResponseEntity<?> processCheckout(@Valid @RequestBody Order order, BindingResult result) {

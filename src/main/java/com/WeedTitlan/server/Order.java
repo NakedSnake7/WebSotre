@@ -1,6 +1,6 @@
 package com.WeedTitlan.server;
 
-import jakarta.persistence.Entity; 
+import jakarta.persistence.Entity;  
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,6 +10,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import jakarta.persistence.FetchType;
 
 
 
@@ -20,8 +21,9 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne // La orden pertenece a un usuario
+    
+    
+    @ManyToOne(fetch = FetchType.EAGER) // Cambia LAZY por EAGER
     @NotNull(message = "El usuario es obligatorio")
     private User user;
 
