@@ -1,6 +1,7 @@
 package com.WeedTitlan.server.model;
 
 import jakarta.persistence.Entity;  
+import jakarta.validation.constraints.Pattern;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,7 +11,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import com.WeedTitlan.server.OrderStatus;
 
 
 @Entity
@@ -29,6 +29,7 @@ public class Order {
     private Double total;
     
     @NotNull(message = "El teléfono no puede estar vacío")
+    @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos")
     private String phone;
 
     @NotNull(message = "La dirección no puede estar vacía")

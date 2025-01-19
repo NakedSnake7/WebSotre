@@ -169,7 +169,7 @@
    
    const whatsappButton = document.getElementById('whatsappButton');
    const phoneNumber = "2213576114"; // Número dinámico, puedes cambiar esto según el usuario
-   const message = "Hola, necesito ayuda con mi compra en WeedTitlan";
+   const message = "Hola, necesito ayuda con mi compra en WeedTlan";
 
    whatsappButton.innerHTML = `
        <a href="https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}" target="_blank" class="btn btn-success">
@@ -394,6 +394,7 @@ function finalizePurchase() {
         totalAmount: cartData.total
     };
 
+    
     // Enviar la información al backend usando fetch
     fetch('/checkout', {
         method: 'POST',

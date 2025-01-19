@@ -1,11 +1,12 @@
 package com.WeedTitlan.server.repository;
 
-import com.WeedTitlan.server.model.Order;  
+import com.WeedTitlan.server.model.Order;   
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.Optional;
+import com.WeedTitlan.server.model.OrderStatus;
 
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -14,5 +15,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 	Optional<Order> findByIdWithUser(@Param("id") Long id);
 
     // Buscar órdenes por estado
-    List<Order> findByStatus(String status);
+    List<Order> findByStatus(OrderStatus status);
 }

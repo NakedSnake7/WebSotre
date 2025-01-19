@@ -6,12 +6,13 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.List;
 import com.WeedTitlan.server.model.Order;
-import com.WeedTitlan.server.OrderStatus;
+import com.WeedTitlan.server.model.OrderStatus;
 
 @Service
 public class OrderService {
     
     private final OrderRepository orderRepository;
+    
 
     public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
@@ -33,10 +34,16 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    // Buscar órdenes por estado
+ // Convertir el String a OrderStatus antes de llamar al repositorio
     public List<Order> findOrdersByStatus(String status) {
-        return orderRepository.findByStatus(status);
+        try {
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase()); // Convierte el String a enum
+            return orderRepository.findByStatus(orderStatus);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Estado de orden no válido: " + status, e);
+        }
     }
+
 
     // Actualizar el estado de una orden
     public Order updateOrderStatus(Long orderId, String newStatus) {
@@ -66,4 +73,6 @@ public class OrderService {
             throw new OrderNotFoundException("Orden no encontrada con ID: " + orderId);
         }
     }
+    
+    
 }

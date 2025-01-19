@@ -1,4 +1,4 @@
-package com.WeedTitlan.server;
+package com.WeedTitlan.server.model;
 
 public enum OrderStatus {
     PENDING,
