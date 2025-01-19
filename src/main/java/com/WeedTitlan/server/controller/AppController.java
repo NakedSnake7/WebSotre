@@ -1,12 +1,11 @@
 package com.WeedTitlan.server.controller;
 
-import jakarta.validation.Valid;  
+import jakarta.validation.Valid;   
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
-import com.WeedTitlan.server.model.Order;
 import com.WeedTitlan.server.model.User;
 import com.WeedTitlan.server.service.OrderService;
 import com.WeedTitlan.server.service.UserService;
@@ -16,11 +15,10 @@ import com.WeedTitlan.server.service.UserService;
 public class AppController {
 
     private final UserService userService;
-    private final OrderService orderService;
 
     public AppController(UserService userService, OrderService orderService) {
         this.userService = userService;
-        this.orderService = orderService;
+      
     }
 
     // Endpoint para suscribir usuarios
@@ -53,29 +51,7 @@ public class AppController {
                     .body(new ResponseMessage("Ocurrió un error interno. Intente nuevamente más tarde.", null));
         }
     }
- // Método para mostrar la página de checkout
-    @GetMapping("/checkout.html")
-    public String showCheckoutPage() {
-        return "checkout"; // Thymeleaf buscará el archivo `checkout.html` en `src/main/resources/templates`
-    }
-  
-    // Endpoint para procesar checkout
-    @PostMapping("/checkout")
-    public ResponseEntity<?> processCheckout(@Valid @RequestBody Order order, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(buildValidationErrorResponse(result));
-        }
-
-        try {
-            Order savedOrder = orderService.saveOrder(order);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ResponseMessage("Orden procesada exitosamente", savedOrder));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseMessage("Error al procesar la orden", e.getMessage()));
-        }
-    }
+ 
  
 
     // Método para construir mensajes de error de validación
