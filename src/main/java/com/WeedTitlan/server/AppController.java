@@ -52,7 +52,7 @@ public class AppController {
     }
  
     // Endpoint para procesar checkout
-    @PostMapping("/checkout")
+    @PostMapping("/api/checkout")
     public ResponseEntity<?> processCheckout(@Valid @RequestBody Order order, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
