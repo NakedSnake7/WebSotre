@@ -1,10 +1,12 @@
-package com.WeedTitlan.server;
+package com.WeedTitlan.server.service; 
 
-import com.WeedTitlan.server.exceptions.OrderNotFoundException;
+import com.WeedTitlan.server.exceptions.OrderNotFoundException; 
 import com.WeedTitlan.server.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.List;
+import com.WeedTitlan.server.model.Order;
+import com.WeedTitlan.server.OrderStatus;
 
 @Service
 public class OrderService {

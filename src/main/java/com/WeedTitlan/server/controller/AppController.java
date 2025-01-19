@@ -1,12 +1,15 @@
-package com.WeedTitlan.server;
+package com.WeedTitlan.server.controller;
 
-import jakarta.validation.Valid; 
+import jakarta.validation.Valid;  
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
-	
+import com.WeedTitlan.server.model.Order;
+import com.WeedTitlan.server.model.User;
+import com.WeedTitlan.server.service.OrderService;
+import com.WeedTitlan.server.service.UserService;
 @Controller 
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")

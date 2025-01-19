@@ -1,6 +1,8 @@
 package com.WeedTitlan.server;
-import com.WeedTitlan.server.exceptions.EmailAlreadyExistsException;
+import com.WeedTitlan.server.exceptions.EmailAlreadyExistsException; 
 import com.WeedTitlan.server.repository.UserRepository;
+import com.WeedTitlan.server.model.User;
+import com.WeedTitlan.server.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

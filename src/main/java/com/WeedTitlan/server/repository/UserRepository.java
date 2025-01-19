@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.repository;
 
-import com.WeedTitlan.server.User; 
+import com.WeedTitlan.server.model.User;  
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

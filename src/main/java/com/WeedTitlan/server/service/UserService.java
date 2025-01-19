@@ -1,10 +1,12 @@
-package com.WeedTitlan.server;
+package com.WeedTitlan.server.service;
 
-import com.WeedTitlan.server.repository.UserRepository;  
+import com.WeedTitlan.server.repository.UserRepository;   
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.WeedTitlan.server.exceptions.UserNotFoundException;
 import com.WeedTitlan.server.exceptions.EmailAlreadyExistsException;
+import com.WeedTitlan.server.model.User;
+
 
 import java.util.Optional;
 

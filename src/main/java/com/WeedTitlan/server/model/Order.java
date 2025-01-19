@@ -1,6 +1,6 @@
-package com.WeedTitlan.server;
+package com.WeedTitlan.server.model;
 
-import jakarta.persistence.Entity; 
+import jakarta.persistence.Entity;  
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,7 +10,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-
+import com.WeedTitlan.server.OrderStatus;
 
 
 @Entity
@@ -27,6 +27,12 @@ public class Order {
 
     @NotNull(message = "El total de la orden no puede ser nulo")
     private Double total;
+    
+    @NotNull(message = "El teléfono no puede estar vacío")
+    private String phone;
+
+    @NotNull(message = "La dirección no puede estar vacía")
+    private String address;
 
     @NotNull(message = "El estado de la orden no puede estar vacío")
     @Enumerated(EnumType.STRING)  // Asegúrate de que el Enum se guarde como un String en la base de datos
@@ -39,11 +45,13 @@ public class Order {
     public Order() {}
 
     // Constructor con parámetros
-    public Order(User user, Double total, OrderStatus status, LocalDate orderDate) {
+    public Order(User user, Double total, OrderStatus status, LocalDate orderDate, String phone, String address) {
         this.user = user;
         this.total = total;
         this.status = status;
         this.orderDate = orderDate;
+        this.phone = phone;
+        this.address = address;
     }
 
     // Getters y setters
@@ -86,10 +94,29 @@ public class Order {
     public void setOrderDate(LocalDate orderDate) {
         this.orderDate = orderDate;
     }
+ 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     // Método toString para facilitar la depuración
     @Override
     public String toString() {
-        return "Order{id=" + id + ", user=" + user.getName() + ", total=" + total + ", status=" + status + ", orderDate=" + orderDate + "}";
+        return "Order{id=" + id + ", user=" + user.getName() + 
+               ", total=" + total + ", status=" + status + 
+               ", orderDate=" + orderDate + ", phone=" + phone + 
+               ", address=" + address + "}";
     }
 }

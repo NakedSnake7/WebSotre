@@ -1,4 +1,4 @@
-package com.WeedTitlan.server;
+package com.WeedTitlan.server.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
