@@ -1,6 +1,7 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.Entity;  
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;   
 import jakarta.validation.constraints.Pattern;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,7 +22,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne // La orden pertenece a un usuario
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @NotNull(message = "El usuario es obligatorio")
     private User user;
 
