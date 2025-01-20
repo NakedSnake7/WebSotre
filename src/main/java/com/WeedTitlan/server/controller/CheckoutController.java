@@ -2,8 +2,9 @@
 
 package com.WeedTitlan.server.controller;
 
-import com.WeedTitlan.server.dto.CheckoutRequestDTO;
+import com.WeedTitlan.server.dto.CheckoutRequestDTO; 
 import com.WeedTitlan.server.service.OrderService;
+import com.WeedTitlan.server.service.UserService;
 import com.WeedTitlan.server.model.Order;
 import com.WeedTitlan.server.model.User;
 import com.WeedTitlan.server.model.OrderStatus;
@@ -19,14 +20,19 @@ public class CheckoutController {
 
     @Autowired
     private OrderService orderService;
-
+    @Autowired
+    private UserService userService; // Inyectar el UserService
+    
     // Endpoint para procesar checkout
     @PostMapping("/checkout")
     public ResponseEntity<?> processCheckout(@RequestBody CheckoutRequestDTO checkoutRequest) {
         try {
             // Crear el usuario (o buscarlo en la base de datos si ya existe)
             User user = new User(checkoutRequest.getCustomer().getFullName(), checkoutRequest.getCustomer().getEmail());
-
+            
+         // Guardar el usuario en la base de datos antes de asociarlo a la orden
+            user = userService.saveUser(user); // Asume que tienes un UserService con un método saveUser
+            
             // Crear la orden con los nuevos campos
             Order order = new Order(
                 user, 
