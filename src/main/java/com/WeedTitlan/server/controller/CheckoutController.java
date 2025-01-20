@@ -39,13 +39,15 @@ public class CheckoutController {
             // Buscar o crear al usuario
             User user = userService.findUserByEmail(checkoutRequest.getCustomer().getEmail());
             if (user == null) {
+            	
                 user = new User(
                     checkoutRequest.getCustomer().getFullName(), 
                     checkoutRequest.getCustomer().getEmail()
                 );
                 user = userService.saveUser(user);
+                throw new IllegalStateException("El usuario no se guardó correctamente");
             }
-
+          
             // Crear y guardar la orden
             Order order = new Order(
                 user, 

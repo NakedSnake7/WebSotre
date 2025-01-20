@@ -1,7 +1,10 @@
 package com.WeedTitlan.server.service; 
 
-import com.WeedTitlan.server.exceptions.OrderNotFoundException; 
+import com.WeedTitlan.server.exceptions.OrderNotFoundException;  
 import com.WeedTitlan.server.repository.OrderRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.List;
@@ -19,6 +22,7 @@ public class OrderService {
     }
 
     // Guardar una orden
+    @Transactional
     public Order saveOrder(Order order) {
         // Aquí podrías agregar lógica de negocio adicional si es necesario
         return orderRepository.save(order);

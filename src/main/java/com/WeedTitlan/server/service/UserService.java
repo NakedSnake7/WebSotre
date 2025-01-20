@@ -1,10 +1,9 @@
 package com.WeedTitlan.server.service;
 
-import com.WeedTitlan.server.repository.UserRepository;    
+import com.WeedTitlan.server.repository.UserRepository;     
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.WeedTitlan.server.exceptions.UserNotFoundException;
-import com.WeedTitlan.server.exceptions.EmailAlreadyExistsException;
 import com.WeedTitlan.server.model.User;
 
 
@@ -29,12 +28,12 @@ public class UserService {
     @Transactional  
     public User saveUser(User user) {
         // Verificar si el email ya está registrado
-        if (existsByEmail(user.getEmail())) {
-            throw new EmailAlreadyExistsException("El correo electrónico ya está registrado.");
-        }
-
-        // Guardar el usuario en la base de datos
-        return userRepository.save(user);
+    	 Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+         if (existingUser.isPresent()) {
+             return existingUser.get(); // Devuelve el usuario existente
+         }
+         // Guardar un nuevo usuario si no existe
+         return userRepository.save(user);
     }
 
     // Buscar un usuario por su correo electrónico
