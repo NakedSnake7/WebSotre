@@ -9,6 +9,7 @@ import com.WeedTitlan.server.model.Order;
 import com.WeedTitlan.server.model.User;
 import com.WeedTitlan.server.model.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,30 +28,47 @@ public class CheckoutController {
     @PostMapping("/checkout")
     public ResponseEntity<?> processCheckout(@RequestBody CheckoutRequestDTO checkoutRequest) {
         try {
-            // Crear el usuario (o buscarlo en la base de datos si ya existe)
-            User user = new User(checkoutRequest.getCustomer().getFullName(), checkoutRequest.getCustomer().getEmail());
-            
-         // Guardar el usuario en la base de datos antes de asociarlo a la orden
-            user = userService.saveUser(user); // Asume que tienes un UserService con un método saveUser
-            
-            // Crear la orden con los nuevos campos
+            // Validar datos de entrada
+            if (checkoutRequest.getCustomer() == null || 
+                checkoutRequest.getCustomer().getEmail() == null || 
+                checkoutRequest.getCustomer().getFullName() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Información del cliente incompleta");
+            }
+
+            // Buscar o crear al usuario
+            User user = userService.findUserByEmail(checkoutRequest.getCustomer().getEmail());
+            if (user == null) {
+                user = new User(
+                    checkoutRequest.getCustomer().getFullName(), 
+                    checkoutRequest.getCustomer().getEmail()
+                );
+                user = userService.saveUser(user);
+            }
+
+            // Crear y guardar la orden
             Order order = new Order(
                 user, 
                 checkoutRequest.getTotalAmount(), 
                 OrderStatus.PENDING, 
                 LocalDate.now(), 
-                checkoutRequest.getPhone(), // Asegúrate de tener estos campos en CheckoutRequestDTO
+                checkoutRequest.getPhone(), 
                 checkoutRequest.getAddress()
             );
-
-            // Guardar la orden en la base de datos
             orderService.saveOrder(order);
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Orden procesada exitosamente");
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("El correo electrónico ya está registrado");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Datos inválidos: " + e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace(); // Log del error para depuración
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al procesar la orden");
+                    .body("Error inesperado al procesar la orden");
         }
     }
 }
