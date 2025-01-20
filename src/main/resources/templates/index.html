@@ -206,7 +206,7 @@ inscriptionForm.addEventListener('submit', function(event) {
     // Proceso de envío
     const formData = { name: userName, email: userEmail };
 
-    fetch('https://www.weedtlanmx.com/api/subscribe', {  // Cambié aquí la URL a '/api/subscribe'
+    fetch('/api/subscribe', {  // Cambié aquí la URL a '/api/subscribe'
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -396,7 +396,7 @@ function finalizePurchase() {
 
     
     // Enviar la información al backend usando fetch
-    fetch('/checkout', {
+    fetch(' /api/checkout', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
