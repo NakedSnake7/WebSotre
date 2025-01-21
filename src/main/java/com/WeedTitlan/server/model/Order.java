@@ -1,15 +1,17 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.CascadeType; 
 import jakarta.persistence.Entity;   
 import jakarta.validation.constraints.Pattern;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -22,7 +24,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
+    @JoinColumn(name = "user_id", nullable = false) // Define la columna de la clave foránea
     @NotNull(message = "El usuario es obligatorio")
     private User user;
 

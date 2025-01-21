@@ -39,27 +39,31 @@ public class CheckoutController {
             // Buscar o crear al usuario
             User user = userService.findUserByEmail(checkoutRequest.getCustomer().getEmail());
             if (user == null) {
-                // Si no existe, crear y guardar el usuario
+                // Crear y guardar el usuario
                 user = new User(
-                    checkoutRequest.getCustomer().getFullName(), 
+                    checkoutRequest.getCustomer().getFullName(),
                     checkoutRequest.getCustomer().getEmail()
                 );
-                user = userService.saveUser(user); // Este método asegura que el usuario se guarda correctamente
+                user = userService.saveUser(user); // Guarda el usuario y devuelve la entidad gestionada
             }
 
-            // Crear y guardar la orden
+            // Crear la orden con el usuario existente o recién creado
             Order order = new Order(
-                user, 
-                checkoutRequest.getTotalAmount(), 
-                OrderStatus.PENDING, 
-                LocalDate.now(), 
-                checkoutRequest.getPhone(), 
+                user, // Usuario gestionado o recién persistido
+                checkoutRequest.getTotalAmount(),
+                OrderStatus.PENDING,
+                LocalDate.now(),
+                checkoutRequest.getPhone(),
                 checkoutRequest.getAddress()
             );
+
+            // Guardar la orden
             orderService.saveOrder(order);
 
+            // Respuesta de éxito
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Orden procesada exitosamente");
+
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("El correo electrónico ya está registrado");
@@ -67,7 +71,7 @@ public class CheckoutController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Datos inválidos: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace(); // Log del error para depuración
+            e.printStackTrace(); // Log para depuración
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error inesperado al procesar la orden");
         }
