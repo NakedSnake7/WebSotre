@@ -24,7 +24,7 @@ public class CheckoutController {
     @Autowired
     private UserService userService; // Inyectar el UserService
     
-    // Endpoint para procesar checkout
+ // Endpoint para procesar checkout
     @PostMapping("/checkout")
     public ResponseEntity<?> processCheckout(@RequestBody CheckoutRequestDTO checkoutRequest) {
         try {
@@ -39,15 +39,14 @@ public class CheckoutController {
             // Buscar o crear al usuario
             User user = userService.findUserByEmail(checkoutRequest.getCustomer().getEmail());
             if (user == null) {
-            	
+                // Si no existe, crear y guardar el usuario
                 user = new User(
                     checkoutRequest.getCustomer().getFullName(), 
                     checkoutRequest.getCustomer().getEmail()
                 );
-                user = userService.saveUser(user);
-                throw new IllegalStateException("El usuario no se guardó correctamente");
+                user = userService.saveUser(user); // Este método asegura que el usuario se guarda correctamente
             }
-          
+
             // Crear y guardar la orden
             Order order = new Order(
                 user, 
