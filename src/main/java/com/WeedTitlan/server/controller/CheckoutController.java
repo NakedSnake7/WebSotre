@@ -1,5 +1,3 @@
-// src/main/java/com/WeedTitlan/server/controller/CheckoutController.java
-
 package com.WeedTitlan.server.controller;
 
 import com.WeedTitlan.server.dto.CheckoutRequestDTO; 
@@ -21,10 +19,11 @@ public class CheckoutController {
 
     @Autowired
     private OrderService orderService;
+    
     @Autowired
     private UserService userService; // Inyectar el UserService
     
- // Endpoint para procesar checkout
+    // Endpoint para procesar checkout
     @PostMapping("/checkout")
     public ResponseEntity<?> processCheckout(@RequestBody CheckoutRequestDTO checkoutRequest) {
         try {
@@ -36,18 +35,13 @@ public class CheckoutController {
                         .body("Información del cliente incompleta");
             }
 
-            // Buscar o crear al usuario
-            User user = userService.findUserByEmail(checkoutRequest.getCustomer().getEmail());
-            if (user == null) {
-                // Crear y guardar el usuario
-                user = new User(
-                    checkoutRequest.getCustomer().getFullName(),
-                    checkoutRequest.getCustomer().getEmail()
-                );
-                user = userService.saveUser(user); // Guarda el usuario y devuelve la entidad gestionada
-            }
+            // Buscar o crear al usuario con el nuevo método
+            User user = userService.findOrCreateUserByEmail(
+                checkoutRequest.getCustomer().getEmail(),
+                checkoutRequest.getCustomer().getFullName()
+            );
 
-            // Crear la orden con el usuario existente o recién creado
+            // Crear la orden con el usuario gestionado o recién creado
             Order order = new Order(
                 user, // Usuario gestionado o recién persistido
                 checkoutRequest.getTotalAmount(),

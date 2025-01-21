@@ -41,6 +41,20 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    // Buscar un usuario por correo o crear uno si no existe
+    public User findOrCreateUserByEmail(String email, String name) {
+        Optional<User> existingUser = findByEmail(email);
+        if (existingUser.isPresent()) {
+            return existingUser.get(); // Usuario ya existe, se devuelve el encontrado
+        } else {
+            // Si no existe, crear un nuevo usuario
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setName(name);  // Puedes asignar el nombre o usar uno predeterminado
+            return saveUser(newUser); // Guardar el nuevo usuario y devolverlo
+        }
+    }
+    
     // Buscar un usuario por correo o lanzar una excepción si no existe
     public User findUserByEmail(String email) {
         return findByEmail(email)
