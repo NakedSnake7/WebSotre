@@ -1,8 +1,14 @@
 package com.WeedTitlan.server.dto;
 
-public class CartItemDTO {
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
+public class CartItemDTO {
+    
+	@NotNull(message = "El ID del producto no puede estar vacío")
     private String productName;
+    @NotNull(message = "La cantidad no puede ser nula")
+    @Min(value = 1, message = "La cantidad mínima debe ser 1")
     private Integer quantity;
     private Double price;
 

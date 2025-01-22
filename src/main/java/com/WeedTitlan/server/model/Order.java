@@ -3,6 +3,7 @@ package com.WeedTitlan.server.model;
 import jakarta.persistence.CascadeType; 
 import jakarta.persistence.Entity;   
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,6 +35,7 @@ public class Order {
     
     @NotNull(message = "El teléfono no puede estar vacío")
     @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos")
+    @Size(min = 10, max = 10, message = "El teléfono debe tener 10 dígitos")
     private String phone;
 
     @NotNull(message = "La dirección no puede estar vacía")

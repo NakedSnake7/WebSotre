@@ -2,12 +2,22 @@ package com.WeedTitlan.server.dto;
 
 import java.util.List;
 
-public class CheckoutRequestDTO {
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
+public class CheckoutRequestDTO {
+    
+	@NotNull(message = "El cliente no puede ser nulo")
     private CustomerDTO customer; // Información del cliente
     private List<CartItemDTO> cart; // Productos en el carrito
+    @NotNull(message = "El monto total no puede ser nulo")
+    @DecimalMin(value = "0.01", message = "El monto total debe ser mayor a 0")
     private Double totalAmount; // Monto total del pedido
+    @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos")
     private String phone;   // Agrega el campo para el teléfono
+    @NotBlank(message = "La dirección no puede estar vacía")
     private String address; // Agrega el campo para la dirección
     // Getters y Setters
 

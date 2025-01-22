@@ -398,31 +398,34 @@ function finalizePurchase() {
 
     
     // Enviar la información al backend usando fetch
-    fetch(' /api/checkout', {
+    console.log('Enviando datos:', JSON.stringify(orderData));
+    fetch('/api/checkout', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(orderData)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Si la compra fue exitosa
-            selectedProducts = [];
-            updateCart();
-            localStorage.removeItem('cartData');
-            toggleModal(false);
-            alert('¡Compra realizada con éxito!');
-        } else {
-            // Si ocurrió un error
-            alert('Hubo un problema con la compra. Intenta nuevamente.');
-        }
-    })
-    .catch(error => {
-        console.error('Error al procesar la compra:', error);
-        alert('Hubo un error en el servidor. Por favor, inténtalo más tarde.');
-    });
+        .then(response => {
+            console.log('Respuesta del servidor:', response);
+            if (!response.ok) {
+                throw new Error(`Error del servidor: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Datos procesados:', data);
+            if (data.success) {
+                alert('¡Compra realizada con éxito!');
+            } else {
+                alert(data.message || 'Hubo un problema con la compra. Intenta nuevamente.');
+            }
+        })
+        .catch(error => {
+            console.error('Error en la solicitud:', error);
+            alert('Hubo un error en el servidor. Por favor, inténtalo más tarde.');
+        });
+
 }
    
 </script>

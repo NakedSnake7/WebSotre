@@ -3,8 +3,14 @@
 
 package com.WeedTitlan.server.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class CustomerDTO {
+	@NotBlank(message = "El nombre completo es obligatorio")
  private String fullName;
+    @Email(message = "Debe proporcionar un correo electrónico válido")
+    @NotBlank(message = "El correo electrónico es obligatorio")
  private String email;
  private String phone;
  private String address;
