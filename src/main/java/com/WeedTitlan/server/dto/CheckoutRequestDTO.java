@@ -17,7 +17,6 @@ public class CheckoutRequestDTO {
     private Double totalAmount; // Monto total del pedido
     @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos")
     private String phone;   // Agrega el campo para el teléfono
-    @NotBlank(message = "La dirección no puede estar vacía")
     private String address; // Agrega el campo para la dirección
     // Getters y Setters
 
