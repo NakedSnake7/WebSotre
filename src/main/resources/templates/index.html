@@ -395,6 +395,7 @@ function finalizePurchase() {
         cart: cartData.products,
         totalAmount: cartData.total
     };
+    console.log('Datos de la orden:', orderData);
 
     
     // Enviar la información al backend usando fetch
@@ -404,6 +405,7 @@ function finalizePurchase() {
         headers: {
             'Content-Type': 'application/json'
         },
+        
         body: JSON.stringify(orderData)
     })
         .then(response => {
