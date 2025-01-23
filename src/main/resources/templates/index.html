@@ -399,7 +399,7 @@ function finalizePurchase() {
     
     // Enviar la información al backend usando fetch
     console.log('Enviando datos:', JSON.stringify(orderData));
-    fetch('/api/checkout', {
+    fetch('https://www.weedtlanmx.com/api/checkout', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
