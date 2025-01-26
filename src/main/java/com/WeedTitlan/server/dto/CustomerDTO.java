@@ -3,7 +3,7 @@
 
 package com.WeedTitlan.server.dto;
 
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Email;  
 import jakarta.validation.constraints.NotBlank;
 
 public class CustomerDTO {
@@ -12,7 +12,9 @@ public class CustomerDTO {
     @Email(message = "Debe proporcionar un correo electrónico válido")
     @NotBlank(message = "El correo electrónico es obligatorio")
  private String email;
+   @NotBlank(message = "El teléfono no puede estar vacío")
  private String phone;
+   @NotBlank(message = "La dirección no puede estar vacía")
  private String address;
 
  // Getters y setters

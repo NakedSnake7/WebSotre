@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.CascadeType; 
+import jakarta.persistence.CascadeType;  
 import jakarta.persistence.Entity;   
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -33,12 +34,15 @@ public class Order {
     @NotNull(message = "El total de la orden no puede ser nulo")
     private Double total;
     
+    @NotBlank(message = "El telefono no puede estar vacía")
     @NotNull(message = "El teléfono no puede estar vacío")
     @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos")
     @Size(min = 10, max = 10, message = "El teléfono debe tener 10 dígitos")
     private String phone;
 
     @NotNull(message = "La dirección no puede estar vacía")
+    @NotBlank(message = "La dirección no puede estar vacía")
+    @Size(min = 5, max = 255, message = "La dirección debe tener entre 5 y 255 caracteres")
     private String address;
 
     @NotNull(message = "El estado de la orden no puede estar vacío")

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.1</version>
+        <version>3.4.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.WeedTitlan</groupId>
@@ -20,6 +20,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
+  <repositories>
+    <repository>
+        <id>maven-central</id>
+        <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+    <repository>
+        <id>jcache</id>
+        <url>https://repo1.maven.org/maven2/</url>
+    </repository>
+</repositories>
 
     <dependencies>
     <dependency>
@@ -62,9 +72,19 @@
         <!-- Dependencia para la base de datos MySQL -->
         <dependency>
           <groupId>com.mysql</groupId>
-    <artifactId>mysql-connector-j</artifactId>
+   <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
+  <dependency>
+
+    <groupId>org.ehcache</groupId>
+    <artifactId>ehcache</artifactId>
+  
+</dependency>
+
+
+
+
 
         <!-- Dependencia de validación -->
         <dependency>
@@ -123,6 +143,9 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        
+       
+
     </dependencies>
 
     <build>
