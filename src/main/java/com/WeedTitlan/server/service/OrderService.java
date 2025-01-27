@@ -20,6 +20,15 @@ public class OrderService {
     public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
     }
+    @Transactional
+    public Order saveOrderWithProducts(Order order, List<String> productNames) {
+        // Combinar nombres de productos en una cadena
+        String concatenatedProductNames = String.join(", ", productNames);
+        order.setProductNames(concatenatedProductNames);
+
+        // Guardar la orden con los nombres de productos incluidos
+        return orderRepository.save(order);
+    }
 
     // Guardar una orden
     @Transactional

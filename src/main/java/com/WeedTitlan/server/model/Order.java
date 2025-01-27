@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.CascadeType;  
+import jakarta.persistence.CascadeType;   
 import jakarta.persistence.Entity;   
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -30,7 +30,19 @@ public class Order {
     @JoinColumn(name = "user_id", nullable = false) // Define la columna de la clave foránea
     @NotNull(message = "El usuario es obligatorio")
     private User user;
+    
+    @NotBlank(message = "Los nombres de los productos no pueden estar vacíos")
+    private String productNames; // Lista de nombres de productos en formato texto
 
+    public String getProductNames() {
+        return productNames;
+    }
+
+    public void setProductNames(String productNames) {
+        this.productNames = productNames;
+    }
+
+    
     @NotNull(message = "El total de la orden no puede ser nulo")
     private Double total;
     
