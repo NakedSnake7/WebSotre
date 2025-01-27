@@ -1,12 +1,12 @@
 package com.WeedTitlan.server.controller;
 
-import com.WeedTitlan.server.dto.CheckoutRequestDTO;    
+import com.WeedTitlan.server.dto.CheckoutRequestDTO;     
 import com.WeedTitlan.server.service.OrderService;
 import com.WeedTitlan.server.service.UserService;
 
 
 
-import jakarta.validation.ConstraintViolationException;
+//import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 
 import com.WeedTitlan.server.model.Order;
@@ -15,7 +15,7 @@ import com.WeedTitlan.server.model.OrderStatus;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+//import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -51,46 +51,26 @@ public class CheckoutController {
                 checkoutRequest.getCustomer().getFullName()
             );
 
+         // Derivar los nombres de los productos
+            String productNames = String.join(", ", checkoutRequest.getProductNames());
+
+            // Crear y guardar la orden
             Order order = new Order(
                 user,
                 checkoutRequest.getTotalAmount(),
                 OrderStatus.PENDING,
                 LocalDate.now(),
                 checkoutRequest.getCustomer().getPhone(),
-                checkoutRequest.getCustomer().getAddress()
-
+                checkoutRequest.getCustomer().getAddress(),
+                productNames
             );
-
             orderService.saveOrder(order);
-            logger.debug("Orden creada exitosamente para el usuario: {}", user.getEmail());
-            
-         // Loguear detalles de la orden
-            logger.info("Orden procesada exitosamente. Detalles: [ID: {}, Total: {}, Usuario: {}]", 
-                    order.getId(), 
-                    order.getTotal(), 
-                    order.getUser() != null && order.getUser().getEmail() != null 
-                        ? order.getUser().getEmail().replaceAll("(?<=.{3}).(?=.*@)", "*") 
-                        : "Usuario desconocido");
 
-            
+            logger.debug("Orden creada exitosamente para el usuario: {}", user.getEmail());
+
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                 "success", true,
                 "message", "Orden procesada exitosamente"
-            ));
-        } catch (ConstraintViolationException e) {
-        	logger.error("Error inesperado: {}, Datos: {}", e.getMessage(), checkoutRequest);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                "success", false,
-                "errors", e.getConstraintViolations().stream().map(v -> Map.of(
-                    "field", v.getPropertyPath().toString(),
-                    "message", v.getMessage()
-                )).toList()
-            ));
-        } catch (DataIntegrityViolationException e) {
-            logger.error("Conflicto al procesar la orden: ", e);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-                "success", false,
-                "message", "El correo electrónico ya está registrado"
             ));
         } catch (Exception e) {
             logger.error("Error inesperado al procesar la orden: ", e);
@@ -100,7 +80,6 @@ public class CheckoutController {
             ));
         }
     }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();

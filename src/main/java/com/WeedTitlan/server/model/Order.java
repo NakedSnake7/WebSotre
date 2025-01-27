@@ -68,13 +68,14 @@ public class Order {
     public Order() {}
 
     // Constructor con parámetros
-    public Order(User user, Double total, OrderStatus status, LocalDate orderDate, String phone, String address) {
+    public Order(User user, Double total, OrderStatus status, LocalDate orderDate, String phone, String address, String productNames) {
         this.user = user;
         this.total = total;
         this.status = status;
         this.orderDate = orderDate;
         this.phone = phone;
         this.address = address;
+        this.productNames = productNames;  // Asignar el valor de productNames
     }
 
     // Getters y setters
