@@ -43,6 +43,7 @@ public class CheckoutRequestDTO {
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
     }
+  
 
     // Método para derivar los nombres de productos
     public List<String> getProductNames() {

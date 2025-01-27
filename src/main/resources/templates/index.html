@@ -392,7 +392,7 @@ function finalizePurchase() {
             phone,
             address
         },
-        cart: cartData.products,
+        cart: selectedProducts, 
         totalAmount: cartData.total
     };
     console.log('Datos de la orden:', orderData);
@@ -400,7 +400,7 @@ function finalizePurchase() {
     
     // Enviar la información al backend usando fetch
     console.log('Enviando datos:', JSON.stringify(orderData));
-    fetch('https://www.weedtlanmx.com/api/checkout', {
+    fetch('/api/checkout', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -411,7 +411,9 @@ function finalizePurchase() {
         .then(response => {
             console.log('Respuesta del servidor:', response);
             if (!response.ok) {
-                throw new Error(`Error del servidor: ${response.status}`);
+            	return response.json().then(errorData => {
+                throw new Error(`Error del servidor: ${response.status} - ${JSON.stringify(errorData)}`);
+            	});
             }
             return response.json();
         })
