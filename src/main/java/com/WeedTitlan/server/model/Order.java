@@ -32,7 +32,7 @@ public class Order {
 	    @JoinColumn(name = "user_id", nullable = false)
 	    @NotNull(message = "El usuario es obligatorio")
 	    private User user;
-
+	    private String customerName; 
 	    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	    private List<OrderItem> items = new ArrayList<>();
 
@@ -58,13 +58,14 @@ public class Order {
 	    public Order() {}
 
 	    // Constructor con parámetros
-	    public Order(User user, Double total, OrderStatus status, LocalDate orderDate, String phone, String address) {
+	    public Order(User user, Double total, OrderStatus status, LocalDate orderDate, String phone, String address, String customerName) {
 	        this.user = user;
 	        this.total = total;
 	        this.status = status;
 	        this.orderDate = orderDate;
 	        this.phone = phone;
 	        this.address = address;
+	        this.customerName = customerName;
 	    }
 
 	    // Métodos para manejar la relación bidireccional
@@ -142,6 +143,14 @@ public class Order {
 	    public void setOrderDate(LocalDate orderDate) {
 	        this.orderDate = orderDate;
 	    }
+	    public String getCustomerName() {
+	        return customerName;
+	    }
+
+	    public void setCustomerName(String customerName) {
+	        this.customerName = customerName;
+	    }
+
 
 	    // Método toString para depuración
 	    @Override

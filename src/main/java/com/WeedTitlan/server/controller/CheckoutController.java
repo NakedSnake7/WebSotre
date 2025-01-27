@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.controller;
 
-import com.WeedTitlan.server.dto.CheckoutRequestDTO;      
+import com.WeedTitlan.server.dto.CheckoutRequestDTO;       
 import com.WeedTitlan.server.service.OrderService;
 import com.WeedTitlan.server.service.UserService;
 
@@ -48,7 +48,9 @@ public class CheckoutController {
                 checkoutRequest.getCustomer().getEmail(),
                 checkoutRequest.getCustomer().getFullName()
             );
-
+         // Obtener el nombre del cliente
+            
+            String customerName = checkoutRequest.getCustomer().getFullName();
             // Crear la orden
             Order order = new Order(
                 user,
@@ -56,7 +58,8 @@ public class CheckoutController {
                 OrderStatus.PENDING,
                 LocalDate.now(),
                 checkoutRequest.getCustomer().getPhone(),
-                checkoutRequest.getCustomer().getAddress()
+                checkoutRequest.getCustomer().getAddress(),
+                customerName  // Asignar el nombre del cliente
             );
 
             // Crear los ítems de la orden
