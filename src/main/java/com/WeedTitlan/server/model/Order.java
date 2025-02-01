@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.CascadeType;   
+import jakarta.persistence.CascadeType;    
 import jakarta.persistence.Entity;   
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

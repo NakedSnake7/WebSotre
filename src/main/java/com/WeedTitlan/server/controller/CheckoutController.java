@@ -1,6 +1,7 @@
 package com.WeedTitlan.server.controller;
 
-import com.WeedTitlan.server.dto.CheckoutRequestDTO;        
+import com.WeedTitlan.server.dto.CheckoutRequestDTO; 
+import com.WeedTitlan.server.service.EmailService;
 import com.WeedTitlan.server.service.OrderService;
 import com.WeedTitlan.server.service.UserService;
 
@@ -20,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +31,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 public class CheckoutController {
+	
+	 @Autowired
+	    private EmailService emailService;
 
     @Autowired
     private OrderService orderService;
@@ -74,6 +81,20 @@ public class CheckoutController {
             	});
             // Guardar la orden
             orderService.saveOrder(order);
+            // Cargar la plantilla HTML desde un archivo
+            String template = new String(Files.readAllBytes(Paths.get("src/main/resources/templates/email-template.html")), StandardCharsets.UTF_8);
+
+            // Reemplazar datos dinámicos en la plantilla
+            String emailHTML = template
+            		                    .replace("{NOMBRE}", user.getName())
+            		                    .replace("{NUMERO_ORDEN}", String.valueOf(order.getId()))
+                                        .replace("{TOTAL}", "$" + order.getTotal());
+
+            // Enviar correo
+            emailService.enviarCorreoHTML(user.getEmail(), "Confirmación de Compra", emailHTML);
+
+        
+        
 
             logger.debug("Orden creada exitosamente para el usuario: {}", user.getEmail());
 
@@ -89,6 +110,8 @@ public class CheckoutController {
             ));
         }
     }
+    
+    
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
