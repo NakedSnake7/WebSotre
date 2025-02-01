@@ -176,7 +176,21 @@ body {
   background: rgba(0, 0, 0, 0.7);
   overflow: auto; /* Permitir scroll si el contenido es grande */
 }
+/* Asegúrate de que el fondo oscuro (backdrop) esté correctamente posicionado */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+}
 .modal-dialog {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100%;
     margin: 10% auto;
     max-width: 500px;
     background: #212529; /* Fondo negro o gris oscuro */
