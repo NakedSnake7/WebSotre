@@ -1,6 +1,6 @@
 package com.WeedTitlan.server;
 
-import java.util.List;
+import java.util.List; 
 import com.WeedTitlan.server.dto.CartItemDTO;
 import com.WeedTitlan.server.dto.CustomerDTO;
 
@@ -10,6 +10,7 @@ public class CheckoutRequest {
     private List<CartItemDTO> cart;
     private Double totalAmount;
 
+    
     // Getters y setters
 
     public CustomerDTO getCustomer() {
@@ -35,4 +36,6 @@ public class CheckoutRequest {
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
     }
+    
 }
+
