@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.controller;
 
-import com.WeedTitlan.server.dto.CheckoutRequestDTO;       
+import com.WeedTitlan.server.dto.CheckoutRequestDTO;        
 import com.WeedTitlan.server.service.OrderService;
 import com.WeedTitlan.server.service.UserService;
 

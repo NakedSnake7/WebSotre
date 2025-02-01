@@ -52,13 +52,13 @@
                     <a class="nav-link" href="#contact">Contact Us</a>
                 </li>
                 <li class="nav-item">
-                 <button class="btn custom-register-btn" data-toggle="modal" data-target="#inscripcionModal">Inscribirse</button>
+                 <button class="btn custom-register-btn" data-toggle="modal" data-target="#modal">Inscribirse</button>
                  </li>
             </ul>
         </div>
     </nav>
-
-    <!-- Modal de inscripcion -->
+    
+     <!-- Modal de inscripcion -->
     <div class="modal fade" id="inscripcionModal" tabindex="-1" aria-labelledby="#inscripcionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark text-light">
@@ -84,70 +84,88 @@
             </div>
         </div>
     </div>
-  
-
-    <!-- Botón del carrito sobre el Navbar -->
-    <div id="cartButtonContainer">
-      <button id="cartButton" class="btn btn-primary" aria-label="Abrir carrito">
-       <i class="ti-shopping-cart"></i> Carrito
-       </button>
-
-    </div>
-
-    <!-- Contenedor del carrito -->
-   <div id="cartDropdown" class="cart-dropdown" style="display:none;">
-    <h4>Productos en el Carrito</h4>
-    <ul id="cartItems"></ul>
-    <div class="d-flex justify-content-between mt-3">
-        <span><b>Total a pagar:</b></span>
-        <span id="cartTotal" class="font-weight-bold">$0</span>
-    </div>
-        <button id="checkoutButton" class="btn btn-success mt-3">Ir al pago</button>
     
-     </div>
-   <!-- Modal para el checkout -->
-<div id="checkoutModal" class="modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-       <div class="modal-content bg-dark text-white">
-            <div class="modal-header">
-                <h5 class="modal-title">Finalizar Compra</h5>
-                <button type="button" class="close" aria-label="Cerrar" onclick="toggleModal(false)">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="checkoutForm">
-         	           <div class="form-group">
-                        <label for="fullName">Nombre completo</label>
-                        <input type="text" class="form-control" id="fullName" placeholder="Tu nombre completo" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Correo electrónico</label>
-                        <input type="email" class="form-control" id="email" placeholder="Tu correo electrónico" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Teléfono</label>
-                        <input type="tel" class="form-control" id="phone" placeholder="Tu teléfono (10 dígitos)" required pattern="\d{10}">
-                    </div>
-                    <div class="form-group">
-                        <label for="address">Dirección</label>
-                        <textarea class="form-control" id="address" rows="3" placeholder="Tu dirección de envío" required></textarea>
-                    </div>
-                </form>
-                <div class="d-flex justify-content-between mt-3">
-                    <span><b>Total:</b></span>
-                    <span id="modalTotal" class="font-weight-bold">$0</span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="toggleModal(false)">Cancelar</button>
-                <button type="button" class="btn btn-success" onclick="finalizePurchase()">Finalizar Compra</button>
-            </div>
-        </div>
-    </div>
+          <div id="modal" class="modal">
+  <div class="modal-content">
+    <h2>¡Obtén ofertas exclusivas! 🚀</h2>
+    
+    <form id="subscribeForm">
+    <label for="name">(Opcional)</label>
+      <input type="text" id="name" placeholder="Nombre"> <!-- Opcional -->
+     <label for="email">(Opcional)</label>
+      <input type="email" id="email" placeholder="Email"> <!-- Opcional -->
+      
+      <!-- Checkbox obligatorio -->
+      <div class="checkbox-container">
+        <input type="checkbox" id="ageCheck" required>
+        <label for="ageCheck">(Obligatorio) mayor de 21 años</label>
+      </div>
+      
+      <button type="submit" id="submitBtn" disabled>CONFIRMAR</button>
+    </form>
+  </div>
 </div>
-   
-     
+
+<!-- Botón del carrito sobre el Navbar -->
+<div id="cartButtonContainer">
+  <button id="cartButton" class="btn btn-primary" aria-label="Abrir carrito">
+    <i class="ti-shopping-cart"></i> Carrito
+  </button>
+</div>
+
+<!-- Contenedor del carrito -->
+<div id="cartDropdown" class="cart-dropdown" style="display:none;">
+  <h4>Productos en el Carrito</h4>
+  <ul id="cartItems"></ul>
+  <div class="d-flex justify-content-between mt-3">
+    <span><b>Total a pagar:</b></span>
+    <span id="cartTotal" class="font-weight-bold">$0</span>
+  </div>
+  <button id="checkoutButton" class="btn btn-success mt-3">Ir al pago</button>
+</div>
+
+<!-- Modal para el checkout -->
+<div id="checkoutModal" class="modal" tabindex="-1" role="dialog" style="display:none;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header">
+        <h5 class="modal-title">Finalizar Compra</h5>
+        <button type="button" class="close" aria-label="Cerrar" onclick="toggleModal(false)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="checkoutForm">
+          <div class="form-group">
+            <label for="fullName">Nombre completo</label>
+            <input type="text" class="form-control" id="fullName" placeholder="Tu nombre completo" required>
+          </div>
+          <div class="form-group">
+            <label for="CosEmail">Correo electrónico</label>
+            <input type="email" class="form-control" id="CosEmail" placeholder="Tu correo electrónico" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Teléfono</label>
+            <input type="tel" class="form-control" id="phone" placeholder="Tu teléfono (10 dígitos)" required pattern="\d{10}">
+          </div>
+          <div class="form-group">
+            <label for="address">Dirección</label>
+            <textarea class="form-control" id="address" rows="3" placeholder="Tu dirección de envío" required></textarea>
+          </div>
+        </form>
+        <div class="d-flex justify-content-between mt-3">
+          <span><b>Total:</b></span>
+          <span id="modalTotal" class="font-weight-bold">$0</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" onclick="finalizePurchase()">Finalizar Compra</button>
+        <button type="button" class="btn btn-secondary" onclick="toggleModal(false)">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
      
 
     <!-- header -->
@@ -168,7 +186,6 @@
     </div>
 
    <script>
-   
    const whatsappButton = document.getElementById('whatsappButton');
    const phoneNumber = "2213576114"; // Número dinámico, puedes cambiar esto según el usuario
    const message = "Hola, necesito ayuda con mi compra en WeedTlan";
@@ -178,78 +195,96 @@
            <i class="ti-whatsapp" style="font-size: 24px; color: #25D366;"></i> WhatsApp
        </a>
    `;
-// Obtener el formulario de inscripción
-const inscriptionForm = document.getElementById('inscriptionForm');
+   
+   document.addEventListener("DOMContentLoaded", function () {
+	    const modal = document.getElementById("modal");
+	    const closeBtn = document.querySelector(".close");
+	    const ageCheck = document.getElementById("ageCheck");
+	    const submitBtn = document.getElementById("submitBtn");
+	    const subscribeForm = document.getElementById("subscribeForm");
+	    const openInscriptionModal = document.getElementById("openInscriptionModal"); // Botón para abrir el modal
+	    
+	    // 🔥 Mostrar el modal INMEDIATAMENTE al cargar la página
+	    abrirModal(); 
 
-// Escuchar el evento de envío del formulario
-inscriptionForm.addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevenir envío por defecto
+	    // Mostrar modal después de 3 segundos (solo si no ha sido cerrado antes)
+	    if (!sessionStorage.getItem("modalClosed")) {
+	        setTimeout(() => {
+	            abrirModal();
+	        }, 3000);
+	    }
 
-    // Obtener los valores de los campos del formulario
-    const userName = document.getElementById('userName').value.trim();
-    const userEmail = document.getElementById('userEmail').value.trim();
+	    // Mostrar modal al hacer clic en el botón "Inscribirse"
+	    if (openInscriptionModal) {
+	        openInscriptionModal.addEventListener("click", function () {
+	            abrirModal();
+	        });
+	    }
 
-    // Validaciones adicionales
-    if (userName === '' || userEmail === '') {
-        alert('Todos los campos son obligatorios.');
-        return;
-    }
-    if (!/\S+@\S+\.\S+/.test(userEmail)) {
-        alert('Por favor, introduce un correo válido.');
-        return;
-    }
+	    // Cerrar modal al hacer clic en el botón de cerrar
+	    closeBtn.addEventListener("click", function () {
+	        cerrarModal();
+	    });
 
-    // Deshabilitar el botón y mostrar indicador de carga
-    const submitButton = inscriptionForm.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-    submitButton.textContent = 'Enviando...';
-    submitButton.setAttribute('aria-busy', 'true'); // Mejora de accesibilidad
+	    // Habilitar o deshabilitar el botón de envío según el checkbox
+	    ageCheck.addEventListener("change", function () {
+	        submitBtn.disabled = !this.checked;
+	    });
 
-    // Proceso de envío
-    const formData = { name: userName, email: userEmail };
+	    // Manejar el envío del formulario
+	    subscribeForm.addEventListener("submit", function (event) {
+	        event.preventDefault();
 
-    fetch('/api/subscribe', {  // Cambié aquí la URL a '/api/subscribe'
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData), // Convertir datos a JSON
-    })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(errData => {
-                    throw new Error(errData.message || 'Error en el servidor');
-                }).catch(() => {
-                    throw new Error('Error inesperado en el servidor.');
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Registro exitoso', data);
-            alert('¡Registro completado con éxito!');
+	        if (!ageCheck.checked) {
+	            alert("Debes confirmar que eres mayor de 21 años.");
+	            return;
+	        }
+
+	      
+	        
+	        // Deshabilitar el botón y mostrar indicador de carga
+	        const submitButton = subscribeForm.querySelector('button[type="submit"]');
+	        submitButton.disabled = true;
+	        submitButton.textContent = 'Enviando...';
+	        submitButton.setAttribute('aria-busy', 'true'); // Mejora de accesibilidad
             
-            // Limpiar el formulario
-            inscriptionForm.reset();
+	        
+	        const name = document.getElementById("name").value;
+	        const email = document.getElementById("email").value;
+	        
+	        fetch("/api/subscribe", {
+	            method: "POST",
+	            headers: { "Content-Type": "application/json" },
+	            body: JSON.stringify({ name, email }),
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	            alert(data.message);
+	            cerrarModal(); // Cierra el modal correctamente
+	            sessionStorage.setItem("modalClosed", "true");
+	        })
+	        .catch(error => console.error("Error:", error));
+	    });
 
-            // Cerrar el modal si existe
-            const modal = document.getElementById('inscripcionModal');
-            if (modal) {
-                $('#inscripcionModal').modal('hide');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Hubo un problema al registrar el usuario: ' + error.message);
-        })
-        .finally(() => {
-            // Restaurar el botón a su estado inicial
-            submitButton.disabled = false;
-            submitButton.textContent = 'Recibir ofertas';
-            submitButton.removeAttribute('aria-busy');
-        });
-});
+	    // Función para abrir el modal correctamente
+	    function abrirModal() {
+	        modal.style.visibility = "visible";
+	        modal.style.opacity = "1";
+	        modal.style.pointerEvents = "auto";
+	    }
 
+	    // Función para cerrar el modal correctamente y resetear el formulario
+	  function cerrarModal() {
+    modal.style.display = "none"; // ✅ Ocultar completamente el modal
+    document.body.classList.remove("modal-open"); // 🔥 Eliminar clase de bloqueo de Bootstrap
+    document.querySelectorAll(".modal-backdrop").forEach(el => el.remove()); // 🔥 Eliminar fondo oscuro si queda activo
+    subscribeForm.reset(); // ✅ Limpiar los campos del formulario
+    submitBtn.disabled = true; // ✅ Deshabilitar el botón de envío
+}
+	});
+
+
+//---------------------------------------------------------- -->
 
 const cartButton = document.getElementById('cartButton');
 const cartDropdown = document.getElementById('cartDropdown');
@@ -258,7 +293,6 @@ const cartTotal = document.getElementById('cartTotal');
 const checkoutModal = document.getElementById('checkoutModal');
 const modalTotal = document.getElementById('modalTotal');
 const checkoutButton = document.getElementById('checkoutButton');
-
 let selectedProducts = [];
 
 if (selectedProducts.length === 0) {
@@ -367,21 +401,49 @@ function toggleModal(show) {
     }
 }
 
+// Definir elementos
+const finalizeButton = document.querySelector('.modal-footer .btn-success');
+
 checkoutButton.addEventListener('click', () => {
-    toggleModal(true);
+  toggleModal(true);
 });
+
+function toggleModal(show) {
+  document.getElementById('checkoutModal').style.display = show ? 'block' : 'none';
+}
+
 
 function finalizePurchase() {
     const fullName = document.getElementById('fullName').value.trim();
-    const email = document.getElementById('email').value.trim();
+    const email = document.getElementById('CosEmail').value.trim();
     const phone = document.getElementById('phone').value.trim();
     const address = document.getElementById('address').value.trim();
-
+    const phonePattern = /^\d{10}$/;
+    
+    
+    
+    if (!phone.match(phonePattern)) {
+        alert('Por favor, ingresa un teléfono válido con 10 dígitos.');
+        return;
+    }
+    
+    console.log("Nombre:", fullName);
+    console.log("Correo:", CosEmail);
+    console.log("Teléfono:", phone);
+    console.log("Dirección:", address);
+    
+    console.log(fullName, email, phone, address); // Esto te dirá si los elementos existen
+  
     if (!fullName || !email || !phone || !address) {
         alert('Por favor, completa todos los campos.');
         return;
     }
 
+    // Deshabilitar el botón para evitar múltiples clics
+    finalizeButton.disabled = true;
+    finalizeButton.textContent = "Procesando...";
+    
+    
     const cartData = JSON.parse(localStorage.getItem('cartData')) || { products: [], total: 0 };
 
     // Datos que se enviarán al servidor
@@ -392,12 +454,11 @@ function finalizePurchase() {
             phone,
             address
         },
-        cart: selectedProducts, 
+        cart: cartData.products, 
         totalAmount: cartData.total
     };
     console.log('Datos de la orden:', orderData);
-
-    
+ 
     // Enviar la información al backend usando fetch
     console.log('Enviando datos:', JSON.stringify(orderData));
     fetch('/api/checkout', {
@@ -419,8 +480,11 @@ function finalizePurchase() {
         })
         .then(data => {
             console.log('Datos procesados:', data);
+
             if (data.success) {
                 alert('¡Compra realizada con éxito!');
+                toggleModal(false);
+                localStorage.removeItem('cartData'); 
             } else {
                 alert(data.message || 'Hubo un problema con la compra. Intenta nuevamente.');
             }
