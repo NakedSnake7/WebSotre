@@ -165,16 +165,17 @@ body {
 /* MODAL - Centrado y Estilo */
 .modal {
   z-index: 1060 !important;
-  display: flex; /* Importante para centrar */
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  overflow: auto; /* Permitir scroll si el contenido es grande */
+  display: none;  /* Oculto por defecto */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 /* Asegúrate de que el fondo oscuro (backdrop) esté correctamente posicionado */
 .modal-backdrop {
@@ -183,32 +184,32 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1040;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1050;
 }
 .modal-dialog {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	min-height: 100%;
-    margin: 10% auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Hace que el modal use toda la altura de la pantalla */
+    margin: 0 auto; /* Elimina margen superior para centrar mejor */
     max-width: 500px;
-    background: #212529; /* Fondo negro o gris oscuro */
+    background: #212529;
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Sombra envolvente */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     padding: 20px;
 }
-
 /* Contenido del modal */
 .modal-content {
   background: #1e1e1e !important;
   padding: 25px;
   border-radius: 10px;
+  width: 90%; /* Ajuste para móviles */
   text-align: center;
   color: #fff;
+  position: relative;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   max-width: 400px;
-  width: 90%;
 }
 /* Encabezado del modal */
 .modal-header {
@@ -219,9 +220,18 @@ body {
     color: #ffffff; /* Texto blanco */
 }
 
-/* Botón de cerrar estilo claro */
-.btn-close-white {
-    filter: invert(1); /* Hacer blanco el icono del botón de cerrar */
+/* Botón de cerrar (X) */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #ffffff;
+}
+
+.close:hover {
+    color: #ddd;
 }
 
 /* Spinner de carga dentro del modal */
@@ -230,17 +240,12 @@ body {
     margin: 1rem auto;
 }
 
-.spinner-border[aria-live="assertive"] {
-    display: block;
-}
-
 /* Pie del modal */
 .modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
 }
-
 /* Botón de cierre */
 .close {
   position: absolute;

@@ -59,28 +59,6 @@
     </nav>
     
     
-    
-          <div id="modal" class="modal">
-  <div class="modal-content">
-    <h2>¡Obtén ofertas exclusivas! 🚀</h2>
-    
-    <form id="subscribeForm">
-    <label for="name">(Opcional)</label>
-      <input type="text" id="name" placeholder="Nombre"> <!-- Opcional -->
-     <label for="email">(Opcional)</label>
-      <input type="email" id="email" placeholder="Email"> <!-- Opcional -->
-      
-      <!-- Checkbox obligatorio -->
-      <div class="checkbox-container">
-        <input type="checkbox" id="ageCheck" required>
-        <label for="ageCheck">(Obligatorio) mayor de 21 años</label>
-      </div>
-      
-      <button type="submit" id="submitBtn" disabled>CONFIRMAR</button>
-    </form>
-  </div>
-</div>
-
 <!-- Botón del carrito sobre el Navbar -->
 <div id="cartButtonContainer">
   <button id="cartButton" class="btn btn-primary" aria-label="Abrir carrito">
@@ -157,6 +135,26 @@
             
         </a>
     </div>
+         <div id="modal" class="modal">
+  <div class="modal-content">
+    <h2>¡Obtén ofertas exclusivas! 🚀</h2>
+    
+    <form id="subscribeForm">
+    <label for="name">(Opcional)</label>
+      <input type="text" id="name" placeholder="Nombre"> <!-- Opcional -->
+     <label for="email">(Opcional)</label>
+      <input type="email" id="email" placeholder="Email"> <!-- Opcional -->
+      
+      <!-- Checkbox obligatorio -->
+      <div class="checkbox-container">
+        <input type="checkbox" id="ageCheck" required>
+        <label for="ageCheck">(Obligatorio) mayor de 21 años</label>
+      </div>
+      
+      <button type="submit" id="submitBtn" disabled>CONFIRMAR</button>
+    </form>
+  </div>
+</div>
 
    <script>
    const whatsappButton = document.getElementById('whatsappButton');
@@ -175,16 +173,12 @@
 	    const submitBtn = document.getElementById("submitBtn");
 	    const subscribeForm = document.getElementById("subscribeForm");
 	    
-	    // 🔥 Mostrar el modal INMEDIATAMENTE al cargar la página
-	    abrirModal(); 
-
-	    // Mostrar modal después de 3 segundos (solo si no ha sido cerrado antes)
-	    if (!sessionStorage.getItem("modalClosed")) {
-	        setTimeout(() => {
-	            abrirModal();
-	        }, 3000);
-	    }
-
+	    setTimeout(function () {
+	        document.getElementById("modal").style.display = "block"; // Muestra el modal después de 2 segundos
+	    }, 2000);
+	    });
+   
+	   
 	  
 
 	    // Habilitar o deshabilitar el botón de envío según el checkbox
@@ -225,7 +219,7 @@
 	            sessionStorage.setItem("modalClosed", "true");
 	        })
 	        .catch(error => console.error("Error:", error));
-	    });
+	   
 
 	    // Función para abrir el modal correctamente
 	    function abrirModal() {
@@ -445,9 +439,12 @@ function finalizePurchase() {
             if (data.success) {
                 alert('¡Compra realizada con éxito!');
                 toggleModal(false);
+                selectedProducts = [];
                 localStorage.removeItem('cartData'); 
+                updateCart(); // **Actualizar carrito para que se vea vacío**
             } else {
                 alert(data.message || 'Hubo un problema con la compra. Intenta nuevamente.');
+                
             }
         })
         .catch(error => {
