@@ -51,6 +51,11 @@ import java.nio.charset.StandardCharsets;
 	        logger.info("Datos recibidos en el servidor: {}", checkoutRequest);
 	
 	        try {
+	        	if (checkoutRequest.getCustomer().getAddress() == null || checkoutRequest.getCustomer().getAddress().length() < 5) {
+	        	    logger.error("Error: La dirección debe tener entre 5 y 255 caracteres.");
+	        	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: La dirección debe tener al menos 5 caracteres.");
+	        	}
+
 	            // Validar antes de procesar la orden
 	            if (checkoutRequest == null || checkoutRequest.getCustomer() == null || 
 	                checkoutRequest.getCustomer().getEmail() == null || checkoutRequest.getCart() == null || 
