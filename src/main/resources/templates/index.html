@@ -173,11 +173,12 @@
 	    const submitBtn = document.getElementById("submitBtn");
 	    const subscribeForm = document.getElementById("subscribeForm");
 	    
-	    setTimeout(function () {
-	        document.getElementById("modal").style.display = "block"; // Muestra el modal después de 2 segundos
-	    }, 2000);
-	    });
-   
+	    if (!localStorage.getItem("usuarioRegistrado")) { // Solo muestra el modal si NO está registrado
+	        setTimeout(function () {
+	            document.getElementById("modal").style.display = "block"; // Muestra el modal
+	        }, 2000);
+	    }
+	});
 	   
 	  
 
@@ -215,6 +216,7 @@
 	        .then(response => response.json())
 	        .then(data => {
 	            alert(data.message);
+	            localStorage.setItem("usuarioRegistrado", "true"); // Guarda que el usuario se registró
 	            cerrarModal(); // Cierra el modal correctamente
 	            sessionStorage.setItem("modalClosed", "true");
 	        })
@@ -438,13 +440,19 @@ function finalizePurchase() {
 
             if (data.success) {
                 alert('¡Compra realizada con éxito!');
-                toggleModal(false);
                 selectedProducts = [];
                 localStorage.removeItem('cartData'); 
                 updateCart(); // **Actualizar carrito para que se vea vacío**
+                document.getElementById('fullName').value = "";
+                document.getElementById('CosEmail').value = "";
+                document.getElementById('phone').value = "";
+                document.getElementById('address').value = "";
+             // ** Cerrar modales**
+                toggleModal(false);
+                document.getElementById("cartDropdown").style.display = "none";  // Oculta el carrito
             } else {
                 alert(data.message || 'Hubo un problema con la compra. Intenta nuevamente.');
-                
+               
             }
         })
         .catch(error => {
