@@ -2420,25 +2420,27 @@ pre code {
 .form-control {
   color: #dee2e6;
   background-color: #495057;
-  border: 1px solid #444;
+  border: 1px solid #444; /* Sin color inicial llamativo */
   border-radius: 6px;
-  transition: border-color 0.3s ease-in-out;
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-.form-control:valid {
-  border-color: #00b32d; /* Verde si es válido */
-  box-shadow: 0 0 5px rgba(0, 157, 38, 0.5); /* Suave resplandor verde */
-}
-
-.form-control:invalid {
+/* Aplica el borde rojo solo si el usuario ha interactuado con el campo */
+.form-control:user-invalid {
   border-color: #F85C70; /* Rojo si es inválido */
-  box-shadow: 0 0 5px rgba(248, 92, 112, 0.5); /* Suave resplandor rojo */
+  box-shadow: 0 0 5px rgba(248, 92, 112, 0.5);
+}
+
+/* Mantiene el borde normal si no hay interacción */
+.form-control:not(:focus):not(:valid):not(:invalid) {
+  border-color: #444;
+  box-shadow: none;
 }
 
 .form-control:focus {
   color: #dee2e6;
   background-color: #495057;
-  border-color: inherit; 
+  border-color: goldenrod; 
   outline: 0;
   box-shadow: goldenrod;
 }

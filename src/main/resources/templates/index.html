@@ -411,12 +411,22 @@ function validateForm() {
 	    alert('Por favor, ingresa un teléfono válido con 10 dígitos.');
 	    return;
 	  }
+	  // Validar que el total no sea menor o igual a 0
+	  const totalElement = document.getElementById("modalTotal");
+	  const total = parseFloat(totalElement.innerText.replace("$", "").trim());
+
+	  if (isNaN(total) || total <= 0) {
+	    alert("El Carrito sta vacio.");
+	    return;
+	  }
+
 
 	  // Verificar que todos los campos estén completos
 	  if (!fullName || !email || !phone || !address) {
 	    alert('Por favor, completa todos los campos.');
 	    return;
 	  }
+	  
 
 	  // Deshabilitar el botón para evitar múltiples clics
 	  const finalizeButton = document.querySelector('.btn-success');
