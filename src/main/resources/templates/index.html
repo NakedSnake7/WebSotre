@@ -5,7 +5,7 @@
     
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Descubre productos premium que potencian tu cuerpo y mente. Mejora tu energía, enfoque y bienestar con soluciones naturales de alta calidad. ¡Empieza hoy tu camino hacia una vida saludable!.">
-    <meta name="keywords" content="WeedTitlan, productos, suplementos, México">
+    <meta name="keywords" content="WeedTitlan,weed,honey,productos premiun, suplementos, México">
     <meta name="author" content="WeedTitlan">
     <link rel="icon" href="/assets/imgs/favicon.png" type="image/png">
     <title>WeedTlanMx</title>
@@ -86,24 +86,28 @@
        
       </div>
       <div class="modal-body">
-        <form id="checkoutForm">
-          <div class="form-group">
-            <label for="fullName">Nombre completo</label>
-            <input type="text" class="form-control" id="fullName" placeholder="Tu nombre completo" required>
-          </div>
-          <div class="form-group">
-            <label for="CosEmail">Correo electrónico</label>
-            <input type="email" class="form-control" id="CosEmail" placeholder="Tu correo electrónico" required>
-          </div>
-          <div class="form-group">
-            <label for="phone">Teléfono</label>
-            <input type="tel" class="form-control" id="phone" placeholder="Tu teléfono (10 dígitos)" required pattern="\d{10}">
-          </div>
-          <div class="form-group">
-            <label for="address">Dirección</label>
-            <textarea class="form-control" id="address" rows="3" placeholder="Tu dirección de envío" required></textarea>
-          </div>
-        </form>
+ <form id="checkoutForm">
+  <div class="form-group">
+    <label for="fullName" style="text-align: left;">Nombre completo</label>
+    <input type="text" class="form-control" id="fullName" placeholder="Tu nombre completo" required>
+    <div class="invalid-feedback">Por favor, ingresa tu nombre completo.</div>
+  </div>
+  <div class="form-group">
+    <label for="CosEmail" style="text-align: left;">Correo electrónico</label>
+    <input type="email" class="form-control" id="CosEmail" placeholder="Tu correo electrónico" required>
+    <div class="invalid-feedback">Por favor, ingresa un correo electrónico válido.</div>
+  </div>
+  <div class="form-group">
+    <label for="phone" style="text-align: left;">Teléfono</label>
+    <input type="tel" class="form-control" id="phone" placeholder="Tu teléfono (10 dígitos)" required pattern="\d{10}">
+    <div class="invalid-feedback">Por favor, ingresa un número de teléfono válido (10 dígitos).</div>
+  </div>
+  <div class="form-group">
+    <label for="address" style="text-align: left;">Dirección</label>
+    <textarea class="form-control" id="address" rows="3" placeholder="Tu dirección de envío" required></textarea>
+    <div class="invalid-feedback">Por favor, ingresa tu dirección de envío.</div>
+  </div>
+</form>
         <div class="d-flex justify-content-between mt-3">
           <span><b>Total:</b></span>
           <span id="modalTotal" class="font-weight-bold">$0</span>
@@ -148,7 +152,7 @@
       <!-- Checkbox obligatorio -->
       <div class="checkbox-container">
         <input type="checkbox" id="ageCheck" required>
-        <label for="ageCheck">(Obligatorio) mayor de 21 años</label>
+        <label for="ageCheck">(Obligatorio)Soy mayor de 21 años</label>
       </div>
       
       <button type="submit" id="submitBtn" disabled>CONFIRMAR</button>
@@ -370,97 +374,123 @@ function toggleModal(show) {
 }
 
 
-function finalizePurchase() {
-    const fullName = document.getElementById('fullName').value.trim();
-    const email = document.getElementById('CosEmail').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const address = document.getElementById('address').value.trim();
-    const phonePattern = /^\d{10}$/;
-    
-    
-    
-    if (!phone.match(phonePattern)) {
-        alert('Por favor, ingresa un teléfono válido con 10 dígitos.');
-        return;
-    }
-    
-    console.log("Nombre:", fullName);
-    console.log("Correo:", CosEmail);
-    console.log("Teléfono:", phone);
-    console.log("Dirección:", address);
-    
-    console.log(fullName, email, phone, address); // Esto te dirá si los elementos existen
-  
-    if (!fullName || !email || !phone || !address) {
-        alert('Por favor, completa todos los campos.');
-        return;
-    }
+function validateForm() {
+	  const form = document.getElementById('checkoutForm');
+	  const inputs = form.querySelectorAll('input, textarea');
 
-    // Deshabilitar el botón para evitar múltiples clics
-    finalizeButton.disabled = true;
-    finalizeButton.textContent = "Procesando...";
-    
-    
-    const cartData = JSON.parse(localStorage.getItem('cartData')) || { products: [], total: 0 };
+	  let isValid = true;
 
-    // Datos que se enviarán al servidor
-    const orderData = {
-        customer: {
-            fullName,
-            email,
-            phone,
-            address
-        },
-        cart: cartData.products, 
-        totalAmount: cartData.total
-    };
-    console.log('Datos de la orden:', orderData);
- 
-    // Enviar la información al backend usando fetch
-    console.log('Enviando datos:', JSON.stringify(orderData));
-    fetch('/api/checkout', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        
-        body: JSON.stringify(orderData)
-    })
-        .then(response => {
-            console.log('Respuesta del servidor:', response);
-            if (!response.ok) {
-            	return response.json().then(errorData => {
-                throw new Error(`Error del servidor: ${response.status} - ${JSON.stringify(errorData)}`);
-            	});
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Datos procesados:', data);
+	  inputs.forEach(input => {
+	    if (!input.checkValidity()) {
+	      input.classList.add('is-invalid'); // Resalta el campo inválido
+	      isValid = false;
+	    } else {
+	      input.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
+	    }
+	  });
 
-            if (data.success) {
-                alert('¡Compra realizada con éxito!');
-                selectedProducts = [];
-                localStorage.removeItem('cartData'); 
-                updateCart(); // **Actualizar carrito para que se vea vacío**
-                document.getElementById('fullName').value = "";
-                document.getElementById('CosEmail').value = "";
-                document.getElementById('phone').value = "";
-                document.getElementById('address').value = "";
-             // ** Cerrar modales**
-                toggleModal(false);
-                document.getElementById("cartDropdown").style.display = "none";  // Oculta el carrito
-            } else {
-                alert(data.message || 'Hubo un problema con la compra. Intenta nuevamente.');
-               
-            }
-        })
-        .catch(error => {
-            console.error('Error en la solicitud:', error);
-            alert('Hubo un error en el servidor. Por favor, inténtalo más tarde.');
-        });
+	  return isValid;
+	}
 
-}
+	function finalizePurchase() {
+	  // Validar el formulario antes de proceder
+	  if (!validateForm()) {
+	    alert('Por favor, corrige los errores en el formulario.');
+	    return;
+	  }
+
+	  // Obtener los valores del formulario
+	  const fullName = document.getElementById('fullName').value.trim();
+	  const email = document.getElementById('CosEmail').value.trim();
+	  const phone = document.getElementById('phone').value.trim();
+	  const address = document.getElementById('address').value.trim();
+	  const phonePattern = /^\d{10}$/;
+
+	  // Validar el formato del teléfono
+	  if (!phone.match(phonePattern)) {
+	    alert('Por favor, ingresa un teléfono válido con 10 dígitos.');
+	    return;
+	  }
+
+	  // Verificar que todos los campos estén completos
+	  if (!fullName || !email || !phone || !address) {
+	    alert('Por favor, completa todos los campos.');
+	    return;
+	  }
+
+	  // Deshabilitar el botón para evitar múltiples clics
+	  const finalizeButton = document.querySelector('.btn-success');
+	  finalizeButton.disabled = true;
+	  finalizeButton.textContent = "Procesando...";
+
+	  // Obtener los datos del carrito desde localStorage
+	  const cartData = JSON.parse(localStorage.getItem('cartData')) || { products: [], total: 0 };
+
+	  // Datos que se enviarán al servidor
+	  const orderData = {
+	    customer: {
+	      fullName,
+	      email,
+	      phone,
+	      address
+	    },
+	    cart: cartData.products,
+	    totalAmount: cartData.total
+	  };
+
+	  console.log('Datos de la orden:', orderData);
+
+	  // Enviar la información al backend usando fetch
+	  fetch('/api/checkout', {
+	    method: 'POST',
+	    headers: {
+	      'Content-Type': 'application/json'
+	    },
+	    body: JSON.stringify(orderData)
+	  })
+	    .then(response => {
+	      if (!response.ok) {
+	        return response.json().then(errorData => {
+	          throw new Error(`Error del servidor: ${response.status} - ${JSON.stringify(errorData)}`);
+	        });
+	      }
+	      return response.json();
+	    })
+	    .then(data => {
+	      console.log('Datos procesados:', data);
+
+	      if (data.success) {
+	        alert('¡Compra realizada con éxito!');
+	        // Limpiar el carrito y el formulario
+	        localStorage.removeItem('cartData');
+	        document.getElementById('checkoutForm').reset();
+	        updateCart(); // Actualizar el carrito para que se vea vacío
+	        toggleModal(false); // Cerrar el modal
+	        document.getElementById("cartDropdown").style.display = "none"; // Ocultar el carrito
+	      } else {
+	        alert(data.message || 'Hubo un problema con la compra. Intenta nuevamente.');
+	      }
+	    })
+	    .catch(error => {
+	      console.error('Error en la solicitud:', error);
+	      alert('Hubo un error en el servidor. Por favor, inténtalo más tarde.');
+	    })
+	    .finally(() => {
+	      // Habilitar el botón nuevamente
+	      finalizeButton.disabled = false;
+	      finalizeButton.textContent = "Finalizar Compra";
+	    });
+	}
+
+	// Agregar eventos para validar en tiempo real
+	document.getElementById('checkoutForm').addEventListener('input', function (event) {
+	  const input = event.target;
+	  if (input.checkValidity()) {
+	    input.classList.remove('is-invalid');
+	  } else {
+	    input.classList.add('is-invalid');
+	  }
+	});
    
 </script>
 </body>
