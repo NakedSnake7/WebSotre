@@ -256,6 +256,9 @@ const modalTotal = document.getElementById('modalTotal');
 const checkoutButton = document.getElementById('checkoutButton');
 let selectedProducts = [];
 
+//Cargar carrito desde localStorage al inicio
+loadCartFromLocalStorage();
+
 if (selectedProducts.length === 0) {
     cartItems.innerHTML = '<p class="text-center">El carrito está vacío.</p>';
 }
@@ -307,6 +310,8 @@ function updateCart() {
     saveCartToLocalStorage();
 
     cartDropdown.style.display = selectedProducts.length > 0 ? 'block' : 'none';
+    // 🔥 Actualizar total en el modal también
+    modalTotal.textContent = `$${total.toFixed(2)}`;
 }
 
 function handleRemove(name) {
@@ -391,6 +396,28 @@ function validateForm() {
 
 	  return isValid;
 	}
+document.addEventListener("DOMContentLoaded", function () {
+    const inputs = document.querySelectorAll(".product-quantity"); // Inputs de cantidad
+    const totalElement = document.getElementById("modal-total"); // Elemento donde se muestra el total
+
+    function actualizarTotal() {
+        let total = 0;
+        inputs.forEach(input => {
+            const precio = parseFloat(input.dataset.precio); // Obtener el precio desde un data-attribute
+            const cantidad = parseInt(input.value) || 0;
+            total += precio * cantidad;
+        });
+
+        totalElement.textContent = `$${total.toFixed(2)}`; // Mostrar el total formateado
+    }
+
+    // Detectar cambios en los inputs y actualizar el total
+    inputs.forEach(input => {
+        input.addEventListener("input", actualizarTotal);
+    });
+
+   
+});
 
 	function finalizePurchase() {
 	  // Validar el formulario antes de proceder
@@ -416,7 +443,7 @@ function validateForm() {
 	  const total = parseFloat(totalElement.innerText.replace("$", "").trim());
 
 	  if (isNaN(total) || total <= 0) {
-	    alert("El Carrito sta vacio.");
+	    alert("¡El Carrito Esta Vacío!");
 	    return;
 	  }
 
