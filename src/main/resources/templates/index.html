@@ -20,6 +20,8 @@
 
     <!-- Estilos personalizados --> 
     <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <!-- importa la logica 
+     <script type="module" src="js/main.js"></script> --> 
 
 </head>
 <body>
@@ -114,7 +116,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success" onclick="finalizePurchase()">Finalizar Compra</button>
+        <button type="button" id="finalizeButton" class="btn btn-success" onclick="finalizePurchase()">Finalizar Compra</button>
        
       </div>
     </div>
@@ -159,7 +161,6 @@
     </form>
   </div>
 </div>
-
    <script>
    const whatsappButton = document.getElementById('whatsappButton');
    const phoneNumber = "2213576114"; // Número dinámico, puedes cambiar esto según el usuario
@@ -315,7 +316,7 @@ function updateCart() {
 }
 
 function handleRemove(name) {
-    const removeInput = document.getElementById(`removeQuantity-${name}`);
+	const removeInput = document.getElementById(`removeQuantity-${name}`);
     const removeQuantity = parseInt(removeInput.value);
 
     if (removeQuantity > 0) {
@@ -435,7 +436,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	  // Validar el formato del teléfono
 	  if (!phone.match(phonePattern)) {
-	    alert('Por favor, ingresa un teléfono válido con 10 dígitos.');
+	    alert('¡Por favor, ingresa un teléfono válido! "10 dígitos".');
 	    return;
 	  }
 	  // Validar que el total no sea menor o igual a 0
@@ -456,7 +457,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	  
 
 	  // Deshabilitar el botón para evitar múltiples clics
-	  const finalizeButton = document.querySelector('.btn-success');
+	  const finalizeButton = document.getElementById('finalizeButton');
 	  finalizeButton.disabled = true;
 	  finalizeButton.textContent = "Procesando...";
 
@@ -488,7 +489,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	    .then(response => {
 	      if (!response.ok) {
 	        return response.json().then(errorData => {
-	          throw new Error(`Error del servidor: ${response.status} - ${JSON.stringify(errorData)}`);
+	        throw new Error(`Error del servidor: ${response.status} - ${JSON.stringify(errorData)}`);
 	        });
 	      }
 	      return response.json();
@@ -528,7 +529,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	    input.classList.add('is-invalid');
 	  }
 	});
-   
+  
 </script>
 </body>
 
