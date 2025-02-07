@@ -20,8 +20,8 @@
 
     <!-- Estilos personalizados --> 
     <link rel="stylesheet" href="/assets/css/custom-styles.css">
-    <!-- importa la logica 
-     <script type="module" src="js/main.js"></script> --> 
+    <!-- importa la logica --> 
+     <script type="module" src="/assets/js/main.js"></script> 
 
 </head>
 <body>
@@ -99,16 +99,18 @@
     <input type="email" class="form-control" id="CosEmail" placeholder="Tu correo electrónico" required>
     <div class="invalid-feedback">Por favor, ingresa un correo electrónico válido.</div>
   </div>
-  <div class="form-group">
-    <label for="phone" style="text-align: left;">Teléfono</label>
-    <input type="tel" class="form-control" id="phone" placeholder="Tu teléfono (10 dígitos)" required pattern="\d{10}">
-    <div class="invalid-feedback">Por favor, ingresa un número de teléfono válido (10 dígitos).</div>
-  </div>
-  <div class="form-group">
-    <label for="address" style="text-align: left;">Dirección</label>
-    <textarea class="form-control" id="address" rows="3" placeholder="Tu dirección de envío" required></textarea>
-    <div class="invalid-feedback">Por favor, ingresa tu dirección de envío.</div>
-  </div>
+<div class="form-group">
+  <label for="phone" style="text-align: left;">Teléfono</label>
+  <input type="tel" class="form-control" id="phone" name="phone" placeholder="Tu teléfono (10 dígitos)" required pattern="\d{10}" autocomplete="tel">
+  <div class="invalid-feedback">Por favor, ingresa un número de teléfono válido (10 dígitos).</div>
+</div>
+
+<div class="form-group">
+  <label for="address" style="text-align: left;">Dirección</label>
+  <textarea class="form-control" id="address" name="address" rows="3" placeholder="Tu dirección de envío" required autocomplete="street-address"></textarea>
+  <div class="invalid-feedback">Por favor, ingresa tu dirección de envío.</div>
+</div>
+
 </form>
         <div class="d-flex justify-content-between mt-3">
           <span><b>Total:</b></span>
@@ -147,9 +149,9 @@
     
     <form id="subscribeForm">
     <label for="name">(Opcional)</label>
-      <input type="text" id="name" placeholder="Nombre"> <!-- Opcional -->
+      <input type="text" id="name" placeholder="Nombre" autocomplete="name"> <!-- Opcional -->
      <label for="email">(Opcional)</label>
-      <input type="email" id="email" placeholder="Email"> <!-- Opcional -->
+      <input type="email" id="email" placeholder="Email" autocomplete="email"> <!-- Opcional -->
       
       <!-- Checkbox obligatorio -->
       <div class="checkbox-container">
@@ -264,11 +266,11 @@ if (selectedProducts.length === 0) {
     cartItems.innerHTML = '<p class="text-center">El carrito está vacío.</p>';
 }
 
-function addToCart(name, price) {
-    const quantityInput = document.getElementById('quantity');
-    const quantity = parseInt(quantityInput.value);
+function addToCart(name, price, quantityId) {
+    const quantityInput = document.getElementById(quantityId);
+    const quantity = parseInt(quantityInput?.value) || 0;
 
-    if (!quantity || quantity <= 0) {
+    if (quantity <= 0) {
         alert('Por favor, introduce una cantidad válida.');
         return;
     }
@@ -463,6 +465,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	  // Obtener los datos del carrito desde localStorage
 	  const cartData = JSON.parse(localStorage.getItem('cartData')) || { products: [], total: 0 };
+	  
+	  // 🔥 Modificación: Verificar que las cantidades sean correctas
+	    const updatedCart = cartData.products.map(product => {
+	        return {
+	            name: product.name,
+	            price: product.price,
+	            quantity: product.quantity, // Ahora tomará la cantidad correcta
+	            total: product.price * product.quantity
+	        };
+	    });
 
 	  // Datos que se enviarán al servidor
 	  const orderData = {
@@ -548,129 +560,17 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         </div>
     </div>
-       <!--  MenuSection  -->
-    <div id="gallary" class="text-center bg-dark text-light has-height-md middle-items wow fadeIn">
-        <h2 class="section-title">MENU</h2>
-    </div>
-        <div class="row justify-content-center">
-            <div class="col-sm-7 col-md-4 mb-5">
-                <ul class="nav nav-pills nav-justified mb-3" id="pills-tab" role="tablist">
-                    <li class="nav-item">
-                         <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#foods" role="tab" aria-controls="pills-home" aria-selected="true">vaporizadores</a>
-                    </li>
-                     <li class="nav-item">
-                         <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#juices" role="tab" aria-controls="pills-profile" aria-selected="false">Otros</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div class="tab-content" id="pills-tabContent">
-            <div class="tab-pane fade show active" id="foods" role="tabpanel" aria-labelledby="pills-home-tab">
-                <div class="row">
-                
-                    <div class="col-md-4">
-    <div class="card bg-transparent border my-3 my-md-0">
-        <img src="assets/imgs/blog-1.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
-        <div class="card-body">
-            <h1 class="text-center mb-4">
-                <a href="#" class="badge badge-primary">$5</a>
-            </h1>
-            <h4 class="pt20 pb20">Reiciendis Laborum </h4>
-            <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
+ 
+  
+    
+    <!-- Incluir el menú -->
+<div th:replace="~{fragments/menu :: menu}"></div>
 
-            <!-- Selector de cantidad  -->
-            <div class="mb-3 d-flex align-items-center">
-                <label for="quantity" class="text-white mr-2">Cantidad:</label>
-                <input type="number" id="quantity" name="quantity" class="form-control-modern" min="1" value="1" style="width: 3.0rem; text-align: center;">
-            </div>
 
-            <!-- Botón de agregar al carrito -->
-            <div class="text-center">
-            <button class="btn btn-primary btn-sm px-3" onclick="addToCart('Reiciendis Laborum', 5)">Agregar al carrito</button>
-            </div>
-            </div>
-            </div>
-            </div>
-            
-                    <div class="col-md-4">
-                        <div class="card bg-transparent border my-3 my-md-0">
-                            <img src="assets/imgs/blog-1.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
-                            <div class="card-body">
-                                <h1 class="text-center mb-4"><a href="#" class="badge badge-primary">$12</a></h1>
-                                <h4 class="pt20 pb20">Adipisci Totam</h4>
-                                <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
-                                        <!-- Selector de cantidad  -->
-                                <div class="mb-3 d-flex align-items-center">
-                                <label for="quantity" class="text-white mr-2">Cantidad:</label>
-                                <input type="number" id="quantity" name="quantity" class="form-control-modern" min="1" value="1" style="width: 3.0rem; text-align: center;">
-                               </div>
 
-                               <!-- Botón de agregar al carrito -->
-                               <div class="text-center">
-                               <button class="btn btn-primary btn-sm px-3" onclick="addToCart('Adipisci Totam', 12)">Agregar al carrito</button>
-                               </div>
-                               </div>
-                               </div>
-                               </div>
-                    <div class="col-md-4">
-                        <div class="card bg-transparent border my-3 my-md-0">
-                            <img src="assets/imgs/blog-3.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
-                            <div class="card-body">
-                                <h1 class="text-center mb-4"><a href="#" class="badge badge-primary">$8</a></h1>
-                                <h4 class="pt20 pb20">Dicta Deserunt</h4>
-                                <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
-                                <!-- Selector de cantidad  -->
-                                <div class="mb-3 d-flex align-items-center">
-                                <label for="quantity" class="text-white mr-2">Cantidad:</label>
-                                <input type="number" id="quantity" name="quantity" class="form-control-modern" min="1" value="1" style="width: 3.0rem; text-align: center;">
-                               </div>
-                               <!-- Botón de agregar al carrito -->
-                               <div class="text-center">
-                               <button class="btn btn-primary btn-sm px-3" onclick="addToCart('Dicta Deserunt', 8)">Agregar al carrito</button>
-                               </div>
-                               </div>
-                               </div>
-                               </div>
-                               </div>
-            </div>
-            
-            
-            
-            <div class="tab-pane fade" id="juices" role="tabpanel" aria-labelledby="pills-profile-tab">
-                <div class="row">
-                    <div class="col-md-4 my-3 my-md-0">
-                        <div class="card bg-transparent border">
-                            <img src="assets/imgs/blog-3.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
-                            <div class="card-body">
-                                <h1 class="text-center mb-4"><a href="#" class="badge badge-primary">$15</a></h1>
-                                <h4 class="pt20 pb20">Consectetur Adipisicing Elit</h4>
-                                <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 my-3 my-md-0">
-                        <div class="card bg-transparent border">
-                            <img src="assets/imgs/blog-1.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
-                            <div class="card-body">
-                                <h1 class="text-center mb-4"><a href="#" class="badge badge-primary">$29</a></h1>
-                                <h4 class="pt20 pb20">Ullam Laboriosam</h4>
-                                <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 my-3 my-md-0">
-                        <div class="card bg-transparent border">
-                            <img src="assets/imgs/blog-3.jpg" alt="template by DevCRID http://www.devcrud.com/" class="rounded-0 card-img-top mg-responsive">
-                            <div class="card-body">
-                                <h1 class="text-center mb-4"><a href="#" class="badge badge-primary">$3</a></h1>
-                                <h4 class="pt20 pb20">Fugit Ipsam</h4>
-                                <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa provident illum officiis fugit laudantium voluptatem sit iste delectus qui ex. </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+   
+   
+   
    
     <!-- REVIEWS Section  -->
     <div id="testmonial" class="container-fluid wow fadeIn bg-dark text-light has-height-lg middle-items">
