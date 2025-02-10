@@ -27,8 +27,7 @@ public class AppController {
     // Endpoint para suscribir usuarios
     @PostMapping("/subscribe")
     public ResponseEntity<?> subscribe(@Valid @RequestBody SubscriptionRequest request, BindingResult result) {
-    	  // Verificar si los datos de la solicitud son correctos
-        System.out.println("Datos recibidos: " + request.getFullName() + ", " + request.getEmail());
+    
     	// Validar errores en la solicitud
         if (result.hasErrors()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -46,7 +45,7 @@ public class AppController {
         try {
             // Crear y guardar el usuario
         	User newUser = new User(request.getFullName(), request.getEmail(), null);
-        	System.out.println("Datos recibidos: Nombre = " + request.getFullName() + ", Email = " + request.getEmail());
+        	
             userService.saveUser(newUser);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ResponseMessage("Suscripción exitosa", newUser));

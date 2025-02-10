@@ -53,7 +53,7 @@ public class CheckoutController {
 	@CrossOrigin(origins = "http://localhost:8080")
 	public ResponseEntity<?> processCheckout(@Valid @RequestBody CheckoutRequestDTO checkoutRequest ) {
 		  
-		logger.info("Datos recibidos en el servidor: {}", checkoutRequest);
+		
 
 		try {
 			if (checkoutRequest.getCustomer().getAddress() == null
@@ -77,7 +77,7 @@ public class CheckoutController {
 				    checkoutRequest.getCustomer().getFullName(),
 				    checkoutRequest.getCustomer().getPhone()
 				);
-			logger.info("Teléfono del cliente: {}", checkoutRequest.getCustomer().getPhone());
+			
 			userService.saveUser(user);  // Asegúrate de que el método `saveUser` esté guardando los datos correctamente
 
 
