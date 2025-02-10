@@ -1,10 +1,13 @@
 package com.WeedTitlan.server.service;
 
 import com.WeedTitlan.server.exceptions.OrderNotFoundException;
+import com.WeedTitlan.server.exceptions.InsufficientStockException;
 import com.WeedTitlan.server.model.Order;
 import com.WeedTitlan.server.model.OrderItem;
 import com.WeedTitlan.server.model.OrderStatus;
+import com.WeedTitlan.server.model.Producto;
 import com.WeedTitlan.server.repository.OrderRepository;
+import com.WeedTitlan.server.repository.ProductoRepository;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -16,25 +19,24 @@ import java.util.Optional;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final ProductoRepository productoRepository;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, ProductoRepository productoRepository) {
         this.orderRepository = orderRepository;
+        this.productoRepository = productoRepository;
     }
 
     // Guardar una orden con sus productos
     @Transactional
     public Order saveOrderWithItems(Order order, List<OrderItem> orderItems) {
-        // Asocia los ítems con la orden
         for (OrderItem item : orderItems) {
-            item.setOrder(order); // Establecer la relación
-            order.addItem(item); // Agregar el ítem a la orden
+            item.setOrder(order);
+            order.addItem(item);
         }
-
-        // Guardar la orden (JPA se encargará de guardar también los ítems relacionados)
         return orderRepository.save(order);
     }
 
-    // Guardar una orden sin productos (si se necesita)
+    // Guardar una orden sin productos
     @Transactional
     public Order saveOrder(Order order) {
         return orderRepository.save(order);
@@ -53,23 +55,28 @@ public class OrderService {
     // Buscar órdenes por estado
     public List<Order> findOrdersByStatus(String status) {
         try {
-            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase()); // Convierte el String a enum
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
             return orderRepository.findByStatus(orderStatus);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Estado de orden no válido: " + status, e);
         }
     }
 
-    // Actualizar el estado de una orden
+    // Actualizar el estado de una orden y manejar stock
+    @Transactional
     public Order updateOrderStatus(Long orderId, String newStatus) {
         Optional<Order> orderOptional = orderRepository.findById(orderId);
 
         if (orderOptional.isPresent()) {
             Order order = orderOptional.get();
 
-            // Verificar si el nuevo estado es válido
             try {
                 OrderStatus status = OrderStatus.valueOf(newStatus.toUpperCase());
+
+                if (status == OrderStatus.DELIVERED) {
+                    restarStock(order);
+                }
+
                 order.setStatus(status);
                 return orderRepository.save(order);
             } catch (IllegalArgumentException e) {
@@ -77,6 +84,21 @@ public class OrderService {
             }
         } else {
             throw new OrderNotFoundException("Orden no encontrada con ID: " + orderId);
+        }
+    }
+
+    // Restar stock de los productos cuando la orden se confirme
+    private void restarStock(Order order) {
+        for (OrderItem item : order.getItems()) {
+            Producto producto = item.getProducto(); 
+            int cantidadComprada = item.getQuantity();
+
+            if (producto.getStock() < cantidadComprada) {
+                throw new InsufficientStockException("Stock insuficiente para el producto: " + producto.getProductName());
+            }
+
+            producto.setStock(producto.getStock() - cantidadComprada);
+            productoRepository.save(producto);
         }
     }
 

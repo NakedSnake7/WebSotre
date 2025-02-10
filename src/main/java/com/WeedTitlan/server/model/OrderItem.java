@@ -1,8 +1,7 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.*;  
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -13,8 +12,9 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "El nombre del producto no puede estar vacío")
-    private String productName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "producto_id", nullable = false)
+    private Producto producto;  // Relación con la entidad Producto
 
     @NotNull(message = "La cantidad no puede ser nula")
     @Min(value = 1, message = "La cantidad debe ser al menos 1")
@@ -31,9 +31,9 @@ public class OrderItem {
     // Constructor vacío para JPA
     public OrderItem() {}
 
-    // Constructor con parámetros, incluyendo precio
-    public OrderItem(String productName, Integer quantity, Double price, Order order) {
-        this.productName = productName;
+    // Constructor con parámetros
+    public OrderItem(Producto producto, Integer quantity, Double price, Order order) {
+        this.producto = producto;
         this.quantity = quantity;
         this.price = price;
         this.order = order;
@@ -48,12 +48,12 @@ public class OrderItem {
         this.id = id;
     }
 
-    public String getProductName() {
-        return productName;
+    public Producto getProducto() {
+        return producto;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 
     public Integer getQuantity() {

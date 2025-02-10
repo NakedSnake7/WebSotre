@@ -1,169 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Descubre productos premium que potencian tu cuerpo y mente. Mejora tu energía, enfoque y bienestar con soluciones naturales de alta calidad. ¡Empieza hoy tu camino hacia una vida saludable!.">
-    <meta name="keywords" content="WeedTitlan,weed,honey,productos premiun, suplementos, México">
-    <meta name="author" content="WeedTitlan">
-    <link rel="icon" href="/assets/imgs/favicon.png" type="image/png">
-    <title>WeedTlanMx</title>
+<meta charset="utf-8">
 
-    <!-- iconos de fuente -->
-    <link rel="stylesheet" href="/assets/vendors/themify-icons/css/themify-icons.css">
-    <link rel="stylesheet" href="/assets/vendors/animate/animate.css">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description"
+	content="Descubre productos premium que potencian tu cuerpo y mente. Mejora tu energía, enfoque y bienestar con soluciones naturales de alta calidad. ¡Empieza hoy tu camino hacia una vida saludable!.">
+<meta name="keywords"
+	content="WeedTitlan,weed,honey,productos premiun, suplementos, México">
+<meta name="author" content="WeedTitlan">
+<link rel="icon" href="/assets/imgs/favicon.png" type="image/png">
+<title>WeedTlanMx</title>
+
+<!-- iconos de fuente -->
+<link rel="stylesheet"
+	href="/assets/vendors/themify-icons/css/themify-icons.css">
+<link rel="stylesheet" href="/assets/vendors/animate/animate.css">
 
 
-     <!-- Bootstrap + Estilos principales de FoodHut -->
-    <link rel="stylesheet" href="/assets/css/foodhut.css">
+<!-- Bootstrap + Estilos principales de FoodHut -->
+<link rel="stylesheet" href="/assets/css/foodhut.css">
 
-    <!-- Estilos personalizados --> 
-    <link rel="stylesheet" href="/assets/css/custom-styles.css">
-    <!-- importa la logica --> 
-     <script type="module" src="/assets/js/main.js"></script> 
+<!-- Estilos personalizados -->
+<link rel="stylesheet" href="/assets/css/custom-styles.css">
+<!-- importa la logica -->
+<script type="module" src="/assets/js/main.js"></script>
 
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="custom-navbar navbar navbar-expand-lg navbar-dark fixed-top" data-spy="affix" data-offset-top="10" style="z-index: 1040;">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="#home">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#about">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#gallary">Productos</a>
-                </li>
-            </ul>
-            <a class="navbar-brand m-auto" href="#">
-                <img src="assets/imgs/logo.png" class="brand-img" alt="">
-                <span class="brand-txt">WeedTlanMx</span>
-            </a>
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="#testmonial">Reviews</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#contact">Contact Us</a>
-                </li>
-                <li class="nav-item">
-                 <button class="btn custom-register-btn" data-toggle="modal" data-target="#modal">Inscribirse</button>
-                 </li>
-            </ul>
-        </div>
-    </nav>
-    
-    
-<!-- Botón del carrito sobre el Navbar -->
-<div id="cartButtonContainer">
-  <button id="cartButton" class="btn btn-primary" aria-label="Abrir carrito">
-    <i class="ti-shopping-cart"></i> Carrito
-  </button>
-</div>
+	<!-- Navbar -->
+	<nav
+		class="custom-navbar navbar navbar-expand-lg navbar-dark fixed-top"
+		data-spy="affix" data-offset-top="10" style="z-index: 1040;">
+		<button class="navbar-toggler" type="button" data-toggle="collapse"
+			data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false"
+			aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav">
+				<li class="nav-item"><a class="nav-link" href="#home">Home</a>
+				</li>
+				<li class="nav-item"><a class="nav-link" href="#about">About</a>
+				</li>
+				<li class="nav-item"><a class="nav-link" href="#gallary">Productos</a>
+				</li>
+			</ul>
+			<a class="navbar-brand m-auto" href="#"> <img
+				src="assets/imgs/logo.png" class="brand-img" alt=""> <span
+				class="brand-txt">WeedTlanMx</span>
+			</a>
+			<ul class="navbar-nav">
+				<li class="nav-item"><a class="nav-link" href="#testmonial">Reviews</a>
+				</li>
+				<li class="nav-item"><a class="nav-link" href="#contact">Contact
+						Us</a></li>
+				<li class="nav-item">
+					<button class="btn custom-register-btn" data-toggle="modal"
+						data-target="#modal">Inscribirse</button>
+				</li>
+			</ul>
+		</div>
+	</nav>
 
-<!-- Contenedor del carrito -->
-<div id="cartDropdown" class="cart-dropdown" style="display:none;">
-  <h4>Productos en el Carrito</h4>
-  <ul id="cartItems"></ul>
-  <div class="d-flex justify-content-between mt-3">
-    <span><b>Total a pagar:</b></span>
-    <span id="cartTotal" class="font-weight-bold">$0</span>
-  </div>
-  <button id="checkoutButton" class="btn btn-success mt-3">Ir al pago</button>
-</div>
 
-<!-- Modal para el checkout -->
-<div id="checkoutModal" class="modal" tabindex="-1" role="dialog" style="display:none;">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content bg-dark text-white">
-      <div class="modal-header">
-        <h5 class="modal-title">Finalizar Compra</h5>
-       
-      </div>
-      <div class="modal-body">
- <form id="checkoutForm">
-  <div class="form-group">
-    <label for="fullName" style="text-align: left;">Nombre completo</label>
-    <input type="text" class="form-control" id="fullName" placeholder="Tu nombre completo" required>
-    <div class="invalid-feedback">Por favor, ingresa tu nombre completo.</div>
-  </div>
-  <div class="form-group">
-    <label for="CosEmail" style="text-align: left;">Correo electrónico</label>
-    <input type="email" class="form-control" id="CosEmail" placeholder="Tu correo electrónico" required>
-    <div class="invalid-feedback">Por favor, ingresa un correo electrónico válido.</div>
-  </div>
-<div class="form-group">
-  <label for="phone" style="text-align: left;">Teléfono</label>
-  <input type="tel" class="form-control" id="phone" name="phone" placeholder="Tu teléfono (10 dígitos)" required pattern="\d{10}" autocomplete="tel">
-  <div class="invalid-feedback">Por favor, ingresa un número de teléfono válido (10 dígitos).</div>
-</div>
+	<!-- Botón del carrito sobre el Navbar -->
+	<div id="cartButtonContainer">
+		<button id="cartButton" class="btn btn-primary"
+			aria-label="Abrir carrito">
+			<i class="ti-shopping-cart"></i> Carrito
+		</button>
+	</div>
 
-<div class="form-group">
-  <label for="address" style="text-align: left;">Dirección</label>
-  <textarea class="form-control" id="address" name="address" rows="3" placeholder="Tu dirección de envío" required autocomplete="street-address"></textarea>
-  <div class="invalid-feedback">Por favor, ingresa tu dirección de envío.</div>
-</div>
+	<!-- Contenedor del carrito -->
+	<div id="cartDropdown" class="cart-dropdown" style="display: none;">
+		<h4>Productos en el Carrito</h4>
+		<ul id="cartItems"></ul>
+		<div class="d-flex justify-content-between mt-3">
+			<span><b>Total a pagar:</b></span> <span id="cartTotal"
+				class="font-weight-bold">$0</span>
+		</div>
+		<button id="checkoutButton" class="btn btn-success mt-3">Ir
+			al pago</button>
+	</div>
 
-</form>
-        <div class="d-flex justify-content-between mt-3">
-          <span><b>Total:</b></span>
-          <span id="modalTotal" class="font-weight-bold">$0</span>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" id="finalizeButton" class="btn btn-success" onclick="finalizePurchase()">Finalizar Compra</button>
-       
-      </div>
-    </div>
-  </div>
-</div>
+	<!-- Modal para el checkout -->
+	<div id="checkoutModal" class="modal" tabindex="-1" role="dialog"
+		style="display: none;">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content bg-dark text-white">
+				<div class="modal-header">
+					<h5 class="modal-title">Finalizar Compra</h5>
 
-     
+				</div>
+				<div class="modal-body">
+					<form id="checkoutForm">
+						<div class="form-group">
+							<label for="fullName" style="text-align: left;">Nombre
+								completo</label> <input type="text" class="form-control" id="fullName"
+								placeholder="Tu nombre completo" required>
+							<div class="invalid-feedback">Por favor, ingresa tu nombre
+								completo.</div>
+						</div>
+						<div class="form-group">
+							<label for="CosEmail" style="text-align: left;">Correo
+								electrónico</label> <input type="email" class="form-control"
+								id="CosEmail" placeholder="Tu correo electrónico" required>
+							<div class="invalid-feedback">Por favor, ingresa un correo
+								electrónico válido.</div>
+						</div>
+						<div class="form-group">
+							<label for="phone" style="text-align: left;">Teléfono</label> <input
+								type="tel" class="form-control" id="phone" name="phone"
+								placeholder="Tu teléfono (10 dígitos)" required pattern="\d{10}"
+								autocomplete="tel">
+							<div class="invalid-feedback">Por favor, ingresa un número
+								de teléfono válido (10 dígitos).</div>
+						</div>
 
-    <!-- header -->
-    <header id="home" class="header">
-        <div class="overlay text-white text-center">
-            <h1 class="display-2 font-weight-bold my-3">WeedTlan Mexico</h1>
-            <h2 class="display-4 mb-5">"Calidad en cada entrega"</h2>
-            <a class="btn btn-lg btn-primary" href="#gallary">Nuestros Productos</a>
-        </div>
-    </header>
+						<div class="form-group">
+							<label for="address" style="text-align: left;">Dirección</label>
+							<textarea class="form-control" id="address" name="address"
+								rows="3" placeholder="Tu dirección de envío" required
+								autocomplete="street-address"></textarea>
+							<div class="invalid-feedback">Por favor, ingresa tu
+								dirección de envío.</div>
+						</div>
 
-    <!-- Botón de WhatsApp -->
-    <div id="whatsappButton">
-        <a target="_blank" 
-           class="btn btn-success">
-            
-        </a>
-    </div>
-         <div id="modal" class="modal">
-  <div class="modal-content">
-    <h2>¡Obtén ofertas exclusivas! 🚀</h2>
-    
-    <form id="subscribeForm">
-    <label for="name">(Opcional)</label>
-      <input type="text" id="name" placeholder="Nombre" autocomplete="name"> <!-- Opcional -->
-     <label for="email">(Opcional)</label>
-      <input type="email" id="email" placeholder="Email" autocomplete="email"> <!-- Opcional -->
-      
-      <!-- Checkbox obligatorio -->
-      <div class="checkbox-container">
-        <input type="checkbox" id="ageCheck" required>
-        <label for="ageCheck">(Obligatorio)Soy mayor de 21 años</label>
-      </div>
-      
-      <button type="submit" id="submitBtn" disabled>CONFIRMAR</button>
-    </form>
-  </div>
-</div>
-   <script>
+					</form>
+					<div class="d-flex justify-content-between mt-3">
+						<span><b>Total:</b></span> <span id="modalTotal"
+							class="font-weight-bold">$0</span>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="finalizeButton" class="btn btn-success"
+						onclick="finalizePurchase()">Finalizar Compra</button>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+	<!-- header -->
+	<header id="home" class="header">
+		<div class="overlay text-white text-center">
+			<h1 class="display-2 font-weight-bold my-3">WeedTlan Mexico</h1>
+			<h2 class="display-4 mb-5">"Calidad en cada entrega"</h2>
+			<a class="btn btn-lg btn-primary" href="#gallary">Nuestros
+				Productos</a>
+		</div>
+	</header>
+
+	<!-- Botón de WhatsApp -->
+	<div id="whatsappButton">
+		<a target="_blank" class="btn btn-success"> </a>
+	</div>
+	
+	<div id="modal" class="modal">
+		<div class="modal-content">
+			<h2>¡Obtén ofertas exclusivas! 🚀</h2>
+
+			<form id="subscribeForm">
+				<label for="Costumer">(Opcional)</label> <input type="text" id="Costumer"
+					placeholder="Nombre" autocomplete="name">
+				<!-- Opcional -->
+				<label for="email">(Opcional)</label> <input type="email" id="email"
+					placeholder="Email" autocomplete="email">
+				<!-- Opcional -->
+
+				<!-- Checkbox obligatorio -->
+				<div class="checkbox-container">
+					<input type="checkbox" id="ageCheck" required> <label
+						for="ageCheck">(Obligatorio)Soy mayor de 21 años</label>
+				</div>
+
+				<button type="submit" id="submitBtn" disabled>CONFIRMAR</button>
+			</form>
+		</div>
+	</div>
+	<script>
    const whatsappButton = document.getElementById('whatsappButton');
    const phoneNumber = "2213576114"; // Número dinámico, puedes cambiar esto según el usuario
    const message = "Hola, necesito ayuda con mi compra en WeedTlan";
@@ -173,18 +193,20 @@
            <i class="ti-whatsapp" style="font-size: 24px; color: #25D366;"></i> WhatsApp
        </a>
    `;
-   
+   	
+
    document.addEventListener("DOMContentLoaded", function () {
+	   if (!localStorage.getItem("usuarioRegistrado")) { // Solo muestra el modal si NO está registrado
+	        setTimeout(function () {
+	            document.getElementById("modal").style.display = "block"; // Muestra el modal
+	        }, 2000);
+	    }
 	    const modal = document.getElementById("modal");
 	    const ageCheck = document.getElementById("ageCheck");
 	    const submitBtn = document.getElementById("submitBtn");
 	    const subscribeForm = document.getElementById("subscribeForm");
 	    
-	    if (!localStorage.getItem("usuarioRegistrado")) { // Solo muestra el modal si NO está registrado
-	        setTimeout(function () {
-	            document.getElementById("modal").style.display = "block"; // Muestra el modal
-	        }, 2000);
-	    }
+	  
 	});
 	   
 	  
@@ -212,16 +234,18 @@
 	        submitButton.setAttribute('aria-busy', 'true'); // Mejora de accesibilidad
             
 	        
-	        const name = document.getElementById("name").value;
-	        const email = document.getElementById("email").value;
-	        
+	        const fullName = document.getElementById("Costumer").value.trim();
+	        const email = document.getElementById("email").value.trim();
+
+	        console.log("Datos a enviar:", { fullName, email });
 	        fetch("/api/subscribe", {
 	            method: "POST",
 	            headers: { "Content-Type": "application/json" },
-	            body: JSON.stringify({ name, email }),
+	            body: JSON.stringify({ fullName, email }),
 	        })
 	        .then(response => response.json())
 	        .then(data => {
+	        	console.log("Respuesta del servidor:", data);
 	            alert(data.message);
 	            localStorage.setItem("usuarioRegistrado", "true"); // Guarda que el usuario se registró
 	            cerrarModal(); // Cierra el modal correctamente
@@ -238,13 +262,14 @@
 	    }
 
 	    // Función para cerrar el modal correctamente y resetear el formulario
-	  function cerrarModal() {
-    modal.style.display = "none"; // ✅ Ocultar completamente el modal
-    document.body.classList.remove("modal-open"); // 🔥 Eliminar clase de bloqueo de Bootstrap
-    document.querySelectorAll(".modal-backdrop").forEach(el => el.remove()); // 🔥 Eliminar fondo oscuro si queda activo
-    subscribeForm.reset(); // ✅ Limpiar los campos del formulario
-    submitBtn.disabled = true; // ✅ Deshabilitar el botón de envío
-}
+		  function cerrarModal() {
+	    modal.style.display = "none"; // ✅ Ocultar completamente el modal
+	    document.body.classList.remove("modal-open"); // 🔥 Eliminar clase de bloqueo de Bootstrap
+	    document.querySelectorAll(".modal-backdrop").forEach(el => el.remove()); // 🔥 Eliminar fondo oscuro si queda activo
+	    subscribeForm.reset(); // ✅ Limpiar los campos del formulario
+	    submitBtn.disabled = true; // ✅ Deshabilitar el botón de envío
+	}
+
 	});
 
 
@@ -371,7 +396,13 @@ function toggleModal(show) {
 }
 
 // Definir elementos
-const finalizeButton = document.querySelector('.modal-footer .btn-success');
+document.addEventListener("DOMContentLoaded", function () {
+    const finalizeButton = document.getElementById("finalizeButton");
+    if (finalizeButton) {
+        finalizeButton.addEventListener("click", finalizePurchase);
+    }
+});
+
 
 checkoutButton.addEventListener('click', () => {
   toggleModal(true);
@@ -543,124 +574,168 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
   
 </script>
-</body>
-
-    <!--  About Section  -->
-    <div id="about" class="container-fluid wow fadeIn" data-wow-duration="1.5s">
-        <div class="row">
-            <div class="col-lg-6 has-img-bg"></div>
-            <div class="col-lg-6">
-                <div class="row justify-content-center">
-                    <div class="col-sm-8 py-5 my-5">
-                        <h2 class="mb-4">About Us</h2>
-                        <p>En WeedTlan, nos enorgullece ser tu opción confiable para adquirir productos de la más alta calidad. Nos dedicamos a ofrecer una experiencia de compra excepcional, con un enfoque en la excelencia, la innovación y la satisfacción de nuestros clientes.<br><br>Nuestro compromiso es llevar hasta la puerta de tu hogar productos cuidadosamente seleccionados que cumplen con los estándares más exigentes. Desde el primer momento, trabajamos para garantizar que cada artículo en nuestra tienda sea sinónimo de durabilidad, calidad y diseño superior.<br>Con alcance en toda la República Mexicana, hacemos que la calidad esté al alcance de todos. Valoramos la confianza que depositas en nosotros, y nos esforzamos cada día para ser tu tienda online de confianza, entregando no solo productos, sino también un servicio excepcional que respalda cada compra.</p>
-                        <p><b>En WeedTlan, la calidad no es solo un objetivo, es nuestra promesa.</b></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
- 
-  
-    
-    <!-- Incluir el menú -->
-<div th:replace="~{fragments/menu :: menu}"></div>
 
 
+	<!--  About Section  -->
+	<div id="about" class="container-fluid wow fadeIn"
+		data-wow-duration="1.5s">
+		<div class="row">
+			<div class="col-lg-6 has-img-bg"></div>
+			<div class="col-lg-6">
+				<div class="row justify-content-center">
+					<div class="col-sm-8 py-5 my-5">
+						<h2 class="mb-4">About Us</h2>
+						<p>
+							En WeedTlan, nos enorgullece ser tu opción confiable para
+							adquirir productos de la más alta calidad. Nos dedicamos a
+							ofrecer una experiencia de compra excepcional, con un enfoque en
+							la excelencia, la innovación y la satisfacción de nuestros
+							clientes.<br>
+							<br>Nuestro compromiso es llevar hasta la puerta de tu hogar
+							productos cuidadosamente seleccionados que cumplen con los
+							estándares más exigentes. Desde el primer momento, trabajamos
+							para garantizar que cada artículo en nuestra tienda sea sinónimo
+							de durabilidad, calidad y diseño superior.<br>Con alcance en
+							toda la República Mexicana, hacemos que la calidad esté al
+							alcance de todos. Valoramos la confianza que depositas en
+							nosotros, y nos esforzamos cada día para ser tu tienda online de
+							confianza, entregando no solo productos, sino también un servicio
+							excepcional que respalda cada compra.
+						</p>
+						<p>
+							<b>En WeedTlan, la calidad no es solo un objetivo, es nuestra
+								promesa.</b>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-   
-   
-   
-   
-    <!-- REVIEWS Section  -->
-    <div id="testmonial" class="container-fluid wow fadeIn bg-dark text-light has-height-lg middle-items">
-        <h2 class="section-title my-5 text-center">REVIEWS</h2>
-        <div class="row mt-3 mb-5">
-            <div class="col-md-4 my-3 my-md-0">
-                <div class="testmonial-card">
-                    <h3 class="testmonial-title">Ana Castillo</h3>
-                    <div class="testmonial-body">
-                        <p>"Desde la primera compra, quedé encantada. El proceso fue súper sencillo, el envío rápido y los productos de excelente calidad. ¡Sin duda seguiré comprando aquí!"</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 my-3 my-md-0">
-                <div class="testmonial-card">
-                    <h3 class="testmonial-title">José Aguilar</h3>
-                    <div class="testmonial-body">
-                        <p>"Me sorprendió la atención al cliente, siempre disponibles para resolver dudas. Recibí mi pedido perfectamente embalado y en tiempo récord. Totalmente recomendado."</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 my-3 my-md-0">
-                <div class="testmonial-card">
-                    <h3 class="testmonial-title">María Luna</h3>
-                    <div class="testmonial-body">
-                        <p>"La calidad de los productos es insuperable. Se nota el cuidado en cada detalle, desde la selección hasta la entrega. Estoy muy satisfecha con mi experiencia."</p>
-                    </div>
-                </div>
-            </div>
-              <div class="col-md-4 my-3 my-md-0">
-                <div class="testmonial-card">
-                    <h3 class="testmonial-title">Carlos Mendoza</h3>
-                    <div class="testmonial-body">
-                        <p>"No solo tienen productos increíbles, también su equipo es muy profesional. Me ayudaron a elegir justo lo que necesitaba. ¡Una experiencia de compra 10 de 10!"</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 my-3 my-md-0">
-                <div class="testmonial-card">
-                    <h3 class="testmonial-title">Lucía Ramírez</h3>
-                    <div class="testmonial-body">
-                        <p>"El seguimiento del pedido es impecable. ¡Los recomiendo muchísimo!"</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 my-3 my-md-0">
-                <div class="testmonial-card">
-                    <h3 class="testmonial-title">Juan Morales</h3>
-            	        <div class="testmonial-body">
-                        <p>"La experiencia fue genial de principio a fin. La página es fácil de usar, los precios justos y la calidad de los productos superó mis expectativas. Definitivamente volveré a comprar."</p>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-    </div>
 
-    <!-- CONTACT Section  -->
-    <div id="contact" class="container-fluid bg-dark text-light border-top wow fadeIn">
-        <div class="row">
-          
-            <div class="col-md-6 px-5 has-height-lg middle-items">
-                <h3>Contacto y Atencion</h3>
-                <p>¡Tu compra está en buenas manos!
-En WeedTlan, nos comprometemos a garantizar que cada una de tus compras sea segura y satisfactoria. Nuestro equipo está aquí para resolver todas tus dudas y ofrecerte el mejor servicio. Puedes contactarnos en cualquier momento a través de los siguientes medios:</p>
-                <div class="text-muted">
-                    <p><span class="ti-support pr-3"></span> (221) 3576 6114</p>
-                    <p><span class="ti-email pr-3"></span>weedtlanmx@gmail.com</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- page footer  -->
-   
-    <div class="bg-dark text-light text-center border-top wow fadeIn">
-        <p class="mb-0 py-3 text-muted small">&copy; Copyright <script>document.write(new Date().getFullYear())</script> WeedTitlan Mexico <i class="ti-heart text-danger"></i> </p>
-    </div>
-    <!-- end of page footer -->
+	<!-- Incluir el menú -->
+	<div th:replace="~{fragments/menu :: menu}"></div>
+
+
+
+
+
+
+
+	<!-- REVIEWS Section  -->
+	<div id="testmonial"
+		class="container-fluid wow fadeIn bg-dark text-light has-height-lg middle-items">
+		<h2 class="section-title my-5 text-center">REVIEWS</h2>
+		<div class="row mt-3 mb-5">
+			<div class="col-md-4 my-3 my-md-0">
+				<div class="testmonial-card">
+					<h3 class="testmonial-title">Ana Castillo</h3>
+					<div class="testmonial-body">
+						<p>"Desde la primera compra, quedé encantada. El proceso fue
+							súper sencillo, el envío rápido y los productos de excelente
+							calidad. ¡Sin duda seguiré comprando aquí!"</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 my-3 my-md-0">
+				<div class="testmonial-card">
+					<h3 class="testmonial-title">José Aguilar</h3>
+					<div class="testmonial-body">
+						<p>"Me sorprendió la atención al cliente, siempre disponibles
+							para resolver dudas. Recibí mi pedido perfectamente embalado y en
+							tiempo récord. Totalmente recomendado."</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 my-3 my-md-0">
+				<div class="testmonial-card">
+					<h3 class="testmonial-title">María Luna</h3>
+					<div class="testmonial-body">
+						<p>"La calidad de los productos es insuperable. Se nota el
+							cuidado en cada detalle, desde la selección hasta la entrega.
+							Estoy muy satisfecha con mi experiencia."</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 my-3 my-md-0">
+				<div class="testmonial-card">
+					<h3 class="testmonial-title">Carlos Mendoza</h3>
+					<div class="testmonial-body">
+						<p>"No solo tienen productos increíbles, también su equipo es
+							muy profesional. Me ayudaron a elegir justo lo que necesitaba.
+							¡Una experiencia de compra 10 de 10!"</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 my-3 my-md-0">
+				<div class="testmonial-card">
+					<h3 class="testmonial-title">Lucía Ramírez</h3>
+					<div class="testmonial-body">
+						<p>"El seguimiento del pedido es impecable. ¡Los recomiendo
+							muchísimo!"</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 my-3 my-md-0">
+				<div class="testmonial-card">
+					<h3 class="testmonial-title">Juan Morales</h3>
+					<div class="testmonial-body">
+						<p>"La experiencia fue genial de principio a fin. La página es
+							fácil de usar, los precios justos y la calidad de los productos
+							superó mis expectativas. Definitivamente volveré a comprar."</p>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- CONTACT Section  -->
+	<div id="contact"
+		class="container-fluid bg-dark text-light border-top wow fadeIn">
+		<div class="row">
+
+			<div class="col-md-6 px-5 has-height-lg middle-items">
+				<h3>Contacto y Atencion</h3>
+				<p>¡Tu compra está en buenas manos! En WeedTlan, nos
+					comprometemos a garantizar que cada una de tus compras sea segura y
+					satisfactoria. Nuestro equipo está aquí para resolver todas tus
+					dudas y ofrecerte el mejor servicio. Puedes contactarnos en
+					cualquier momento a través de los siguientes medios:</p>
+				<div class="text-muted">
+					<p>
+						<span class="ti-support pr-3"></span> (221) 3576 6114
+					</p>
+					<p>
+						<span class="ti-email pr-3"></span>weedtlanmx@gmail.com
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- page footer  -->
+
+	<div class="bg-dark text-light text-center border-top wow fadeIn">
+		<p class="mb-0 py-3 text-muted small">
+			&copy; Copyright
+			<script>document.write(new Date().getFullYear())</script>
+			WeedTitlan Mexico <i class="ti-heart text-danger"></i>
+		</p>
+	</div>
+	<!-- end of page footer -->
 
 	<!-- core  -->
-    <script src="assets/vendors/jquery/jquery-3.4.1.js"></script>
-    <script src="assets/vendors/bootstrap/bootstrap.bundle.js"></script>
+	<script src="assets/vendors/jquery/jquery-3.4.1.js"></script>
+	<script src="assets/vendors/bootstrap/bootstrap.bundle.js"></script>
 
-    <!-- bootstrap affix -->
-    <script src="assets/vendors/bootstrap/bootstrap.affix.js"></script>
-    <!-- wow.js -->
-    <script src="assets/vendors/wow/wow.js"></script>
-    <!-- FoodHut js -->
-    <script src="assets/js/foodhut.js"></script>
+	<!-- bootstrap affix -->
+	<script src="assets/vendors/bootstrap/bootstrap.affix.js"></script>
+	<!-- wow.js -->
+	<script src="assets/vendors/wow/wow.js"></script>
+	<!-- FoodHut js -->
+	<script src="assets/js/foodhut.js"></script>
 
 </body>
 </html>

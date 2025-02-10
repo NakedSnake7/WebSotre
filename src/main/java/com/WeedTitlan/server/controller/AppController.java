@@ -1,6 +1,8 @@
 package com.WeedTitlan.server.controller;
 
 import jakarta.validation.Valid;   
+
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import com.WeedTitlan.server.model.User;
 import com.WeedTitlan.server.service.OrderService;
 import com.WeedTitlan.server.service.UserService;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Controller 
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
@@ -24,7 +27,9 @@ public class AppController {
     // Endpoint para suscribir usuarios
     @PostMapping("/subscribe")
     public ResponseEntity<?> subscribe(@Valid @RequestBody SubscriptionRequest request, BindingResult result) {
-        // Validar errores en la solicitud
+    	  // Verificar si los datos de la solicitud son correctos
+        System.out.println("Datos recibidos: " + request.getFullName() + ", " + request.getEmail());
+    	// Validar errores en la solicitud
         if (result.hasErrors()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(buildValidationErrorResponse(result));
@@ -40,13 +45,14 @@ public class AppController {
 
         try {
             // Crear y guardar el usuario
-            User newUser = new User(request.getName(), request.getEmail());
+        	User newUser = new User(request.getFullName(), request.getEmail(), null);
+        	System.out.println("Datos recibidos: Nombre = " + request.getFullName() + ", Email = " + request.getEmail());
             userService.saveUser(newUser);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ResponseMessage("Suscripción exitosa", newUser));
         } catch (Exception e) {
             // Registrar la excepción para diagnóstico
-            System.err.println("Error al guardar el usuario: " + e.getMessage()); // Cambiar a un logger en producción
+        	
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseMessage("Ocurrió un error interno. Intente nuevamente más tarde.", null));
         }
@@ -62,16 +68,18 @@ public class AppController {
     }
 
     // Clase interna para manejar solicitudes de suscripción
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SubscriptionRequest {
-        private String name;
+        private String fullName;
         private String email;
+       
 
-        public String getName() {
-            return name;
+        public String getFullName() {
+            return fullName;
         }
 
-        public void setName(String name) {
-            this.name = name;
+        public void setFullName(String fullName) {
+            this.fullName = fullName;
         }
 
         public String getEmail() {
@@ -81,6 +89,7 @@ public class AppController {
         public void setEmail(String email) {
             this.email = email;
         }
+     
     }
 
     // Clase para las respuestas personalizadas

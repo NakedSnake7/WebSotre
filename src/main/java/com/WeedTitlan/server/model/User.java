@@ -1,16 +1,19 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.Entity;    
+import jakarta.persistence.Column;  
+import jakarta.persistence.Entity;      
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+
 import java.util.Objects;
 
 @Entity
-@Table(name = "users") // Especifica un nombre distinto para la tabla
+@Table(name = "users") 
 public class User {
 
     @Id
@@ -18,20 +21,29 @@ public class User {
     private Long id;
 
     @NotEmpty(message = "El nombre no puede estar vacío")
-    private String name;
+    private String fullName;
 
     @Email(message = "El correo electrónico no es válido")
     @NotEmpty(message = "El correo no puede estar vacío")
     private String email;
+    
+    @Size(min = 10, max = 15, message = "El número de teléfono debe contener entre 10 y 15 dígitos")
+    @Column(name = "phone", nullable = true)
+    private String phone;
+
 
     // Constructor vacío necesario para JPA
     public User() {}
 
     // Constructor con parámetros
-    public User(String name, String email) {
-        this.name = name;
+    public User(String fullName, String email, String phone) {
+        this.fullName = fullName;
         this.email = email;
+        this.phone = phone;
     }
+    
+ 
+
 
     // Getters y setters
     public Long getId() {
@@ -42,12 +54,12 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getEmail() {
@@ -58,13 +70,19 @@ public class User {
         this.email = email;
     }
 
-    // Método toString para facilitar la depuración
-    @Override
-    public String toString() {
-        return "User{id=" + id + ", name='" + name + "', email='" + email + "'}";
+    public String getPhone() {
+        return phone;
     }
 
-    // Método equals y hashCode para comparaciones
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    @Override
+    public String toString() {
+        return "User{id=" + id + ", name='" + fullName + "', email='" + email + "', phone='" + phone + "'}";
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

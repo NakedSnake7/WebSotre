@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.service;
 
-import com.WeedTitlan.server.repository.UserRepository;     
+import com.WeedTitlan.server.repository.UserRepository;      
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.WeedTitlan.server.exceptions.UserNotFoundException;
@@ -42,7 +42,7 @@ public class UserService {
     }
 
     // Buscar un usuario por correo o crear uno si no existe
-    public User findOrCreateUserByEmail(String email, String name) {
+    public User findOrCreateUserByEmail(String email, String name, String phone) {
         Optional<User> existingUser = findByEmail(email);
         if (existingUser.isPresent()) {
             return existingUser.get(); // Usuario ya existe, se devuelve el encontrado
@@ -50,7 +50,8 @@ public class UserService {
             // Si no existe, crear un nuevo usuario
             User newUser = new User();
             newUser.setEmail(email);
-            newUser.setName(name);  // Puedes asignar el nombre o usar uno predeterminado
+            newUser.setFullName(name);// Puedes asignar el nombre o usar uno predeterminado 
+            newUser.setPhone(phone != null ? phone : "No disponible");
             return saveUser(newUser); // Guardar el nuevo usuario y devolverlo
         }
     }

@@ -1,9 +1,6 @@
-
-//src/main/java/com/WeedTitlan/server/dto/CustomerDTO.java
-
 package com.WeedTitlan.server.dto;
 
-import jakarta.validation.constraints.Email;  
+import jakarta.validation.constraints.Email;     
 import jakarta.validation.constraints.NotBlank;
 
 public class CustomerDTO {

@@ -21,7 +21,7 @@ class UserServiceTest {
 
         // Creamos un usuario de prueba
         User user = new User();
-        user.setName("Test User");
+        user.setFullName("Test User");
         user.setEmail("test@example.com");
 
         // Simulamos el comportamiento del repositorio
@@ -35,7 +35,7 @@ class UserServiceTest {
         // Verificamos que el usuario se haya guardado correctamente
         assertNotNull(savedUser);
         assertEquals("test@example.com", savedUser.getEmail());
-        assertEquals("Test User", savedUser.getName());
+        assertEquals("Test User", savedUser.getFullName());
     }
 
     @Test
@@ -48,7 +48,7 @@ class UserServiceTest {
 
         // Creamos un usuario de prueba
         User user = new User();
-        user.setName("Test User");
+        user.setFullName("Test User");
         user.setEmail("test@example.com");
 
         // Simulamos que el correo ya existe en la base de datos
