@@ -452,13 +452,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
    
 });
-
+let isProcessing = false; // Variable global
 	function finalizePurchase() {
+		 if (isProcessing) return; // Evita procesar si ya está en curso
+		  isProcessing = true; // Bloquea nuevos intentos
 	  // Validar el formulario antes de proceder
 	  if (!validateForm()) {
 	    alert('Por favor, corrige los errores en el formulario.');
+	    isProcessing = false;
 	    return;
 	  }
+		  
+		  
 
 	  // Obtener los valores del formulario
 	  const fullName = document.getElementById('fullName').value.trim();
@@ -478,6 +483,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	  if (isNaN(total) || total <= 0) {
 	    alert("¡El Carrito Esta Vacío!");
+	    isProcessing = false; // Restablecer estado
 	    return;
 	  }
 
@@ -557,6 +563,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	      alert('Hubo un error en el servidor. Por favor, inténtalo más tarde.');
 	    })
 	    .finally(() => {
+	    	isProcessing = false;
 	      // Habilitar el botón nuevamente
 	      finalizeButton.disabled = false;
 	      finalizeButton.textContent = "Finalizar Compra";
