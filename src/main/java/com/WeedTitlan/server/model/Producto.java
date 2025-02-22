@@ -1,10 +1,16 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.Column; 
-import jakarta.persistence.Entity; 
+import java.util.ArrayList;    
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;  
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -14,10 +20,24 @@ public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "product_name")
     private String productName;
+
     private double price;
-    private int stock;  // Nuevo atributo
+    private int stock;
+    
+    @Column(name = "category")
+    private String category;
+
+    
+    @Column(name = "description", columnDefinition = "TEXT") // Permite descripciones largas
+    private String description;
+    
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<ImagenProducto> imagenes = new ArrayList<>();
+    
+   
 
     // Getters y Setters
     public Long getId() {
@@ -51,4 +71,30 @@ public class Producto {
     public void setStock(int stock) {
         this.stock = stock;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    
+    public List<ImagenProducto> getImagenes() {
+        return imagenes;
+    }
+
+    public void setImagenes(List<ImagenProducto> imagenes) {
+        this.imagenes = imagenes;
+    }
+
+
 }

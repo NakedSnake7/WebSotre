@@ -45,7 +45,7 @@
 				</li>
 				<li class="nav-item"><a class="nav-link" href="#about">About</a>
 				</li>
-				<li class="nav-item"><a class="nav-link" href="#gallary">Productos</a>
+				<li class="nav-item"><a class="nav-link" href="#menu-list">Productos</a>
 				</li>
 			</ul>
 			<a class="navbar-brand m-auto" href="#"> <img
@@ -151,8 +151,8 @@
 		<div class="overlay text-white text-center">
 			<h1 class="display-2 font-weight-bold my-3">WeedTlan Mexico</h1>
 			<h2 class="display-4 mb-5">"Calidad en cada entrega"</h2>
-			<a class="btn btn-lg btn-primary" href="#gallary">Nuestros
-				Productos</a>
+			<a class="btn btn-lg btn-primary" href="#" onclick="redireccionarYScroll()">Nuestros Productos</a>
+
 		</div>
 	</header>
 
@@ -160,14 +160,14 @@
 	<div id="whatsappButton">
 		<a target="_blank" class="btn btn-success"> </a>
 	</div>
-	
+
 	<div id="modal" class="modal">
 		<div class="modal-content">
 			<h2>¡Obtén ofertas exclusivas! 🚀</h2>
 
 			<form id="subscribeForm">
-				<label for="Costumer">(Opcional)</label> <input type="text" id="Costumer"
-					placeholder="Nombre" autocomplete="name">
+				<label for="Costumer">(Opcional)</label> <input type="text"
+					id="Costumer" placeholder="Nombre" autocomplete="name">
 				<!-- Opcional -->
 				<label for="email">(Opcional)</label> <input type="email" id="email"
 					placeholder="Email" autocomplete="email">
@@ -184,6 +184,16 @@
 		</div>
 	</div>
 	<script>
+	 function redireccionarYScroll() {
+	        // Redirigir a la ruta /menu
+	        window.location.href = "/menu";
+	        
+	        // Esperar un poco para asegurarse de que la redirección haya sido procesada
+	        setTimeout(function() {
+	            // Hacer scroll al fragmento #menu-list en la página /menu
+	            window.location.href = "/menu#menu-list";
+	        }, 300);
+	    }
    const whatsappButton = document.getElementById('whatsappButton');
    const phoneNumber = "2213576114"; // Número dinámico, puedes cambiar esto según el usuario
    const message = "Hola, necesito ayuda con mi compra en WeedTlan";
@@ -275,310 +285,234 @@
 
 //---------------------------------------------------------- -->
 
-const cartButton = document.getElementById('cartButton');
-const cartDropdown = document.getElementById('cartDropdown');
-const cartItems = document.getElementById('cartItems');
-const cartTotal = document.getElementById('cartTotal');
-const checkoutModal = document.getElementById('checkoutModal');
-const modalTotal = document.getElementById('modalTotal');
-const checkoutButton = document.getElementById('checkoutButton');
-let selectedProducts = [];
+document.addEventListener("DOMContentLoaded", function () {
+    const cartButton = document.getElementById('cartButton');
+    const cartDropdown = document.getElementById('cartDropdown');
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
+    const checkoutModal = document.getElementById('checkoutModal');
+    const modalTotal = document.getElementById('modalTotal');
+    const checkoutButton = document.getElementById('checkoutButton');
+    const finalizeButton = document.getElementById("finalizeButton");
+    let selectedProducts = [];
 
-//Cargar carrito desde localStorage al inicio
-loadCartFromLocalStorage();
+    // Cargar carrito desde localStorage al inicio
+    loadCartFromLocalStorage();
 
-if (selectedProducts.length === 0) {
-    cartItems.innerHTML = '<p class="text-center">El carrito está vacío.</p>';
-}
-
-function addToCart(name, price, quantityId) {
-    const quantityInput = document.getElementById(quantityId);
-    const quantity = parseInt(quantityInput?.value) || 0;
-
-    if (quantity <= 0) {
-        alert('Por favor, introduce una cantidad válida.');
-        return;
+    if (selectedProducts.length === 0) {
+        cartItems.innerHTML = '<p class="text-center">El carrito está vacío.</p>';
     }
 
-    const existingProduct = selectedProducts.find(product => product.name === name);
-    if (existingProduct) {
-        existingProduct.quantity += quantity;
-    } else {
-        selectedProducts.push({ name, price, quantity });
-    }
-
-    updateCart();
-}
-
-function updateCart() {
-    cartItems.innerHTML = '';
-    let total = 0;
-
-    selectedProducts.forEach(product => {
-        total += product.price * product.quantity;
-
-        const li = document.createElement('li');
-        li.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'mb-2');
-
-        li.innerHTML = `
-            <div>
-                <span><b>${product.name}</b> - $${product.price} x ${product.quantity}</span>
-            </div>
-            <div class="d-flex align-items-center">
-                <input type="number" id="removeQuantity-${product.name}" min="1" max="${product.quantity}" value="1" style="width: 3rem; text-align: center; margin-right: 5px;">
-                <button class="btn btn-danger btn-sm" onclick="handleRemove('${product.name}')">Eliminar</button>
-            </div>
-        `;
-
-        cartItems.appendChild(li);
+    // Conectar los botones "Agregar al carrito"
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', function () {
+            const name = this.getAttribute('data-name');
+            const price = parseFloat(this.getAttribute('data-price'));
+            const quantityInputId = this.getAttribute('data-quantity-id');
+            
+            console.log(`Producto a agregar: Nombre: ${name}, Precio: ${price}`);
+            
+            addToCart(name, price, quantityInputId);
+        });
     });
 
-    cartTotal.textContent = `$${total.toFixed(2)}`;
+    function addToCart(name, price, quantityId) {
+        const quantityInput = document.getElementById(quantityId);
+        const quantity = parseInt(quantityInput?.value) || 0;
 
-    saveCartToLocalStorage();
-
-    cartDropdown.style.display = selectedProducts.length > 0 ? 'block' : 'none';
-    // 🔥 Actualizar total en el modal también
-    modalTotal.textContent = `$${total.toFixed(2)}`;
-}
-
-function handleRemove(name) {
-	const removeInput = document.getElementById(`removeQuantity-${name}`);
-    const removeQuantity = parseInt(removeInput.value);
-
-    if (removeQuantity > 0) {
-        removeFromCart(name, removeQuantity);
-    } else {
-        alert('Por favor, introduce una cantidad válida para eliminar.');
-    }
-}
-
-function removeFromCart(name, removeQuantity) {
-    const product = selectedProducts.find(p => p.name === name);
-    if (product) {
-        product.quantity -= removeQuantity;
-        if (product.quantity <= 0) {
-            selectedProducts = selectedProducts.filter(p => p.name !== name);
+        if (quantity <= 0) {
+            alert('Por favor, introduce una cantidad válida.');
+            return;
         }
-    }
-    updateCart();
-}
 
-function saveCartToLocalStorage() {
-    const cartData = {
-        products: selectedProducts,
-        total: selectedProducts.reduce((sum, product) => sum + product.price * product.quantity, 0),
-    };
-    localStorage.setItem('cartData', JSON.stringify(cartData));
-}
+        console.log(`Añadiendo al carrito: ${name} - Precio: ${price} - Cantidad: ${quantity}`);
+     
+        const existingProduct = selectedProducts.find(product => product.name === name);
+        if (existingProduct) {
+            existingProduct.quantity += quantity;
+        } else {
+            selectedProducts.push({ name, price, quantity });
+        }
 
-function loadCartFromLocalStorage() {
-    const savedCart = localStorage.getItem('cartData');
-    if (savedCart) {
-        const cartData = JSON.parse(savedCart);
-        selectedProducts = cartData.products || [];
         updateCart();
     }
-}
 
-cartButton.addEventListener('click', () => {
-    const isVisible = cartDropdown.style.display === 'block';
-    cartDropdown.style.display = isVisible ? 'none' : 'block';
-});
+    function updateCart() {
+        cartItems.innerHTML = '';
+        let total = 0;
 
-function toggleModal(show) {
-    checkoutModal.style.display = show ? 'block' : 'none';
+        selectedProducts.forEach(product => {
+            total += product.price * product.quantity;
 
-    if (show) {
-        const cartData = JSON.parse(localStorage.getItem('cartData')) || { total: 0 };
-        modalTotal.textContent = `$${cartData.total.toFixed(2)}`;
+            console.log("Producto en el carrito:", product);
+
+            const li = document.createElement('li');
+            li.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'mb-2');
+
+            li.innerHTML = `
+                <div>
+                    <span><b>${product.name}</b> - $${product.price} x ${product.quantity}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <input type="number" class="remove-quantity" min="1" max="${product.quantity}" value="1"
+                        data-product="${product.name}" style="width: 3rem; text-align: center; margin-right: 5px;">
+                    <button class="btn btn-danger btn-sm remove-button" data-product="${product.name}">Eliminar</button>
+                </div>
+            `;
+
+            cartItems.appendChild(li);
+        });
+
+        cartTotal.textContent = `$${total.toFixed(2)}`;
+        modalTotal.textContent = `$${total.toFixed(2)}`;
+
+        saveCartToLocalStorage();
+        cartDropdown.style.display = selectedProducts.length > 0 ? 'block' : 'none';
     }
-}
 
-// Definir elementos
-document.addEventListener("DOMContentLoaded", function () {
-    const finalizeButton = document.getElementById("finalizeButton");
+    // ✅ Capturar clic en los botones "Eliminar" con event delegation
+    cartItems.addEventListener('click', function (event) {
+        if (event.target.classList.contains('remove-button')) {
+            const productName = event.target.getAttribute('data-product');
+            const removeInput = event.target.previousElementSibling;
+            const removeQuantity = parseInt(removeInput.value);
+
+            if (removeQuantity > 0) {
+                removeFromCart(productName, removeQuantity);
+            } else {
+                alert('Por favor, introduce una cantidad válida para eliminar.');
+            }
+        }
+    });
+
+    function removeFromCart(name, removeQuantity) {
+        const product = selectedProducts.find(p => p.name === name);
+        if (product) {
+            product.quantity -= removeQuantity;
+            if (product.quantity <= 0) {
+                selectedProducts = selectedProducts.filter(p => p.name !== name);
+            }
+        }
+        updateCart();
+    }
+
+
+
+    function saveCartToLocalStorage() {
+        localStorage.setItem('cartData', JSON.stringify({
+            products: selectedProducts,
+            total: selectedProducts.reduce((sum, product) => sum + product.price * product.quantity, 0),
+        }));
+    }
+
+    function loadCartFromLocalStorage() {
+        const savedCart = localStorage.getItem('cartData');
+        if (savedCart) {
+            const cartData = JSON.parse(savedCart);
+            selectedProducts = cartData.products || [];
+            updateCart();
+        }
+    }
+
+    cartButton.addEventListener('click', () => {
+        cartDropdown.style.display = cartDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    checkoutButton.addEventListener('click', () => {
+        toggleModal(true);
+    });
+
+    function toggleModal(show) {
+        checkoutModal.style.display = show ? 'block' : 'none';
+    }
+
+    function validateForm() {
+        const form = document.getElementById('checkoutForm');
+        const inputs = form.querySelectorAll('input, textarea');
+        let isValid = true;
+
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+
+        return isValid;
+    }
+
     if (finalizeButton) {
         finalizeButton.addEventListener("click", finalizePurchase);
     }
-});
 
+    let isProcessing = false;
 
-checkoutButton.addEventListener('click', () => {
-  toggleModal(true);
-});
+    function finalizePurchase() {
+        if (isProcessing) return;
+        isProcessing = true;
 
-function toggleModal(show) {
-  document.getElementById('checkoutModal').style.display = show ? 'block' : 'none';
-}
+        if (!validateForm()) {
+            alert('Por favor, corrige los errores en el formulario.');
+            isProcessing = false;
+            return;
+        }
 
+        const fullName = document.getElementById('fullName').value.trim();
+        const email = document.getElementById('CosEmail').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const phonePattern = /^\d{10}$/;
 
-function validateForm() {
-	  const form = document.getElementById('checkoutForm');
-	  const inputs = form.querySelectorAll('input, textarea');
+        if (!phone.match(phonePattern)) {
+            alert('¡Por favor, ingresa un teléfono válido! "10 dígitos".');
+            isProcessing = false;
+            return;
+        }
 
-	  let isValid = true;
+        const total = parseFloat(modalTotal.innerText.replace("$", "").trim());
 
-	  inputs.forEach(input => {
-	    if (!input.checkValidity()) {
-	      input.classList.add('is-invalid'); // Resalta el campo inválido
-	      isValid = false;
-	    } else {
-	      input.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
-	    }
-	  });
+        if (isNaN(total) || total <= 0) {
+            alert("¡El Carrito Está Vacío!");
+            isProcessing = false;
+            return;
+        }
 
-	  return isValid;
-	}
-document.addEventListener("DOMContentLoaded", function () {
-    const inputs = document.querySelectorAll(".product-quantity"); // Inputs de cantidad
-    const totalElement = document.getElementById("modal-total"); // Elemento donde se muestra el total
+        const orderData = {
+            customer: { fullName, email, phone, address },
+            cart: selectedProducts,
+            totalAmount: total
+        };
 
-    function actualizarTotal() {
-        let total = 0;
-        inputs.forEach(input => {
-            const precio = parseFloat(input.dataset.precio); // Obtener el precio desde un data-attribute
-            const cantidad = parseInt(input.value) || 0;
-            total += precio * cantidad;
+        fetch('/api/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.success ? '¡Compra realizada con éxito!' : (data.message || 'Hubo un problema con la compra.'));
+            if (data.success) {
+                localStorage.removeItem('cartData');
+                document.getElementById('checkoutForm').reset();
+                updateCart();
+                toggleModal(false);
+                cartDropdown.style.display = "none";
+            }
+        })
+        .catch(error => {
+            console.error('Error en la solicitud:', error);
+            alert('Hubo un error en el servidor.');
+        })
+        .finally(() => {
+            isProcessing = false;
+            finalizeButton.disabled = false;
+            finalizeButton.textContent = "Finalizar Compra";
         });
-
-        totalElement.textContent = `$${total.toFixed(2)}`; // Mostrar el total formateado
     }
-
-    // Detectar cambios en los inputs y actualizar el total
-    inputs.forEach(input => {
-        input.addEventListener("input", actualizarTotal);
-    });
-
-   
 });
-let isProcessing = false; // Variable global
-	function finalizePurchase() {
-		 if (isProcessing) return; // Evita procesar si ya está en curso
-		  isProcessing = true; // Bloquea nuevos intentos
-	  // Validar el formulario antes de proceder
-	  if (!validateForm()) {
-	    alert('Por favor, corrige los errores en el formulario.');
-	    isProcessing = false;
-	    return;
-	  }
-		  
-		  
 
-	  // Obtener los valores del formulario
-	  const fullName = document.getElementById('fullName').value.trim();
-	  const email = document.getElementById('CosEmail').value.trim();
-	  const phone = document.getElementById('phone').value.trim();
-	  const address = document.getElementById('address').value.trim();
-	  const phonePattern = /^\d{10}$/;
-
-	  // Validar el formato del teléfono
-	  if (!phone.match(phonePattern)) {
-	    alert('¡Por favor, ingresa un teléfono válido! "10 dígitos".');
-	    return;
-	  }
-	  // Validar que el total no sea menor o igual a 0
-	  const totalElement = document.getElementById("modalTotal");
-	  const total = parseFloat(totalElement.innerText.replace("$", "").trim());
-
-	  if (isNaN(total) || total <= 0) {
-	    alert("¡El Carrito Esta Vacío!");
-	    isProcessing = false; // Restablecer estado
-	    return;
-	  }
-
-
-	  // Verificar que todos los campos estén completos
-	  if (!fullName || !email || !phone || !address) {
-	    alert('Por favor, completa todos los campos.');
-	    return;
-	  }
-	  
-
-	  // Deshabilitar el botón para evitar múltiples clics
-	  const finalizeButton = document.getElementById('finalizeButton');
-	  finalizeButton.disabled = true;
-	  finalizeButton.textContent = "Procesando...";
-
-	  // Obtener los datos del carrito desde localStorage
-	  const cartData = JSON.parse(localStorage.getItem('cartData')) || { products: [], total: 0 };
-	  
-	  // 🔥 Modificación: Verificar que las cantidades sean correctas
-	    const updatedCart = cartData.products.map(product => {
-	        return {
-	            name: product.name,
-	            price: product.price,
-	            quantity: product.quantity, // Ahora tomará la cantidad correcta
-	            total: product.price * product.quantity
-	        };
-	    });
-
-	  // Datos que se enviarán al servidor
-	  const orderData = {
-	    customer: {
-	      fullName,
-	      email,
-	      phone,
-	      address
-	    },
-	    cart: cartData.products,
-	    totalAmount: cartData.total
-	  };
-
-	  console.log('Datos de la orden:', orderData);
-
-	  // Enviar la información al backend usando fetch
-	  fetch('/api/checkout', {
-	    method: 'POST',
-	    headers: {
-	      'Content-Type': 'application/json'
-	    },
-	    body: JSON.stringify(orderData)
-	  })
-	    .then(response => {
-	      if (!response.ok) {
-	        return response.json().then(errorData => {
-	        throw new Error(`Error del servidor: ${response.status} - ${JSON.stringify(errorData)}`);
-	        });
-	      }
-	      return response.json();
-	    })
-	    .then(data => {
-	      console.log('Datos procesados:', data);
-
-	      if (data.success) {
-	        alert('¡Compra realizada con éxito!');
-	        // Limpiar el carrito y el formulario
-	        localStorage.removeItem('cartData');
-	        document.getElementById('checkoutForm').reset();
-	        updateCart(); // Actualizar el carrito para que se vea vacío
-	        toggleModal(false); // Cerrar el modal
-	        document.getElementById("cartDropdown").style.display = "none"; // Ocultar el carrito
-	      } else {
-	        alert(data.message || 'Hubo un problema con la compra. Intenta nuevamente.');
-	      }
-	    })
-	    .catch(error => {
-	      console.error('Error en la solicitud:', error);
-	      alert('Hubo un error en el servidor. Por favor, inténtalo más tarde.');
-	    })
-	    .finally(() => {
-	    	isProcessing = false;
-	      // Habilitar el botón nuevamente
-	      finalizeButton.disabled = false;
-	      finalizeButton.textContent = "Finalizar Compra";
-	    });
-	}
-
-	// Agregar eventos para validar en tiempo real
-	document.getElementById('checkoutForm').addEventListener('input', function (event) {
-	  const input = event.target;
-	  if (input.checkValidity()) {
-	    input.classList.remove('is-invalid');
-	  } else {
-	    input.classList.add('is-invalid');
-	  }
-	});
   
 </script>
 
@@ -597,14 +531,13 @@ let isProcessing = false; // Variable global
 							adquirir productos de la más alta calidad. Nos dedicamos a
 							ofrecer una experiencia de compra excepcional, con un enfoque en
 							la excelencia, la innovación y la satisfacción de nuestros
-							clientes.<br>
-							<br>Nuestro compromiso es llevar hasta la puerta de tu hogar
-							productos cuidadosamente seleccionados que cumplen con los
-							estándares más exigentes. Desde el primer momento, trabajamos
-							para garantizar que cada artículo en nuestra tienda sea sinónimo
-							de durabilidad, calidad y diseño superior.<br>Con alcance en
-							toda la República Mexicana, hacemos que la calidad esté al
-							alcance de todos. Valoramos la confianza que depositas en
+							clientes.<br> <br>Nuestro compromiso es llevar hasta la
+							puerta de tu hogar productos cuidadosamente seleccionados que
+							cumplen con los estándares más exigentes. Desde el primer
+							momento, trabajamos para garantizar que cada artículo en nuestra
+							tienda sea sinónimo de durabilidad, calidad y diseño superior.<br>Con
+							alcance en toda la República Mexicana, hacemos que la calidad
+							esté al alcance de todos. Valoramos la confianza que depositas en
 							nosotros, y nos esforzamos cada día para ser tu tienda online de
 							confianza, entregando no solo productos, sino también un servicio
 							excepcional que respalda cada compra.
