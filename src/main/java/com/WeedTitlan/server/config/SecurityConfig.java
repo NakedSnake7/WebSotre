@@ -14,12 +14,12 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/index", "/inicio", "/productos/**", "/css/**", "/js/**", "/images/**").permitAll() // Rutas públicas
-                .requestMatchers("/subirProducto").authenticated() // Solo subirProducto requiere login
+                .requestMatchers("/subirProducto", "/VerProductos").authenticated() // Solo subirProducto requiere login
                 .anyRequest().permitAll() // Todo lo demás es accesible
             )
             .formLogin(form -> form
                 .loginPage("/login") // Página personalizada de login
-                .defaultSuccessUrl("/subirProducto", true) // Redirige aquí tras login
+                .defaultSuccessUrl("/subirProducto", false) // Redirige aquí tras login
                 .permitAll()
             )
             .logout(logout -> logout

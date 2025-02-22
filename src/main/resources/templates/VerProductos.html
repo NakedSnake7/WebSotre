@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subir Producto</title>
+    <title>Modificar Productos</title>
 
     <!-- Bootstrap 4 (CDN) para diseño moderno -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -66,7 +66,7 @@
         .btn-custom:hover {
             background-color: #45a049;
         }
-        .ver-productos-btn {
+         .subirProducto-btn {
         position: fixed;
         bottom: 10px;
         right: 10px;
@@ -79,62 +79,78 @@
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Efecto de sombra para resaltar */
     }
 
-    .ver-productos-btn:hover {
+    .subirProducto-btn:hover {
         background-color: #45a049;
     }
     </style>
 </head>
 <body>
-<div class="container">
+
+<h2 class="text-center">Lista de Productos</h2>
+<table class="table table-dark table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Categoría</th>
+            <th>Imagen</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="producto : ${productos}">
+            <td th:text="${producto.id}"></td>
+            <td th:text="${producto.productName}"></td>
+            <td th:text="'$' + ${producto.price}"></td>
+            <td th:text="${producto.stock}"></td>
+            <td th:text="${producto.category}"></td>
+            <td>
+                <img th:src="@{{img}(img=${producto.imagenes[0]?.imageUrl})}" width="50" height="50">
+            </td>
+            <td>
+                <button class="btn btn-danger btn-sm delete-product" th:attr="data-id=${producto.id}">
+                    Eliminar
+                </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+  <div class="container">
         <!-- Botón para ver productos -->
-        <a href="/VerProductos" class="btn btn-primary ver-productos-btn">Ver Productos</a>
+        <a href="/subirProducto" class="btn btn-primary subirProducto-btn">Subir Productos</a>
     </div>
-
-    <div class="form-container">
-        <h2>Formulario para Subir Productos</h2>
-        <form action="/productos/subirProducto" method="post" enctype="multipart/form-data">
-            
-            <div class="form-group">
-                <label for="productName">Nombre del Producto:</label>
-                <input type="text" id="productName" name="productName" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="price">Precio:</label>
-                <input type="number" step="0.01" id="price" name="price" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="stock">Stock:</label>
-                <input type="number" id="stock" name="stock" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="category">Categoría:</label>
-                <input type="text" id="category" name="category" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="description">Descripción:</label>
-                <textarea id="description" name="description" class="form-control" required></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="imagen">Imagen del Producto:</label>
-                <input type="file" id="imagen" name="imagen" class="form-control-file" accept="image/*" required>
-            </div>
-
-            <button type="submit" class="btn-custom">Subir Producto</button>
-        </form>
-    </div>
-
-
+  
     <!-- Scripts de Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </body>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".delete-product").forEach(button => {
+        button.addEventListener("click", function () {
+            let productId = this.getAttribute("data-id");
 
+            if (confirm("¿Estás seguro de que quieres eliminar este producto?")) {
+                fetch(`/productos/eliminar/${productId}`, {
+                    method: "DELETE",
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Producto eliminado correctamente.");
+                        location.reload(); // Recargar la página para reflejar cambios
+                    } else {
+                        alert("Error al eliminar el producto.");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
+        });
+    });
+});
+</script>
 
 </html>
