@@ -121,7 +121,7 @@ public class ProductoController {
         return fileName;
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarProducto(@PathVariable Long id) {
         try {
             productoService.eliminarProducto(id);

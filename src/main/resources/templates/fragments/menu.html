@@ -35,6 +35,13 @@
 							<div th:id="'carousel-' + ${producto.id}" class="carousel slide"
 								data-ride="carousel">
 								<div class="carousel-inner">
+									<!-- Verifica si el producto tiene imágenes -->
+									<div class="carousel-item active"
+										th:if="${#lists.isEmpty(producto.imagenes)}">
+										<img th:src="@{/imgs/default.png}" class="d-block w-100"
+											alt="Imagen por defecto">
+									</div>
+
 									<!-- Itera sobre las imágenes del producto -->
 									<div th:each="imagen, iterStat : ${producto.imagenes}"
 										class="carousel-item"
@@ -42,6 +49,7 @@
 										<img th:src="@{${imagen.imageUrl}}" class="d-block w-100"
 											th:alt="'Imagen de ' + ${producto.productName}">
 									</div>
+
 								</div>
 								<!-- Controles del carrusel -->
 								<a class="carousel-control-prev"
