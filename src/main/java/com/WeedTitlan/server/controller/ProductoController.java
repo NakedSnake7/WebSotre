@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.controller;
 
-import com.WeedTitlan.server.model.ImagenProducto;
+import com.WeedTitlan.server.model.ImagenProducto; 
 import com.WeedTitlan.server.model.Producto;
 import com.WeedTitlan.server.service.ProductoService;
 import com.WeedTitlan.server.service.ImagenProductoService;
@@ -120,7 +120,6 @@ public class ProductoController {
 
         return fileName;
     }
-
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarProducto(@PathVariable Long id) {
         try {
@@ -130,4 +129,41 @@ public class ProductoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+    @PostMapping("/actualizar")
+    public String actualizarProducto(@ModelAttribute Producto producto, 
+                                     @RequestParam(value = "imagen", required = false) MultipartFile imagen) {
+        Producto productoExistente = productoService.obtenerProducto(producto.getId());
+
+        if (productoExistente == null) {
+            return "redirect:/VerProductos?error=ProductoNoEncontrado";
+        }
+
+        // Si se sube una nueva imagen, reemplazarla
+        if (imagen != null && !imagen.isEmpty()) {
+            try {
+                String fileName = guardarImagen(imagen);  
+                
+                // Eliminar imágenes previas solo si se sube una nueva
+                productoExistente.getImagenes().clear();  
+
+                ImagenProducto nuevaImagen = new ImagenProducto();
+                nuevaImagen.setImageUrl("/imgs/" + fileName);
+                nuevaImagen.setProducto(productoExistente);
+                imagenProductoService.guardarImagen(nuevaImagen);
+            } catch (IOException e) {
+                return "redirect:/VerProductos?error=ErrorAlGuardarImagen";
+            }
+        }
+
+        // Mantener los demás datos del producto
+        productoExistente.setProductName(producto.getProductName());
+        productoExistente.setPrice(producto.getPrice());
+        productoExistente.setStock(producto.getStock());
+        productoExistente.setCategory(producto.getCategory());
+        productoExistente.setDescription(producto.getDescription());
+
+        productoService.guardarProducto(productoExistente);
+        return "redirect:/VerProductos?success=ProductoActualizado";
+    }
+
 }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Producto</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-light">
+    <div class="container mt-5">
+        <h2 class="text-center">Editar Producto</h2>
+        <form th:action="@{/productos/actualizar}" method="post">
+            <input type="hidden" th:field="${producto.id}">
+            
+            <div class="form-group">
+                <label>Nombre:</label>
+                <input type="text" class="form-control" th:field="${producto.productName}" required>
+            </div>
+            <div class="form-group">
+                <label>Precio:</label>
+                <input type="number" class="form-control" th:field="${producto.price}" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Stock:</label>
+                <input type="number" class="form-control" th:field="${producto.stock}" required>
+            </div>
+            <div class="form-group">
+                <label>Categoría:</label>
+                <input type="text" class="form-control" th:field="${producto.category}" required>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                <a href="/productos" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

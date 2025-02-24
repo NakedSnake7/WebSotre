@@ -137,10 +137,10 @@ table {
 						<td><img
 							th:src="${#lists.isEmpty(producto.imagenes) ? '/imgs/default.png' : producto.imagenes[0].imageUrl}"
 							width="50" height="50" alt="Imagen del producto"></td>
-						<td>
+						<td><a th:href="@{/editar/{id}(id=${producto.id})}"
+							class="btn btn-warning btn-sm">Editar</a>
 							<button class="btn btn-danger btn-sm delete-product"
-								th:attr="data-id=${producto.id}">Eliminar</button>
-						</td>
+								th:attr="data-id=${producto.id}">Eliminar</button></td>
 					</tr>
 				</tbody>
 			</table>
