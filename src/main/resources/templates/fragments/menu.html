@@ -68,7 +68,8 @@
 										th:text="${producto.price}"></a>
 								</h1>
 								<h4 class="pt20 pb20" th:text="${producto.productName}"></h4>
-								<p class="text-white" th:text="${producto.description}"></p>
+								<!-- F <p class="text-white" th:text="${producto.description}"></p> -->
+								<div class="descripcion-producto"><p style="white-space: pre-line;" th:text="${producto.description}"></p></div>
 
 								<!-- Selector de cantidad -->
 								<div class="mb-3 d-flex align-items-center">
