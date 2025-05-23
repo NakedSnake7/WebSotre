@@ -28,6 +28,10 @@
                 <label>Categoría:</label>
                 <input type="text" class="form-control" th:field="${producto.category}" required>
             </div>
+                <div class="form-group">
+                <label>Descripcion</label>
+                <input type="text" class="form-control" th:field="${producto.description}" required>
+            </div>
             <div class="text-center">
                 <button type="submit" class="btn btn-success">Guardar Cambios</button>
                 <a href="/productos" class="btn btn-secondary">Cancelar</a>
