@@ -70,6 +70,17 @@ body {
   text-align: left;
   background-color: #343a40 !important;
 }
+.descripcion-producto {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-top: 1rem;
+  white-space: pre-line;
+}
 
   .checkbox-container {
     display: flex;
