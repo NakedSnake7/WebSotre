@@ -4,6 +4,7 @@ import com.WeedTitlan.server.model.ImagenProducto;
 import com.WeedTitlan.server.model.Producto;
 import com.WeedTitlan.server.service.ProductoService;
 import com.WeedTitlan.server.service.ImagenProductoService;
+import com.WeedTitlan.server.service.CloudinaryService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,14 +13,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/productos")
 public class ProductoController {
 
-    private static final String IMAGE_UPLOAD_DIR = "/imgs/";
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     @Autowired
     private ProductoService productoService;
@@ -44,21 +44,21 @@ public class ProductoController {
             if (producto == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
             }
+
             if (file.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El archivo está vacío");
             }
 
-            String fileName = guardarImagen(file);
+            String urlCloudinary = cloudinaryService.subirImagen(file);
+
             ImagenProducto imagen = new ImagenProducto();
-            imagen.setImageUrl(fileName);
+            imagen.setImageUrl(urlCloudinary);
             imagen.setProducto(producto);
             imagenProductoService.guardarImagen(imagen);
 
-            return ResponseEntity.ok("Imagen subida con éxito: " + fileName);
+            return ResponseEntity.ok("Imagen subida con éxito: " + urlCloudinary);
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar la imagen");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir la imagen");
         }
     }
 
@@ -76,6 +76,7 @@ public class ProductoController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El nombre y la categoría son obligatorios.");
             }
 
+            // 1. Guardar el producto sin imagen
             Producto nuevoProducto = new Producto();
             nuevoProducto.setProductName(productName);
             nuevoProducto.setPrice(price);
@@ -85,41 +86,24 @@ public class ProductoController {
 
             Producto productoGuardado = productoService.guardarProducto(nuevoProducto);
 
-            // Subir imagen si se proporcionó
+            // 2. Si se proporciona imagen, subirla y asociarla
             if (imagen != null && !imagen.isEmpty()) {
-                String mensajeImagen = subirImagenProducto(productoGuardado.getId(), imagen);
-                return ResponseEntity.ok("Producto y imagen subidos correctamente. " + mensajeImagen);
+                String urlImagen = cloudinaryService.subirImagen(imagen);
+                ImagenProducto imagenProducto = new ImagenProducto();
+                imagenProducto.setImageUrl(urlImagen);
+                imagenProducto.setProducto(productoGuardado);
+                imagenProductoService.guardarImagen(imagenProducto);
+
+                return ResponseEntity.ok("Producto e imagen subidos correctamente.");
             }
 
             return ResponseEntity.ok("Producto subido correctamente sin imagen.");
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir el producto.");
         }
     }
 
-    private String subirImagenProducto(Long productoId, MultipartFile imagen) {
-        try {
-            String fileName = guardarImagen(imagen);
-            ImagenProducto imagenProducto = new ImagenProducto();
-            imagenProducto.setImageUrl("/imgs/" + fileName);
-            imagenProducto.setProducto(productoService.obtenerProducto(productoId));
-            imagenProductoService.guardarImagen(imagenProducto);
-            return "Imagen subida con éxito: " + fileName;
-        } catch (IOException e) {
-            return "Error al guardar la imagen: " + e.getMessage();
-        }
-    }
-
-    private String guardarImagen(MultipartFile imagen) throws IOException {
-        // Generar un nombre único para la imagen utilizando UUID
-        String fileName = UUID.randomUUID().toString() + "_" + imagen.getOriginalFilename();
-        Path path = Paths.get(IMAGE_UPLOAD_DIR + fileName);
-
-        // Guardar la imagen en la carpeta del servidor
-        Files.write(path, imagen.getBytes());
-
-        return fileName;
-    }
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarProducto(@PathVariable Long id) {
         try {
@@ -129,6 +113,7 @@ public class ProductoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
     @PostMapping("/actualizar")
     public String actualizarProducto(@ModelAttribute Producto producto, 
                                      @RequestParam(value = "imagen", required = false) MultipartFile imagen) {
@@ -141,13 +126,13 @@ public class ProductoController {
         // Si se sube una nueva imagen, reemplazarla
         if (imagen != null && !imagen.isEmpty()) {
             try {
-                String fileName = guardarImagen(imagen);  
-                
+                String urlCloudinary = cloudinaryService.subirImagen(imagen);
+
                 // Eliminar imágenes previas solo si se sube una nueva
-                productoExistente.getImagenes().clear();  
+                productoExistente.getImagenes().clear();
 
                 ImagenProducto nuevaImagen = new ImagenProducto();
-                nuevaImagen.setImageUrl("/imgs/" + fileName);
+                nuevaImagen.setImageUrl(urlCloudinary);
                 nuevaImagen.setProducto(productoExistente);
                 imagenProductoService.guardarImagen(nuevaImagen);
             } catch (IOException e) {
@@ -155,7 +140,7 @@ public class ProductoController {
             }
         }
 
-        // Mantener los demás datos del producto
+        // Actualizar los demás campos del producto
         productoExistente.setProductName(producto.getProductName());
         productoExistente.setPrice(producto.getPrice());
         productoExistente.setStock(producto.getStock());
@@ -163,6 +148,7 @@ public class ProductoController {
         productoExistente.setDescription(producto.getDescription());
 
         productoService.guardarProducto(productoExistente);
+
         return "redirect:/VerProductos?success=ProductoActualizado";
     }
 
