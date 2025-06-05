@@ -104,5 +104,10 @@ public class ProductoService {
             throw new RuntimeException("Producto no encontrado con ID: " + id);
         }
     }
+    public void eliminarImagenesPorProducto(Long productoId) {
+        List<ImagenProducto> imagenes = imagenProductoRepository.findByProductoId(productoId);
+        imagenProductoRepository.deleteAll(imagenes);
+    }
+
 
 }

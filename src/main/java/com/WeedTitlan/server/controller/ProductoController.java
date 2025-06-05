@@ -69,14 +69,14 @@ public class ProductoController {
         @RequestParam("stock") int stock,
         @RequestParam("category") String category,
         @RequestParam("description") String description,
-        @RequestParam(value = "imagen", required = false) MultipartFile imagen) {
+        @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes) {
 
         try {
             if (productName.isEmpty() || category.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El nombre y la categoría son obligatorios.");
             }
 
-            // 1. Guardar el producto sin imagen
+            // 1. Guardar el producto sin imágenes aún
             Producto nuevoProducto = new Producto();
             nuevoProducto.setProductName(productName);
             nuevoProducto.setPrice(price);
@@ -86,23 +86,31 @@ public class ProductoController {
 
             Producto productoGuardado = productoService.guardarProducto(nuevoProducto);
 
-            // 2. Si se proporciona imagen, subirla y asociarla
-            if (imagen != null && !imagen.isEmpty()) {
-                String urlImagen = cloudinaryService.subirImagen(imagen);
-                ImagenProducto imagenProducto = new ImagenProducto();
-                imagenProducto.setImageUrl(urlImagen);
-                imagenProducto.setProducto(productoGuardado);
-                imagenProductoService.guardarImagen(imagenProducto);
+            // 2. Subir múltiples imágenes si se proporcionan
+            if (imagenes != null && imagenes.length > 0) {
+                int imagenesSubidas = 0;
 
-                return ResponseEntity.ok("Producto e imagen subidos correctamente.");
+                for (MultipartFile imagen : imagenes) {
+                    if (imagen != null && !imagen.isEmpty()) {
+                        String urlImagen = cloudinaryService.subirImagen(imagen);
+                        ImagenProducto imagenProducto = new ImagenProducto();
+                        imagenProducto.setImageUrl(urlImagen);
+                        imagenProducto.setProducto(productoGuardado);
+                        imagenProductoService.guardarImagen(imagenProducto);
+                        imagenesSubidas++;
+                    }
+                }
+
+                return ResponseEntity.ok("Producto y " + imagenesSubidas + " imagen(es) subidas correctamente.");
             }
 
-            return ResponseEntity.ok("Producto subido correctamente sin imagen.");
+            return ResponseEntity.ok("Producto subido correctamente sin imágenes.");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir el producto.");
         }
     }
+
 
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarProducto(@PathVariable Long id) {
@@ -115,41 +123,47 @@ public class ProductoController {
     }
 
     @PostMapping("/actualizar")
-    public String actualizarProducto(@ModelAttribute Producto producto, 
-                                     @RequestParam(value = "imagen", required = false) MultipartFile imagen) {
+    public String actualizarProducto(
+        @ModelAttribute Producto producto, 
+        @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes) {
+
         Producto productoExistente = productoService.obtenerProducto(producto.getId());
 
         if (productoExistente == null) {
             return "redirect:/VerProductos?error=ProductoNoEncontrado";
         }
 
-        // Si se sube una nueva imagen, reemplazarla
-        if (imagen != null && !imagen.isEmpty()) {
-            try {
-                String urlCloudinary = cloudinaryService.subirImagen(imagen);
+        try {
+            // Si se suben nuevas imágenes, eliminar las anteriores y guardar las nuevas
+            if (imagenes != null && imagenes.length > 0) {
+                // Eliminar imágenes anteriores
+                imagenProductoService.eliminarImagenesPorProducto(productoExistente.getId());
+                
+                for (MultipartFile imagen : imagenes) {
+                    if (imagen != null && !imagen.isEmpty()) {
+                        String urlCloudinary = cloudinaryService.subirImagen(imagen);
 
-                // Eliminar imágenes previas solo si se sube una nueva
-                productoExistente.getImagenes().clear();
-
-                ImagenProducto nuevaImagen = new ImagenProducto();
-                nuevaImagen.setImageUrl(urlCloudinary);
-                nuevaImagen.setProducto(productoExistente);
-                imagenProductoService.guardarImagen(nuevaImagen);
-            } catch (IOException e) {
-                return "redirect:/VerProductos?error=ErrorAlGuardarImagen";
+                        ImagenProducto nuevaImagen = new ImagenProducto();
+                        nuevaImagen.setImageUrl(urlCloudinary);
+                        nuevaImagen.setProducto(productoExistente);
+                        imagenProductoService.guardarImagen(nuevaImagen);
+                    }
+                }
             }
+
+            // Actualizar los demás campos del producto
+            productoExistente.setProductName(producto.getProductName());
+            productoExistente.setPrice(producto.getPrice());
+            productoExistente.setStock(producto.getStock());
+            productoExistente.setCategory(producto.getCategory());
+            productoExistente.setDescription(producto.getDescription());
+
+            productoService.guardarProducto(productoExistente);
+
+            return "redirect:/VerProductos?success=ProductoActualizado";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "redirect:/VerProductos?error=ErrorAlGuardarImagen";
         }
-
-        // Actualizar los demás campos del producto
-        productoExistente.setProductName(producto.getProductName());
-        productoExistente.setPrice(producto.getPrice());
-        productoExistente.setStock(producto.getStock());
-        productoExistente.setCategory(producto.getCategory());
-        productoExistente.setDescription(producto.getDescription());
-
-        productoService.guardarProducto(productoExistente);
-
-        return "redirect:/VerProductos?success=ProductoActualizado";
     }
-
 }
