@@ -166,4 +166,14 @@ public class ProductoController {
             return "redirect:/VerProductos?error=ErrorAlGuardarImagen";
         }
     }
+    @PostMapping("/toggle-visibility")
+    public String toggleVisibility(@RequestParam Long id, @RequestParam(required = false) Boolean visibleEnMenu) {
+        Producto producto = productoService.findById(id);
+        if (producto != null) {
+            producto.setVisibleEnMenu(visibleEnMenu != null); // Si viene null, se pone en false
+            productoService.save(producto);
+        }
+        return "redirect:/productos";
+    }
+
 }

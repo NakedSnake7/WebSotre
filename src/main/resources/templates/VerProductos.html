@@ -125,9 +125,11 @@ table {
 						<th>Categoría</th>
 						<th>Imagen</th>
 						<th>Acciones</th>
+						<th>Visible en Menú</th>
 					</tr>
 				</thead>
 				<tbody>
+				    
 					<tr th:each="producto : ${productos}">
 						<td th:text="${producto.id}"></td>
 						<td th:text="${producto.productName}"></td>
@@ -141,7 +143,15 @@ table {
 							class="btn btn-warning btn-sm">Editar</a>
 							<button class="btn btn-danger btn-sm delete-product"
 								th:attr="data-id=${producto.id}">Eliminar</button></td>
+										    <td>
+  <form th:action="@{/productos/toggle-visibility}" method="post">
+    <input type="hidden" name="id" th:value="${producto.id}" />
+    <input type="checkbox" name="visibleEnMenu" th:checked="${producto.visibleEnMenu}" onchange="this.form.submit()" />
+  </form>
+</td>
+								
 					</tr>
+					
 				</tbody>
 			</table>
 		</div>

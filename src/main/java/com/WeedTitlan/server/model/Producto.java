@@ -37,7 +37,16 @@ public class Producto {
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ImagenProducto> imagenes = new ArrayList<>();
     
-   
+    @Column(nullable = false)
+    private boolean visibleEnMenu = true; // Valor por defecto
+
+    public boolean isVisibleEnMenu() {
+        return visibleEnMenu;
+    }
+
+    public void setVisibleEnMenu(boolean visibleEnMenu) {
+        this.visibleEnMenu = visibleEnMenu;
+    }
 
     // Getters y Setters
     public Long getId() {

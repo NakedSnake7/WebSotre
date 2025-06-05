@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.service;
 
-import java.io.IOException;  
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -20,27 +20,33 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class ProductoService {
-	
-	private static final String IMAGE_UPLOAD_DIR = "src/main/resources/static/assets/imgs/";
-    
+
+    private static final String IMAGE_UPLOAD_DIR = "src/main/resources/static/assets/imgs/";
+
     @Autowired
     private ProductoRepository productoRepository;
-    
+
     @Autowired
     private ImagenProductoRepository imagenProductoRepository;
-    
+
     public List<Producto> obtenerTodosLosProductos() {
         return productoRepository.findAll();
     }
 
-    // Cargar productos con imágenes usando fetch join
-    @Transactional// Asegura que la sesión esté abierta mientras se accede a los datos
+    @Transactional
     public List<Producto> listarProductos() {
         return productoRepository.findAllWithImages();
     }
 
     @Transactional
     public Producto obtenerProducto(Long id) {
+        return productoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+    }
+
+    // ✅ Nuevo método que tu controlador busca: findById
+    @Transactional
+    public Producto findById(Long id) {
         return productoRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
     }
@@ -55,7 +61,20 @@ public class ProductoService {
             throw new RuntimeException("Stock insuficiente");
         }
     }
- // Nuevo método para subir imágenes
+
+    // ✅ Método usado por el controlador para guardar producto (nombre genérico: save)
+    @Transactional
+    public Producto save(Producto producto) {
+        return productoRepository.save(producto);
+    }
+
+    // Método ya existente
+    @Transactional
+    public Producto guardarProducto(Producto producto) {
+        return productoRepository.save(producto);
+    }
+
+    // Subida de imagen
     @Transactional
     public String guardarImagen(Long productoId, MultipartFile file) {
         Optional<Producto> productoOpt = productoRepository.findById(productoId);
@@ -72,8 +91,6 @@ public class ProductoService {
             Producto producto = productoOpt.get();
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             Path path = Paths.get(IMAGE_UPLOAD_DIR + fileName);
-            Files.write(path, file.getBytes());
-
 
             // 🔥 Crear directorio si no existe
             if (!Files.exists(Paths.get(IMAGE_UPLOAD_DIR))) {
@@ -92,22 +109,17 @@ public class ProductoService {
             throw new RuntimeException("Error al guardar la imagen", e);
         }
     }
-    @Transactional
-    public Producto guardarProducto(Producto producto) {
-        return productoRepository.save(producto);
-    }
+
     public void eliminarProducto(Long id) {
-        // Verificar si el producto existe
         if (productoRepository.existsById(id)) {
             productoRepository.deleteById(id);
         } else {
             throw new RuntimeException("Producto no encontrado con ID: " + id);
         }
     }
+
     public void eliminarImagenesPorProducto(Long productoId) {
         List<ImagenProducto> imagenes = imagenProductoRepository.findByProductoId(productoId);
         imagenProductoRepository.deleteAll(imagenes);
     }
-
-
 }

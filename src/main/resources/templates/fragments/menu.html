@@ -30,7 +30,9 @@
 				<div class="row">
 					<!-- Itera sobre los productos y filtra por categoría -->
 					<div th:each="producto : ${productos}"
-						th:if="${producto.category.equals(categoria)}" class="col-md-4">
+     th:if="${producto.visibleEnMenu} and ${producto.category.equals(categoria)}"
+     class="col-md-4">
+
 						<div class="card bg-transparent border my-3 my-md-0">
 							<div th:id="'carousel-' + ${producto.id}" class="carousel slide"
 								data-ride="carousel">
