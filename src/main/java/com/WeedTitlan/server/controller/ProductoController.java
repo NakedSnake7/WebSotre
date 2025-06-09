@@ -164,44 +164,72 @@ public class ProductoController {
 
     @PostMapping("/actualizar")
     public String actualizarProducto(
-        @ModelAttribute Producto producto,
-        @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes) {
-
+            @ModelAttribute Producto producto,
+            @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes,
+            @RequestParam(value = "eliminarImagenes", required = false) List<Long> imagenesAEliminar,
+            @RequestParam(value = "nuevaCategoria", required = false) String nuevaCategoria,
+            @RequestParam(value = "categoriaId", required = false) Long categoriaId
+    ) {
         Producto productoExistente = productoService.obtenerProducto(producto.getId());
         if (productoExistente == null) {
             return "redirect:/VerProductos?error=ProductoNoEncontrado";
         }
 
         try {
-            if (imagenes != null && imagenes.length > 0) {
-                imagenProductoService.eliminarImagenesPorProducto(productoExistente.getId());
+            // Manejo de nueva o existente categoría
+            Categoria categoria = null;
+            if (nuevaCategoria != null && !nuevaCategoria.trim().isEmpty()) {
+                categoria = categoriaRepository.findByNombre(nuevaCategoria.trim());
+                if (categoria == null) {
+                    categoria = new Categoria();
+                    categoria.setNombre(nuevaCategoria.trim());
+                    categoria = categoriaRepository.save(categoria);
+                }
+            } else if (categoriaId != null) {
+                categoria = categoriaRepository.findById(categoriaId).orElse(null);
+            }
 
+            if (categoria == null) {
+                return "redirect:/VerProductos?error=CategoriaNoValida";
+            }
+
+            // Eliminar imágenes seleccionadas
+            if (imagenesAEliminar != null) {
+                for (Long imagenId : imagenesAEliminar) {
+                    imagenProductoService.eliminarPorId(imagenId);
+                }
+            }
+
+            // Subir nuevas imágenes
+            if (imagenes != null && imagenes.length > 0) {
                 for (MultipartFile imagen : imagenes) {
                     if (imagen != null && !imagen.isEmpty()) {
-                        String urlCloudinary = cloudinaryService.subirImagen(imagen);
-
+                        String url = cloudinaryService.subirImagen(imagen);
                         ImagenProducto nuevaImagen = new ImagenProducto();
-                        nuevaImagen.setImageUrl(urlCloudinary);
+                        nuevaImagen.setImageUrl(url);
                         nuevaImagen.setProducto(productoExistente);
                         imagenProductoService.guardarImagen(nuevaImagen);
                     }
                 }
             }
 
+            // Actualizar producto
             productoExistente.setProductName(producto.getProductName());
             productoExistente.setPrice(producto.getPrice());
             productoExistente.setStock(producto.getStock());
-            productoExistente.setCategoria(producto.getCategoria());
+            productoExistente.setCategoria(categoria);
             productoExistente.setDescription(producto.getDescription());
 
             productoService.guardarProducto(productoExistente);
 
             return "redirect:/VerProductos?success=ProductoActualizado";
+
         } catch (IOException e) {
             e.printStackTrace();
             return "redirect:/VerProductos?error=ErrorAlGuardarImagen";
         }
     }
+
 
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable Long id, Model model) {

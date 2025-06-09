@@ -25,19 +25,26 @@
         <label>Stock:</label>
         <input type="number" class="form-control" th:field="${producto.stock}" required>
     </div>
-
-    <!-- Categoría -->
     <div class="form-group">
-        <label>Categoría:</label>
-        <select class="form-control" name="categoriaId" required>
-            <option value="" disabled>Selecciona una categoría</option>
-            <option th:each="cat : ${categorias}"
-                    th:value="${cat.id}"
-                    th:text="${cat.nombre}"
-                    th:selected="${producto.categoria != null and cat.id == producto.categoria.id}">
-            </option>
-        </select>
-    </div>
+    <label>Descripción:</label>
+    <textarea class="form-control" th:field="${producto.description}" rows="4" required></textarea>
+</div>
+    
+
+ <!-- Categoría -->
+<div class="form-group">
+    <label>Categoría:</label>
+   <select class="form-control" th:field="*{categoria.id}">
+    <option value="" disabled selected>Selecciona una categoría</option>
+    <option th:each="cat : ${categorias}"
+            th:value="${cat.id}"
+            th:text="${cat.nombre}">
+    </option>
+</select>
+
+
+</div>
+
 
     <!-- Imágenes actuales -->
     <div class="form-group">

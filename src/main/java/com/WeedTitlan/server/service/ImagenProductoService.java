@@ -17,9 +17,13 @@ public class ImagenProductoService {
     public void guardarImagen(ImagenProducto imagen) {
         imagenProductoRepository.save(imagen);
     }
+
     public void eliminarImagenesPorProducto(Long productoId) {
         List<ImagenProducto> imagenes = imagenProductoRepository.findByProductoId(productoId);
         imagenProductoRepository.deleteAll(imagenes);
     }
 
+    public void eliminarPorId(Long id) {
+        imagenProductoRepository.deleteById(id);
+    }
 }

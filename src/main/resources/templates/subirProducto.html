@@ -103,62 +103,35 @@ body {
 		<a href="/VerProductos" class="btn btn-primary ver-productos-btn">Ver
 			Productos</a>
 	</div>
-<div th:if="${#lists.isEmpty(categorias)}">
-    <p>No se cargaron categorías. Asegúrate de acceder desde /productos/nuevo.</p>
-</div>
+	<div th:if="${#lists.isEmpty(categorias)}">
+		<p>No se cargaron categorías. Asegúrate de acceder desde
+			/productos/nuevo.</p>
+	</div>
 
 	<div class="form-container">
 		<h2>Formulario para Subir Productos</h2>
-		<form action="/productos/subirProducto" method="post"
+
+		<form th:action="@{/productos/subirProducto}" method="post"
 			enctype="multipart/form-data">
 
-			<div class="form-group">
-				<label for="productName">Nombre del Producto:</label> <input
-					type="text" id="productName" name="productName"
-					class="form-control" required>
-			</div>
+			<label>Nombre del producto:</label> <input type="text"
+				name="productName" required /><br /> <label>Precio:</label> <input
+				type="number" step="0.01" name="price" required /><br /> <label>Stock:</label>
+			<input type="number" name="stock" required /><br /> <label>Categoría
+				existente:</label> <select name="categoriaId">
+				<option value="" disabled selected>Selecciona una categoría</option>
+				<option th:each="cat : ${categorias}" th:value="${cat.id}"
+					th:text="${cat.nombre}"></option>
+			</select><br /> <label>O escribe una nueva categoría:</label> <input
+				type="text" name="nuevaCategoria"
+				placeholder="Nueva categoría (opcional)" /><br /> <label>Descripción:</label>
+			<textarea name="description" rows="4" cols="50"></textarea>
+			<br /> <label>Imágenes:</label> <input type="file" name="imagenes"
+				multiple /><br />
+			<br />
 
-			<div class="form-group">
-				<label for="price">Precio:</label> <input type="number" step="0.01"
-					id="price" name="price" class="form-control" required>
-			</div>
+			<button type="submit">Subir producto</button>
 
-			<div class="form-group">
-				<label for="stock">Stock:</label> <input type="number" id="stock"
-					name="stock" class="form-control" required>
-			</div>
-<div class="form-group">
-    <label for="categoria">Categoría:</label>
-    <select name="categoriaId" id="categoria" class="form-control">
-        <option value="">Selecciona una categoría</option>
-        <th:block th:each="cat : ${categorias}">
-            <option th:value="${cat.id}" th:text="${cat.nombre}"></option>
-        </th:block>
-    </select>
-</div>
-
-<div class="form-group">
-    <label for="nuevaCategoria">O ingresa nueva categoría:</label>
-    <input type="text" id="nuevaCategoria" name="nuevaCategoria" class="form-control"
-           placeholder="Escribe una nueva categoría (opcional)">
-</div>
-
-
-
-			<div class="form-group">
-				<label for="description">Descripción:</label>
-				<textarea id="description" name="description" class="form-control"
-					required></textarea>
-			</div>
-
-			<div class="form-group">
-				<label for="imagenes">Imágenes del Producto:</label> <input
-					type="file" id="imagenes" name="imagenes" class="form-control-file"
-					accept="image/*" multiple required>
-			</div>
-
-
-			<button type="submit" class="btn-custom">Subir Producto</button>
 		</form>
 	</div>
 	<div th:if="${param.success}" class="alert alert-success">
@@ -174,26 +147,27 @@ body {
 		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 	<script
 		src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-		
-		<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const categoriaSelect = document.getElementById("categoria");
-        const nuevaCategoriaInput = document.getElementById("nuevaCategoria");
 
-        categoriaSelect.addEventListener("change", function () {
-            if (this.value !== "") {
-                nuevaCategoriaInput.value = ""; // Borra la nueva categoría si se selecciona una existente
-            }
-        });
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			const categoriaSelect = document.getElementById("categoria");
+			const nuevaCategoriaInput = document
+					.getElementById("nuevaCategoria");
 
-        nuevaCategoriaInput.addEventListener("input", function () {
-            if (this.value.trim() !== "") {
-                categoriaSelect.value = ""; // Borra la selección si empieza a escribir una nueva
-            }
-        });
-    });
-</script>
-		
+			categoriaSelect.addEventListener("change", function() {
+				if (this.value !== "") {
+					nuevaCategoriaInput.value = ""; // Borra la nueva categoría si se selecciona una existente
+				}
+			});
+
+			nuevaCategoriaInput.addEventListener("input", function() {
+				if (this.value.trim() !== "") {
+					categoriaSelect.value = ""; // Borra la selección si empieza a escribir una nueva
+				}
+			});
+		});
+	</script>
+
 </body>
 
 
