@@ -30,7 +30,7 @@
 				<div class="row">
 					<!-- Itera sobre los productos y filtra por categoría -->
 					<div th:each="producto : ${productos}"
-     th:if="${producto.visibleEnMenu} and ${producto.category.equals(categoria)}"
+    th:if="${producto.visibleEnMenu} and ${producto.categoria.nombre.equals(categoria)}"
      class="col-md-4">
 
 						<div class="card bg-transparent border my-3 my-md-0">

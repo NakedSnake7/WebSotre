@@ -40,8 +40,9 @@ public class ProductoService {
 
     @Transactional
     public Producto obtenerProducto(Long id) {
-        return productoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+    	return productoRepository.findById(id)
+    		    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
     }
 
     // ✅ Nuevo método que tu controlador busca: findById
@@ -50,6 +51,12 @@ public class ProductoService {
         return productoRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
     }
+
+    @Transactional
+    public Producto obtenerPorId(Long id) {
+        return findById(id); // Reutiliza el método anterior
+    }
+
 
     @Transactional
     public void actualizarStock(Long id, int cantidad) {
@@ -122,4 +129,12 @@ public class ProductoService {
         List<ImagenProducto> imagenes = imagenProductoRepository.findByProductoId(productoId);
         imagenProductoRepository.deleteAll(imagenes);
     }
+    @Transactional
+    public Producto actualizarProducto(Producto producto) {
+        if (!productoRepository.existsById(producto.getId())) {
+            throw new RuntimeException("Producto no encontrado con ID: " + producto.getId());
+        }
+        return productoRepository.save(producto);
+    }
+
 }

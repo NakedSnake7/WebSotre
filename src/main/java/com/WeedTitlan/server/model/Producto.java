@@ -13,6 +13,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
+
+
 @Entity
 @Table(name = "productos")
 public class Producto {
@@ -26,27 +32,23 @@ public class Producto {
 
     private double price;
     private int stock;
-    
-    @Column(name = "category")
-    private String category;
 
-    
-    @Column(name = "description", columnDefinition = "TEXT") // Permite descripciones largas
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "categoria_id") // clave foránea
+    private Categoria categoria;
+
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
-    
+
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ImagenProducto> imagenes = new ArrayList<>();
-    
+
     @Column(nullable = false)
-    private boolean visibleEnMenu = true; // Valor por defecto
+    private boolean visibleEnMenu = true;
+    
+    
 
-    public boolean isVisibleEnMenu() {
-        return visibleEnMenu;
-    }
 
-    public void setVisibleEnMenu(boolean visibleEnMenu) {
-        this.visibleEnMenu = visibleEnMenu;
-    }
 
     // Getters y Setters
     public Long getId() {
@@ -81,6 +83,14 @@ public class Producto {
         this.stock = stock;
     }
 
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -88,15 +98,7 @@ public class Producto {
     public void setDescription(String description) {
         this.description = description;
     }
-    
-    public String getCategory() {
-        return category;
-    }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-    
     public List<ImagenProducto> getImagenes() {
         return imagenes;
     }
@@ -105,5 +107,11 @@ public class Producto {
         this.imagenes = imagenes;
     }
 
+    public boolean isVisibleEnMenu() {
+        return visibleEnMenu;
+    }
 
+    public void setVisibleEnMenu(boolean visibleEnMenu) {
+        this.visibleEnMenu = visibleEnMenu;
+    }
 }

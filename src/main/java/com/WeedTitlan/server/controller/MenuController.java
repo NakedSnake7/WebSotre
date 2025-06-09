@@ -25,8 +25,10 @@ public class MenuController {
         
         // Extraer categorías únicas desde los productos
         Set<String> categorias = productos.stream()
-            .map(Producto::getCategory)
-            .collect(Collectors.toSet());
+        	    .map(p -> p.getCategoria() != null ? p.getCategoria().getNombre() : "")
+        	    .filter(nombre -> !nombre.isEmpty())
+        	    .collect(Collectors.toSet());
+
 
         System.out.println("Productos: " + productos); // Para depuración
         System.out.println("Categorías: " + categorias);
