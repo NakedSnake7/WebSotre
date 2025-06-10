@@ -84,7 +84,7 @@ public class ProductoController {
             @RequestParam("productName") String productName,
             @RequestParam("price") double price,
             @RequestParam("stock") int stock,
-            @RequestParam("categoriaId") String categoriaIdStr,
+            @RequestParam(value = "categoriaId", required = false) String categoriaIdStr,
             @RequestParam("description") String description,
             @RequestParam(value = "nuevaCategoria", required = false) String nuevaCategoria,
             @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes) {

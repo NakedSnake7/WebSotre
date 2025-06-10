@@ -9,41 +9,39 @@
 <body class="bg-dark text-light">
     <div class="container mt-5">
         <h2 class="text-center">Editar Producto</h2>
-      <form th:action="@{/productos/actualizar}" method="post" enctype="multipart/form-data">
-    <input type="hidden" th:field="${producto.id}">
-    
-    <!-- Campos básicos -->
+ <form th:action="@{/productos/actualizar}" th:object="${producto}" method="post" enctype="multipart/form-data">
+    <input type="hidden" th:field="*{id}">
+
     <div class="form-group">
         <label>Nombre:</label>
-        <input type="text" class="form-control" th:field="${producto.productName}" required>
+        <input type="text" class="form-control" th:field="*{productName}" required>
     </div>
     <div class="form-group">
         <label>Precio:</label>
-        <input type="number" class="form-control" th:field="${producto.price}" step="0.01" required>
+        <input type="number" class="form-control" th:field="*{price}" step="0.01" required>
     </div>
     <div class="form-group">
         <label>Stock:</label>
-        <input type="number" class="form-control" th:field="${producto.stock}" required>
+        <input type="number" class="form-control" th:field="*{stock}" required>
     </div>
     <div class="form-group">
-    <label>Descripción:</label>
-    <textarea class="form-control" th:field="${producto.description}" rows="4" required></textarea>
-</div>
-    
+        <label>Descripción:</label>
+        <textarea class="form-control" th:field="*{description}" rows="4" required></textarea>
+    </div>
 
- <!-- Categoría -->
-<div class="form-group">
-    <label>Categoría:</label>
-   <select class="form-control" th:field="*{categoria.id}">
-    <option value="" disabled selected>Selecciona una categoría</option>
+    <!-- Categoría -->
+    <div class="form-group">
+        <label>Categoría:</label>
+       <select class="form-control" name="categoriaId">
+    <option value="" disabled>Selecciona una categoría</option>
     <option th:each="cat : ${categorias}"
             th:value="${cat.id}"
-            th:text="${cat.nombre}">
+            th:text="${cat.nombre}"
+            th:selected="${producto.categoria != null} ? ${cat.id} == ${producto.categoria.id} : false">
     </option>
 </select>
 
-
-</div>
+    </div>
 
 
     <!-- Imágenes actuales -->
