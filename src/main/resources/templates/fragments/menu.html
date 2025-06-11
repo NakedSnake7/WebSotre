@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
+
 	<div th:fragment="menu">
 		<!--  MenuSection  -->
 		<div id="menu"
@@ -71,7 +72,19 @@
 								</h1>
 								<h4 class="pt20 pb20" th:text="${producto.productName}"></h4>
 								<!-- F <p class="text-white" th:text="${producto.description}"></p> -->
-								<div class="descripcion-producto"><p style="white-space: pre-line;" th:text="${producto.description}"></p></div>
+				<div class="descripcion-producto text-white">
+    <div class="descripcion-corta" th:text="${producto.description}" style="white-space: pre-line;"></div>
+    <a href="javascript:void(0);" class="ver-mas text-primary d-inline-flex align-items-center" onclick="toggleDescripcion(this)">
+        <span>Ver más</span>
+        <svg class="icono-flecha ml-1" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </a>
+</div>
+
+
 
 								<!-- Selector de cantidad -->
 								<div class="mb-3 d-flex align-items-center">
@@ -97,5 +110,7 @@
 			<!-- Fin del loop de categorías -->
 		</div>
 	</div>
+	
+	
 </body>
 </html>

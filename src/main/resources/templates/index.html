@@ -26,6 +26,55 @@
 <link rel="stylesheet" href="/assets/css/custom-styles.css">
 <!-- importa la logica -->
 <script type="module" src="/assets/js/main.js"></script>
+<style>
+  .descripcion-corta {
+        max-height: 5.2em;
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+    }
+
+    .descripcion-corta.expandida {
+        max-height: 1000px;
+    }
+
+    .ver-mas {
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 0.5rem;
+        transition: color 0.3s;
+    }
+
+    .ver-mas:hover {
+        color: #ffc107;
+    }
+
+    .icono-flecha {
+        transition: transform 0.3s ease;
+    }
+
+    .ver-mas.expandido .icono-flecha {
+        transform: rotate(180deg);
+    }
+        .resaltado {
+        animation: resaltar 1.5s ease-in-out;
+        border: 2px solid #ffc107;
+        border-radius: 12px;
+        box-shadow: 0 0 10px 4px rgba(255, 193, 7, 0.6);
+    }
+
+    @keyframes resaltar {
+        0% {
+            box-shadow: 0 0 10px 4px rgba(255, 193, 7, 0.8);
+        }
+        50% {
+            box-shadow: 0 0 12px 8px rgba(255, 193, 7, 0.5);
+        }
+        100% {
+            box-shadow: 0 0 0px 0px rgba(255, 193, 7, 0);
+        }
+    }
+</style>
+
 
 </head>
 <body>
@@ -513,6 +562,56 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+
+document.addEventListener("DOMContentLoaded", function () {
+    window.toggleDescripcion = function (link) {
+        const descripcion = link.previousElementSibling;
+        const estaExpandida = descripcion.classList.contains('expandida');
+        const todasDescripciones = document.querySelectorAll('.descripcion-corta');
+        const todosLosBotones = document.querySelectorAll('.ver-mas');
+
+        const tarjetaProducto = link.closest('.card');
+
+        if (!estaExpandida) {
+            // Colapsar otras descripciones
+            todasDescripciones.forEach(function (desc) {
+                desc.classList.remove('expandida');
+            });
+
+            todosLosBotones.forEach(function (btn) {
+                btn.classList.remove('expandido');
+                btn.querySelector("span").textContent = 'Ver más';
+            });
+
+            // Expandir la actual sin scroll ni efecto
+            descripcion.classList.add('expandida');
+            link.classList.add('expandido');
+            link.querySelector("span").textContent = 'Ver menos';
+
+        } else {
+            // Colapsar esta
+            descripcion.classList.remove('expandida');
+            link.classList.remove('expandido');
+            link.querySelector("span").textContent = 'Ver más';
+
+            // Hacer scroll y resaltar
+            if (tarjetaProducto) {
+                setTimeout(() => {
+                    tarjetaProducto.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+
+                    tarjetaProducto.classList.add('resaltado');
+
+                    setTimeout(() => {
+                        tarjetaProducto.classList.remove('resaltado');
+                    }, 2000);
+                }, 200);
+            }
+        }
+    };
+});
   
 </script>
 
