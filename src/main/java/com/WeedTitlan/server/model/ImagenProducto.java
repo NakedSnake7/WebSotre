@@ -16,6 +16,14 @@ public class ImagenProducto {
     @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
+ // Constructor que acepta la URL y el producto
+    public ImagenProducto(String imageUrl, Producto producto) {
+        this.imageUrl = imageUrl;
+        this.producto = producto;
+    }
+    public ImagenProducto() {
+        // Constructor vacío necesario para JPA y otras instancias manuales
+    }
 
     // Getters y Setters
     public Long getId() {

@@ -1,46 +1,44 @@
 package com.WeedTitlan.server.controller;
 
+import com.WeedTitlan.server.model.Categoria;
 import com.WeedTitlan.server.model.ImagenProducto;
 import com.WeedTitlan.server.model.Producto;
-import com.WeedTitlan.server.service.ProductoService;
-import com.WeedTitlan.server.service.ImagenProductoService;
-import com.WeedTitlan.server.service.CloudinaryService;
+import com.WeedTitlan.server.repository.CategoriaRepository;
 import com.WeedTitlan.server.service.CategoriaService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.WeedTitlan.server.service.CloudinaryService;
+import com.WeedTitlan.server.service.ImagenProductoService;
+import com.WeedTitlan.server.service.ProductoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.ui.Model;
-import java.util.List;
-
 
 import java.io.IOException;
-import com.WeedTitlan.server.model.Categoria;
-import com.WeedTitlan.server.repository.CategoriaRepository;
-
+import java.util.List;
 
 @Controller
 @RequestMapping("/productos")
 public class ProductoController {
 
-    @Autowired
-    private CloudinaryService cloudinaryService;
+    private final ProductoService productoService;
+    private final ImagenProductoService imagenProductoService;
+    private final CloudinaryService cloudinaryService;
+    private final CategoriaRepository categoriaRepository;
+    private final CategoriaService categoriaService;
 
-    @Autowired
-    private ProductoService productoService;
-
-    @Autowired
-    private ImagenProductoService imagenProductoService;
-    
-    @Autowired
-    private CategoriaRepository categoriaRepository;
-    
-    @Autowired
-    private CategoriaService categoriaService;
-
-
+    public ProductoController(ProductoService productoService,
+                              ImagenProductoService imagenProductoService,
+                              CloudinaryService cloudinaryService,
+                              CategoriaRepository categoriaRepository,
+                              CategoriaService categoriaService) {
+        this.productoService = productoService;
+        this.imagenProductoService = imagenProductoService;
+        this.cloudinaryService = cloudinaryService;
+        this.categoriaRepository = categoriaRepository;
+        this.categoriaService = categoriaService;
+    }
 
     @ResponseBody
     @PutMapping("/{id}/stock/{cantidad}")
@@ -62,15 +60,12 @@ public class ProductoController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
             }
 
-            if (file.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El archivo está vacío");
+            if (file.isEmpty() || !file.getContentType().startsWith("image/")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El archivo no es una imagen válida");
             }
 
             String urlCloudinary = cloudinaryService.subirImagen(file);
-
-            ImagenProducto imagen = new ImagenProducto();
-            imagen.setImageUrl(urlCloudinary);
-            imagen.setProducto(producto);
+            ImagenProducto imagen = new ImagenProducto(urlCloudinary, producto);
             imagenProductoService.guardarImagen(imagen);
 
             return ResponseEntity.ok("Imagen subida con éxito: " + urlCloudinary);
@@ -90,66 +85,25 @@ public class ProductoController {
             @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes) {
 
         try {
-            // Determinar la categoría final
-            Categoria categoria = null;
+            Categoria categoria = obtenerOCrearCategoria(nuevaCategoria, categoriaIdStr);
+            if (categoria == null) return "redirect:/VerProductos?error=CategoriaNoValida";
 
-            if (nuevaCategoria != null && !nuevaCategoria.trim().isEmpty()) {
-                // Buscar si ya existe una categoría con ese nombre
-                categoria = categoriaRepository.findByNombre(nuevaCategoria.trim());
-                if (categoria == null) {
-                    categoria = new Categoria();
-                    categoria.setNombre(nuevaCategoria.trim());
-                    categoria = categoriaRepository.save(categoria);
-                }
-            } 
-            else {
-                if (categoriaIdStr != null && !categoriaIdStr.trim().isEmpty()) {
-                    try {
-                        Long categoriaId = Long.parseLong(categoriaIdStr);
-                        categoria = categoriaRepository.findById(categoriaId).orElse(null);
-                    } catch (NumberFormatException e) {
-                        return "redirect:/VerProductos?error=CategoriaNoValida";
-                    }
-                }
-            }
-
-
-            if (categoria == null) {
-                return "redirect:/VerProductos?error=CategoriaNoValida";
-            }
-
-            // Crear y guardar el producto
-            Producto nuevoProducto = new Producto();
-            nuevoProducto.setProductName(productName);
-            nuevoProducto.setPrice(price);
-            nuevoProducto.setStock(stock);
-            nuevoProducto.setCategoria(categoria);
-            nuevoProducto.setDescription(description);
-
+            Producto nuevoProducto = new Producto(productName, price, stock, description, categoria);
             Producto productoGuardado = productoService.guardarProducto(nuevoProducto);
 
-            // Subir imágenes
-            if (imagenes != null && imagenes.length > 0) {
+            if (imagenes != null) {
                 for (MultipartFile imagen : imagenes) {
                     if (!imagen.isEmpty()) {
                         String urlImagen = cloudinaryService.subirImagen(imagen);
-                        ImagenProducto imagenProducto = new ImagenProducto();
-                        imagenProducto.setImageUrl(urlImagen);
-                        imagenProducto.setProducto(productoGuardado);
-                        imagenProductoService.guardarImagen(imagenProducto);
+                        imagenProductoService.guardarImagen(new ImagenProducto(urlImagen, productoGuardado));
                     }
                 }
             }
-
             return "redirect:/VerProductos?success=subido";
-
         } catch (Exception e) {
-            e.printStackTrace();
             return "redirect:/VerProductos?error=errorInterno";
         }
     }
-
-
 
     @ResponseBody
     @DeleteMapping("/eliminar/{id}")
@@ -165,80 +119,63 @@ public class ProductoController {
     @PostMapping("/actualizar")
     public String actualizarProducto(
             @ModelAttribute Producto producto,
-            @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes,
+            @RequestParam(value = "nuevasImagenes", required = false) MultipartFile[] imagenes,
             @RequestParam(value = "eliminarImagenes", required = false) List<Long> imagenesAEliminar,
             @RequestParam(value = "nuevaCategoria", required = false) String nuevaCategoria,
-            @RequestParam(value = "categoriaId", required = false) Long categoriaId
-    ) {
+            @RequestParam(value = "categoriaId", required = false) Long categoriaId) {
+
         Producto productoExistente = productoService.obtenerProducto(producto.getId());
-        if (productoExistente == null) {
-            return "redirect:/VerProductos?error=ProductoNoEncontrado";
-        }
+        if (productoExistente == null) return "redirect:/VerProductos?error=ProductoNoEncontrado";
 
         try {
-            // Manejo de nueva o existente categoría
-            Categoria categoria = null;
-            if (nuevaCategoria != null && !nuevaCategoria.trim().isEmpty()) {
-                categoria = categoriaRepository.findByNombre(nuevaCategoria.trim());
-                if (categoria == null) {
-                    categoria = new Categoria();
-                    categoria.setNombre(nuevaCategoria.trim());
-                    categoria = categoriaRepository.save(categoria);
-                }
-            } else if (categoriaId != null) {
-                categoria = categoriaRepository.findById(categoriaId).orElse(null);
-            }
+            Categoria categoria = obtenerOCrearCategoria(nuevaCategoria, categoriaId);
+            if (categoria == null) return "redirect:/VerProductos?error=CategoriaNoValida";
 
-            if (categoria == null) {
-                return "redirect:/VerProductos?error=CategoriaNoValida";
-            }
-
-            // Eliminar imágenes seleccionadas
             if (imagenesAEliminar != null) {
                 for (Long imagenId : imagenesAEliminar) {
                     imagenProductoService.eliminarPorId(imagenId);
                 }
             }
 
-            // Subir nuevas imágenes
-            if (imagenes != null && imagenes.length > 0) {
+            if (imagenes != null) {
                 for (MultipartFile imagen : imagenes) {
-                    if (imagen != null && !imagen.isEmpty()) {
+                    if (!imagen.isEmpty()) {
                         String url = cloudinaryService.subirImagen(imagen);
-                        ImagenProducto nuevaImagen = new ImagenProducto();
-                        nuevaImagen.setImageUrl(url);
-                        nuevaImagen.setProducto(productoExistente);
-                        imagenProductoService.guardarImagen(nuevaImagen);
+                        imagenProductoService.guardarImagen(new ImagenProducto(url, productoExistente));
                     }
                 }
             }
 
-            // Actualizar producto
-            productoExistente.setProductName(producto.getProductName());
-            productoExistente.setPrice(producto.getPrice());
-            productoExistente.setStock(producto.getStock());
-            productoExistente.setCategoria(categoria);
-            productoExistente.setDescription(producto.getDescription());
-
+            productoExistente.actualizarDatosDesde(producto, categoria);
             productoService.guardarProducto(productoExistente);
 
             return "redirect:/VerProductos?success=ProductoActualizado";
-
         } catch (IOException e) {
-            e.printStackTrace();
             return "redirect:/VerProductos?error=ErrorAlGuardarImagen";
         }
     }
 
-
     @GetMapping("/editar/{id}")
-    public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
-        Producto producto = productoService.obtenerPorId(id);
+    public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
+    	Producto producto = productoService.obtenerPorIdConCategoria(id);
         List<Categoria> categorias = categoriaService.obtenerTodas();
+        System.out.println("Categorías encontradas: " + categorias.size());
         model.addAttribute("producto", producto);
         model.addAttribute("categorias", categorias);
+        System.out.println("Producto: " + producto.getProductName());
+        System.out.println("Categorías disponibles:");
+        for (Categoria c : categorias) {
+            System.out.println("- " + c.getId() + ": " + c.getNombre());
+        }
+        System.out.println("✔ Producto: " + producto.getProductName());
+        System.out.println("✔ Categorías en model: " + categorias);
+        model.addAttribute("producto", producto);
+        model.addAttribute("categorias", categorias);
+
         return "EditarProducto";
+        
     }
+
     @GetMapping("/subirProducto")
     public String mostrarFormulario(Model model) {
         model.addAttribute("categorias", categoriaRepository.findAll());
@@ -258,4 +195,16 @@ public class ProductoController {
         }
     }
 
-}
+    // Helpers
+    private Categoria obtenerOCrearCategoria(String nuevaCategoria, Object categoriaIdObj) {
+        if (nuevaCategoria != null && !nuevaCategoria.trim().isEmpty()) {
+            return categoriaRepository.findByNombre(nuevaCategoria.trim()) != null ?
+                    categoriaRepository.findByNombre(nuevaCategoria.trim()) :
+                    categoriaRepository.save(new Categoria(nuevaCategoria.trim()));
+        } else if (categoriaIdObj != null) {
+            Long categoriaId = (categoriaIdObj instanceof Long) ? (Long) categoriaIdObj : Long.parseLong(categoriaIdObj.toString());
+            return categoriaRepository.findById(categoriaId).orElse(null);
+        }
+        return null;
+    }
+} 

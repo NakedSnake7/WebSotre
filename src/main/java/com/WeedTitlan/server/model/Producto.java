@@ -46,7 +46,24 @@ public class Producto {
     @Column(nullable = false)
     private boolean visibleEnMenu = true;
     
-    
+    //vacio
+    public Producto() {
+    }
+ // Constructor completo
+    public Producto(String productName, double price, int stock, String description, Categoria categoria) {
+        this.productName = productName;
+        this.price = price;
+        this.stock = stock;
+        this.description = description;
+        this.categoria = categoria;
+    }
+    public void actualizarDatosDesde(Producto producto, Categoria categoria) {
+        this.productName = producto.getProductName();
+        this.price = producto.getPrice();
+        this.stock = producto.getStock();
+        this.description = producto.getDescription();
+        this.categoria = categoria;
+    }
 
 
 

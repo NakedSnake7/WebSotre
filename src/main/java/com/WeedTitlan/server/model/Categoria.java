@@ -6,6 +6,16 @@ import java.util.List;
 @Entity
 @Table(name = "categorias")
 public class Categoria {
+	
+	
+	// 🛠 Constructor vacío requerido por Hibernate
+    public Categoria() {
+    }
+	// Constructor que acepta solo el nombre
+	public Categoria(String nombre) {
+	    this.nombre = nombre;
+	}
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

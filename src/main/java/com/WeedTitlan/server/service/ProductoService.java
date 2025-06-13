@@ -27,6 +27,7 @@ public class ProductoService {
     private ProductoRepository productoRepository;
 
     @Autowired
+    
     private ImagenProductoRepository imagenProductoRepository;
 
     public List<Producto> obtenerTodosLosProductos() {
@@ -49,13 +50,26 @@ public class ProductoService {
     @Transactional
     public Producto findById(Long id) {
         return productoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado")); 
+        
     }
 
     @Transactional
     public Producto obtenerPorId(Long id) {
-        return findById(id); // Reutiliza el método anterior
+        return productoRepository.findByIdWithCategoria(id)
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
     }
+    public Producto obtenerPorIdConCategoria(Long id) {
+        Producto producto = productoRepository.findByIdWithCategoria(id)
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        System.out.println("✔ Producto: " + producto.getProductName());
+        System.out.println("✔ Categoría del producto: " +
+            (producto.getCategoria() != null ? producto.getCategoria().getNombre() : "NULL"));
+
+        return producto;
+    }
+
 
 
     @Transactional

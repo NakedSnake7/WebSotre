@@ -15,8 +15,11 @@ public class CategoriaService {
     private CategoriaRepository categoriaRepository;
 
     public List<Categoria> obtenerTodas() {
-        return categoriaRepository.findAll();
+        List<Categoria> categorias = categoriaRepository.findAll();
+        System.out.println("🔎 Categorías obtenidas: " + categorias);
+        return categorias; // ✅ devuelve la misma lista que imprimes
     }
+
 
     public Categoria obtenerPorId(Long id) {
         return categoriaRepository.findById(id)
