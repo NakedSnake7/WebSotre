@@ -40,12 +40,9 @@
 			</div>
 
 			<!-- Categoría -->
+<!--
 <div class="form-group">
     <label for="categoria">Categoría:</label>
-
-    <p th:if="${categorias != null}" th:text="'✔ ' + ${#lists.size(categorias)} + ' categorías cargadas'">Cargando...</p>
-    <p th:if="${categorias == null or #lists.isEmpty(categorias)}">⚠️ No hay categorías disponibles</p>
-
     <select th:field="*{categoria.id}" class="form-control" id="categoria">
         <option value="">Selecciona una categoría</option>
         <option th:each="categoria : ${categorias}"
@@ -54,6 +51,8 @@
         </option>
     </select>
 </div>
+-->
+
 
 
 

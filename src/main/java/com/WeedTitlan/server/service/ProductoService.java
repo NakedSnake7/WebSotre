@@ -150,5 +150,16 @@ public class ProductoService {
         }
         return productoRepository.save(producto);
     }
+    public void actualizarCamposBasicos(Producto nuevoProducto) {
+        Producto existente = productoRepository.findById(nuevoProducto.getId())
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        existente.setProductName(nuevoProducto.getProductName());
+        existente.setPrice(nuevoProducto.getPrice());
+        existente.setStock(nuevoProducto.getStock());
+        existente.setDescription(nuevoProducto.getDescription());
+
+        productoRepository.save(existente);
+    }
 
 }

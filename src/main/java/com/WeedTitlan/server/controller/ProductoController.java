@@ -120,23 +120,20 @@ public class ProductoController {
     public String actualizarProducto(
             @ModelAttribute Producto producto,
             @RequestParam(value = "nuevasImagenes", required = false) MultipartFile[] imagenes,
-            @RequestParam(value = "eliminarImagenes", required = false) List<Long> imagenesAEliminar,
-            @RequestParam(value = "nuevaCategoria", required = false) String nuevaCategoria,
-            @RequestParam(value = "categoriaId", required = false) Long categoriaId) {
+            @RequestParam(value = "eliminarImagenes", required = false) List<Long> imagenesAEliminar) {
 
         Producto productoExistente = productoService.obtenerProducto(producto.getId());
         if (productoExistente == null) return "redirect:/VerProductos?error=ProductoNoEncontrado";
 
         try {
-            Categoria categoria = obtenerOCrearCategoria(nuevaCategoria, categoriaId);
-            if (categoria == null) return "redirect:/VerProductos?error=CategoriaNoValida";
-
+            // Eliminar imágenes si se marcaron
             if (imagenesAEliminar != null) {
                 for (Long imagenId : imagenesAEliminar) {
                     imagenProductoService.eliminarPorId(imagenId);
                 }
             }
 
+            // Subir nuevas imágenes si se enviaron
             if (imagenes != null) {
                 for (MultipartFile imagen : imagenes) {
                     if (!imagen.isEmpty()) {
@@ -146,7 +143,12 @@ public class ProductoController {
                 }
             }
 
-            productoExistente.actualizarDatosDesde(producto, categoria);
+            // Actualizar campos básicos (sin categoría)
+            productoExistente.setProductName(producto.getProductName());
+            productoExistente.setPrice(producto.getPrice());
+            productoExistente.setStock(producto.getStock());
+            productoExistente.setDescription(producto.getDescription());
+
             productoService.guardarProducto(productoExistente);
 
             return "redirect:/VerProductos?success=ProductoActualizado";
@@ -155,26 +157,6 @@ public class ProductoController {
         }
     }
 
-    @GetMapping("/editar/{id}")
-    public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
-    	Producto producto = productoService.obtenerPorIdConCategoria(id);
-        List<Categoria> categorias = categoriaService.obtenerTodas();
-        System.out.println("Categorías encontradas: " + categorias.size());
-        model.addAttribute("producto", producto);
-        model.addAttribute("categorias", categorias);
-        System.out.println("Producto: " + producto.getProductName());
-        System.out.println("Categorías disponibles:");
-        for (Categoria c : categorias) {
-            System.out.println("- " + c.getId() + ": " + c.getNombre());
-        }
-        System.out.println("✔ Producto: " + producto.getProductName());
-        System.out.println("✔ Categorías en model: " + categorias);
-        model.addAttribute("producto", producto);
-        model.addAttribute("categorias", categorias);
-
-        return "EditarProducto";
-        
-    }
 
     @GetMapping("/subirProducto")
     public String mostrarFormulario(Model model) {
