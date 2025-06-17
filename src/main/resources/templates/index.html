@@ -175,6 +175,46 @@
         transition: transform 0.2s ease-in-out;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
+    /* Por defecto sin sombras */
+.product-wrapper {
+    position: relative;
+}
+
+.product-wrapper.scrollable::before,
+.product-wrapper.scrollable::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.product-wrapper.scrollable::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.6), transparent);
+}
+
+.product-wrapper.scrollable::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.6), transparent);
+}
+    /* Desactivamos sombras si no hay scroll o estamos en el borde */
+.product-wrapper::before,
+.product-wrapper::after {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.product-wrapper.sombra-izquierda::before {
+    opacity: 1;
+}
+
+.product-wrapper.sombra-derecha::after {
+    opacity: 1;
+}
+    
 </style>
 
 
@@ -747,33 +787,68 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const sections = document.querySelectorAll("[id^='cat-']");
-        const links = document.querySelectorAll(".category-scroll a");
 
-        function onScroll() {
-            let current = "";
+document.addEventListener("DOMContentLoaded", function () {
+    const sections = document.querySelectorAll("[id^='cat-']");
+    const links = document.querySelectorAll(".category-scroll a");
 
-            sections.forEach(section => {
-                const sectionTop = section.getBoundingClientRect().top;
-                if (sectionTop <= 100) {
-                    current = section.getAttribute("id");
-                }
-            });
+    function onScroll() {
+        let current = "";
 
-            links.forEach(link => {
-                link.classList.remove("active");
-                if (link.getAttribute("href") === `#${current}`) {
-                    link.classList.add("active");
-                }
-            });
-        }
+        sections.forEach(section => {
+            const sectionTop = section.getBoundingClientRect().top;
+            if (sectionTop <= 100) {
+                current = section.getAttribute("id");
+            }
+        });
 
-        window.addEventListener("scroll", onScroll);
-        onScroll(); // Ejecutar al cargar
+        links.forEach(link => {
+            link.classList.remove("active");
+            if (link.getAttribute("href") === `#${current}`) {
+                link.classList.add("active");
+            }
+        });
+    }
+
+    window.addEventListener("scroll", onScroll);
+    onScroll(); // Ejecutar al cargar
+});
+
+function actualizarSombrasScroll() {
+    document.querySelectorAll('.product-wrapper').forEach(wrapper => {
+        const scrollArea = wrapper.querySelector('.product-scroll');
+
+        if (!scrollArea) return;
+
+        // Detecta si hay overflow horizontal
+        const tieneScroll = scrollArea.scrollWidth > scrollArea.clientWidth;
+        wrapper.classList.toggle('scrollable', tieneScroll);
+
+        if (!tieneScroll) return;
+
+        // Crea clases dinámicas para sombreado izquierda/derecha
+        const alInicio = scrollArea.scrollLeft <= 5;
+        const alFinal = scrollArea.scrollLeft + scrollArea.clientWidth >= scrollArea.scrollWidth - 5;
+
+        wrapper.classList.toggle('sombra-izquierda', !alInicio);
+        wrapper.classList.toggle('sombra-derecha', !alFinal);
     });
+}
+
+// Reacciona al scroll para ajustar sombras
+function manejarEventoScroll() {
+    document.querySelectorAll('.product-scroll').forEach(scrollArea => {
+        scrollArea.addEventListener('scroll', actualizarSombrasScroll);
+    });
+}
+
+// Ejecuta en eventos importantes
+window.addEventListener('load', () => {
+    actualizarSombrasScroll();
+    manejarEventoScroll();
+});
+window.addEventListener('resize', actualizarSombrasScroll);
+
 </script>
 
 
