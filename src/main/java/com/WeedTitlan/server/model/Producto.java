@@ -46,9 +46,28 @@ public class Producto {
     @Column(nullable = false)
     private boolean visibleEnMenu = true;
     
+    @Column(name = "tiene_promocion", nullable = false)
+    private Boolean tienePromocion;
+
+    @Column(name = "porcentaje_descuento", nullable = false)
+    private Double porcentajeDescuento;
+
+    
+    public double getPrecioConDescuento() {
+        if (tienePromocion && porcentajeDescuento != null) {
+            return price - (price * porcentajeDescuento / 100);
+        }
+        return price;
+    } 
+
+    
     //vacio
     public Producto() {
+        this.visibleEnMenu = true;
+        this.tienePromocion = false;
+        this.porcentajeDescuento = 0.0;
     }
+
  // Constructor completo
     public Producto(String productName, double price, int stock, String description, Categoria categoria) {
         this.productName = productName;
@@ -128,7 +147,23 @@ public class Producto {
         return visibleEnMenu;
     }
 
-    public void setVisibleEnMenu(boolean visibleEnMenu) {
+    public void setVisibleEnMenu(Boolean visibleEnMenu) {
         this.visibleEnMenu = visibleEnMenu;
     }
+    public Boolean getTienePromocion() {
+        return tienePromocion;
+    }
+
+    public void setTienePromocion(Boolean tienePromocion) {
+        this.tienePromocion = tienePromocion;
+    }
+
+    public Double getPorcentajeDescuento() {
+        return porcentajeDescuento;
+    }
+
+    public void setPorcentajeDescuento(Double porcentajeDescuento) {
+        this.porcentajeDescuento = porcentajeDescuento;
+    }
+
 }

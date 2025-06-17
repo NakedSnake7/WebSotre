@@ -161,5 +161,10 @@ public class ProductoService {
 
         productoRepository.save(existente);
     }
+    public Producto obtenerProductoPorId(Long id) {
+        return productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
+    }
+
 
 }

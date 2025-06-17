@@ -67,9 +67,28 @@
 							</div>
 							<div class="card-body">
 								<h1 class="text-center mb-4">
-									<a href="#" class="badge badge-primary"
-										th:text="${producto.price}"></a>
+									<!-- Si tiene promoción -->
+									<span th:if="${producto.tienePromocion}"> <!-- Precio normal tachado -->
+										<span class="badge badge-secondary mr-2"
+										style="text-decoration: line-through;"> <span
+											th:text="'$' + ${#numbers.formatDecimal(producto.price, 1, 'POINT', 2, 'POINT')}"></span>
+									</span> <!-- Precio con descuento --> <span class="badge badge-danger">
+											<span
+											th:text="'$' + ${#numbers.formatDecimal(producto.precioConDescuento, 1, 'POINT', 2, 'POINT')}"></span>
+									</span> <!-- Porcentaje de descuento --> <span
+										class="badge badge-success ml-1"> -<span
+											th:text="${producto.porcentajeDescuento}"></span>%
+									</span>
+									</span>
+
+									<!-- Si NO tiene promoción -->
+									<span th:if="${!producto.tienePromocion}"> <span
+										class="badge badge-primary"> <span
+											th:text="'$' + ${#numbers.formatDecimal(producto.price, 1, 'POINT', 2, 'POINT')}"></span>
+									</span>
+									</span>
 								</h1>
+
 								<h4 class="pt20 pb20" th:text="${producto.productName}"></h4>
 								<!-- F <p class="text-white" th:text="${producto.description}"></p> -->
 								<div class="descripcion-producto text-white">

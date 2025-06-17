@@ -139,10 +139,25 @@
               <img th:src="${#lists.isEmpty(producto.imagenes) ? '/imgs/default.png' : producto.imagenes[0].imageUrl}"
                    th:alt="'Imagen de ' + ${producto.productName}" width="50" height="50" />
             </td>
-            <td>
-              <a th:href="@{/editar/{id}(id=${producto.id})}" class="btn btn-warning btn-sm">Editar</a>
+             
+            <td><a th:href="@{/editar/{id}(id=${producto.id})}" class="btn btn-warning btn-sm">Editar</a>
               <button class="btn btn-danger btn-sm delete-product" th:attr="data-id=${producto.id}">Eliminar</button>
+                       <!-- Activar/Desactivar Promoción -->
+<form th:action="@{/productos/togglePromocion}" method="post" style="display:inline;">
+  <input type="hidden" name="id" th:value="${producto.id}" />
+  <input type="hidden" name="activar" th:value="${producto.tienePromocion != null && producto.tienePromocion ? false : true}" />
+  
+  <button type="submit"
+    th:class="${'btn btn-sm ' + ((producto.tienePromocion != null && producto.tienePromocion) ? 'btn-danger' : 'btn-success')}">
+    <span th:text="${producto.tienePromocion != null && producto.tienePromocion ? 'Desactivar Promo' : 'Activar Promo'}"></span>
+  </button>
+</form>
+
+
+
+
             </td>
+   
             <td>
               <input type="checkbox" class="toggle-visibility"
                      th:attr="data-id=${producto.id}"
@@ -154,7 +169,8 @@
     </div>
   </div>
 
-  <a th:href="@{/productos/subirProducto}" class="subirProducto-btn">Subir Productos</a>
+ <a th:href="@{/productos/nuevo}" class="subirProducto-btn">Subir Productos</a>
+
 
 
 

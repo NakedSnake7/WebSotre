@@ -76,19 +76,32 @@ public class ProductoController {
 
     @PostMapping("/subirProducto")
     public String subirProducto(
+    		@RequestParam(value = "porcentajeDescuento", required = false) Double porcentajeDescuento,
             @RequestParam("productName") String productName,
             @RequestParam("price") double price,
             @RequestParam("stock") int stock,
             @RequestParam(value = "categoriaId", required = false) String categoriaIdStr,
             @RequestParam("description") String description,
             @RequestParam(value = "nuevaCategoria", required = false) String nuevaCategoria,
-            @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes) {
-
+            @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes)
+    {
+            
         try {
             Categoria categoria = obtenerOCrearCategoria(nuevaCategoria, categoriaIdStr);
             if (categoria == null) return "redirect:/VerProductos?error=CategoriaNoValida";
 
             Producto nuevoProducto = new Producto(productName, price, stock, description, categoria);
+
+            if (porcentajeDescuento != null && porcentajeDescuento > 0 && porcentajeDescuento <= 100) {
+                nuevoProducto.setTienePromocion(true);
+                nuevoProducto.setPorcentajeDescuento(porcentajeDescuento);
+            } else {
+                nuevoProducto.setTienePromocion(false);
+                nuevoProducto.setPorcentajeDescuento(0.0);
+            }
+
+
+            
             Producto productoGuardado = productoService.guardarProducto(nuevoProducto);
 
             if (imagenes != null) {
@@ -120,13 +133,15 @@ public class ProductoController {
     public String actualizarProducto(
             @ModelAttribute Producto producto,
             @RequestParam(value = "nuevasImagenes", required = false) MultipartFile[] imagenes,
-            @RequestParam(value = "eliminarImagenes", required = false) List<Long> imagenesAEliminar) {
+            @RequestParam(value = "eliminarImagenes", required = false) List<Long> imagenesAEliminar,
+            @RequestParam(value = "porcentajeDescuento", required = false) Double porcentajeDescuento
+    ) {
 
         Producto productoExistente = productoService.obtenerProducto(producto.getId());
         if (productoExistente == null) return "redirect:/VerProductos?error=ProductoNoEncontrado";
 
         try {
-            // Eliminar imágenes si se marcaron
+            // Eliminar imágenes marcadas
             if (imagenesAEliminar != null) {
                 for (Long imagenId : imagenesAEliminar) {
                     imagenProductoService.eliminarPorId(imagenId);
@@ -143,7 +158,16 @@ public class ProductoController {
                 }
             }
 
-            // Actualizar campos básicos (sin categoría)
+            if (porcentajeDescuento != null && porcentajeDescuento > 0 && porcentajeDescuento <= 100) {
+                productoExistente.setTienePromocion(true);
+                productoExistente.setPorcentajeDescuento(porcentajeDescuento);
+            } else {
+                productoExistente.setTienePromocion(false);
+                productoExistente.setPorcentajeDescuento(0.0);
+            }
+
+
+            // Actualizar datos del producto
             productoExistente.setProductName(producto.getProductName());
             productoExistente.setPrice(producto.getPrice());
             productoExistente.setStock(producto.getStock());
@@ -157,12 +181,12 @@ public class ProductoController {
         }
     }
 
-
     @GetMapping("/subirProducto")
-    public String mostrarFormulario(Model model) {
-        model.addAttribute("categorias", categoriaRepository.findAll());
-        return "subirProducto";
+    public String redirigirAFormulario() {
+        return "redirect:/nuevo";
     }
+
+
 
     @ResponseBody
     @PostMapping("/toggle-visibility")
@@ -176,6 +200,36 @@ public class ProductoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado.");
         }
     }
+    @GetMapping("/nuevo")
+    public String mostrarFormularioNuevoProducto(Model model) {
+        model.addAttribute("producto", new Producto()); // necesario para evitar errores en Thymeleaf
+        model.addAttribute("categorias", categoriaRepository.findAll());// o categoriaRepository.findAll()
+        return "subirProducto";
+    }
+    @GetMapping("/editar/{id}")
+    public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
+    	Producto producto = productoService.obtenerPorIdConCategoria(id);
+        if (producto == null) {
+            return "redirect:/VerProductos?error=ProductoNoEncontrado";
+        }
+
+        model.addAttribute("producto", producto);
+        model.addAttribute("categorias", categoriaRepository.findAll());
+        return "editarProducto"; // Este debe ser el nombre exacto de tu archivo HTML (editarProducto.html)
+    }
+    @PostMapping("/togglePromocion")
+    public String togglePromocion(@RequestParam Long id, @RequestParam boolean activar) {
+        Producto producto = productoService.obtenerProductoPorId(id);
+        producto.setTienePromocion(activar);
+
+        if (activar && producto.getPorcentajeDescuento() == 0) {
+            producto.setPorcentajeDescuento(10.0); // Valor por defecto si estaba en 0
+        }
+
+        productoService.guardarProducto(producto);
+        return "redirect:/VerProductos";
+    }
+
 
     // Helpers
     private Categoria obtenerOCrearCategoria(String nuevaCategoria, Object categoriaIdObj) {

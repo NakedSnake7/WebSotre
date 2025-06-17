@@ -37,7 +37,7 @@
 				<label>Descripción:</label>
 				<textarea class="form-control" th:field="*{description}" rows="4"
 					required></textarea>
-			</div>
+			</div>	
 
 			<!-- Categoría -->
 <!--
@@ -52,6 +52,16 @@
     </select>
 </div>
 -->
+
+
+<div class="form-group">
+    <label for="porcentajeDescuento">Porcentaje de Descuento (%)</label>
+    <input type="number" class="form-control" id="porcentajeDescuento"
+           name="porcentajeDescuento"
+           th:value="${producto.porcentajeDescuento}"
+           min="0" max="100" step="1"/>
+</div>
+
 
 
 
