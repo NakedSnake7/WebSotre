@@ -15,6 +15,8 @@ import com.WeedTitlan.server.model.ImagenProducto;
 import com.WeedTitlan.server.model.Producto;
 import com.WeedTitlan.server.repository.ImagenProductoRepository;
 import com.WeedTitlan.server.repository.ProductoRepository;
+import com.WeedTitlan.server.dto.ProductoResumenDTO;
+
 
 import jakarta.transaction.Transactional;
 
@@ -38,6 +40,13 @@ public class ProductoService {
     public List<Producto> listarProductos() {
         return productoRepository.findAllWithImages();
     }
+    public List<ProductoResumenDTO> obtenerProductosParaMenu() {
+        return productoRepository.obtenerProductosParaMenu();
+    }
+    public List<String> obtenerCategorias() {
+        return productoRepository.obtenerNombresCategoriasVisibles();
+    }
+
 
     @Transactional
     public Producto obtenerProducto(Long id) {

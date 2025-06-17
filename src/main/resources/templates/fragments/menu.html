@@ -1,140 +1,92 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<body>
+<div th:fragment="menu">
+	<!-- Menu Section -->
+	<div id="menu" class="text-center bg-dark text-light has-height-md middle-items wow fadeIn">
+		<h2 class="section-title">
+			<a href="/menu" class="text-light text-decoration-none">MENU</a>
+		</h2>
+	</div>
 
-	<div th:fragment="menu">
-		<!--  MenuSection  -->
-		<div id="menu"
-			class="text-center bg-dark text-light has-height-md middle-items wow fadeIn">
-			<h2 class="section-title">
-				<a href="/menu" class="text-light text-decoration-none">MENU</a>
-			</h2>
-		</div>
-		<div class="row justify-content-center">
-			<div class="col-sm-7 col-md-4 mb-5">
-				<ul id="menu-list" class="nav nav-pills nav-justified mb-3"></ul>
-				<ul class="nav nav-pills nav-justified mb-3" id="pills-tab"
-					role="tablist">
-					<li class="nav-item" th:each="categoria, iter : ${categorias}">
-						<a class="nav-link" th:classappend="${iter.first} ? 'active' : ''"
-						data-toggle="pill" th:href="'#' + ${categoria}"
-						th:text="${categoria}"> </a>
-					</li>
-				</ul>
-			</div>
-		</div>
-		<div class="tab-content" id="pills-tabContent">
-			<!-- Itera sobre las categorías pasadas desde el controlador -->
-			<div th:each="categoria, iter : ${categorias}" class="tab-pane fade"
-				th:classappend="${iter.first} ? 'show active' : ''"
-				th:id="${categoria}" role="tabpanel">
-				<div class="row">
-					<!-- Itera sobre los productos y filtra por categoría -->
-					<div th:each="producto : ${productos}"
-						th:if="${producto.visibleEnMenu} and ${producto.categoria.nombre.equals(categoria)}"
-						class="col-md-4">
-
-						<div class="card bg-transparent border my-3 my-md-0">
-							<div th:id="'carousel-' + ${producto.id}" class="carousel slide"
-								data-ride="carousel">
-								<div class="carousel-inner">
-									<!-- Verifica si el producto tiene imágenes -->
-									<div class="carousel-item active"
-										th:if="${#lists.isEmpty(producto.imagenes)}">
-										<img th:src="@{/imgs/default.png}" class="d-block w-100"
-											alt="Imagen por defecto">
-									</div>
-
-									<!-- Itera sobre las imágenes del producto -->
-									<div th:each="imagen, iterStat : ${producto.imagenes}"
-										class="carousel-item"
-										th:classappend="${iterStat.first} ? 'active' : ''">
-										<img th:src="@{${imagen.imageUrl}}" class="d-block w-100"
-											th:alt="'Imagen de ' + ${producto.productName}">
-									</div>
-
-								</div>
-								<!-- Controles del carrusel -->
-								<a class="carousel-control-prev"
-									th:href="'#carousel-' + ${producto.id}" role="button"
-									data-slide="prev"> <span class="carousel-control-prev-icon"
-									aria-hidden="true"></span> <span class="sr-only">Anterior</span>
-								</a> <a class="carousel-control-next"
-									th:href="'#carousel-' + ${producto.id}" role="button"
-									data-slide="next"> <span class="carousel-control-next-icon"
-									aria-hidden="true"></span> <span class="sr-only">Siguiente</span>
-								</a>
-							</div>
-							<div class="card-body">
-								<h1 class="text-center mb-4">
-									<!-- Si tiene promoción -->
-									<span th:if="${producto.tienePromocion}"> <!-- Precio normal tachado -->
-										<span class="badge badge-secondary mr-2"
-										style="text-decoration: line-through;"> <span
-											th:text="'$' + ${#numbers.formatDecimal(producto.price, 1, 'POINT', 2, 'POINT')}"></span>
-									</span> <!-- Precio con descuento --> <span class="badge badge-danger">
-											<span
-											th:text="'$' + ${#numbers.formatDecimal(producto.precioConDescuento, 1, 'POINT', 2, 'POINT')}"></span>
-									</span> <!-- Porcentaje de descuento --> <span
-										class="badge badge-success ml-1"> -<span
-											th:text="${producto.porcentajeDescuento}"></span>%
-									</span>
-									</span>
-
-									<!-- Si NO tiene promoción -->
-									<span th:if="${!producto.tienePromocion}"> <span
-										class="badge badge-primary"> <span
-											th:text="'$' + ${#numbers.formatDecimal(producto.price, 1, 'POINT', 2, 'POINT')}"></span>
-									</span>
-									</span>
-								</h1>
-
-								<h4 class="pt20 pb20" th:text="${producto.productName}"></h4>
-								<!-- F <p class="text-white" th:text="${producto.description}"></p> -->
-								<div class="descripcion-producto text-white">
-									<div class="descripcion-corta"
-										th:text="${producto.description}"
-										style="white-space: pre-line;"></div>
-									<a href="javascript:void(0);"
-										class="ver-mas text-primary d-inline-flex align-items-center"
-										onclick="toggleDescripcion(this)"> <span>Ver más</span> <svg
-											class="icono-flecha ml-1" width="16" height="16"
-											viewBox="0 0 24 24" fill="none"
-											xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 9l6 6 6-6" stroke="currentColor"
-												stroke-width="2" fill="none" stroke-linecap="round"
-												stroke-linejoin="round" />
-        </svg>
-									</a>
-								</div>
-
-
-
-								<!-- Selector de cantidad -->
-								<div class="mb-3 d-flex align-items-center">
-									<label for="quantity-[[${producto.id}]]"
-										class="text-white mr-2">Cantidad:</label> <input type="number"
-										th:id="'quantity-' + ${producto.id}" name="quantity"
-										class="form-control-modern" min="1" value="1"
-										style="width: 3.0rem; text-align: center;">
-								</div>
-
-								<div class="text-center">
-									<button class="btn btn-primary btn-sm px-3 add-to-cart"
-										th:attr="data-name=${producto.productName}, data-price=${producto.price}, data-quantity-id='quantity-' + ${producto.id}">
-										Agregar al carrito</button>
-								</div>
-							</div>
-
-						</div>
-					</div>
-					<!-- Fin del loop de productos -->
-				</div>
-			</div>
-			<!-- Fin del loop de categorías -->
+	<div class="row justify-content-center">
+		<div class="col-sm-7 col-md-4 mb-5">
+			<ul id="menu-list" class="nav nav-pills nav-justified mb-3"></ul>
+			<ul class="nav nav-pills nav-justified mb-3" id="pills-tab" role="tablist">
+				<li class="nav-item" th:each="categoria, iter : ${categorias}">
+					<a class="nav-link"
+					   th:classappend="${iter.first} ? 'active' : ''"
+					   data-toggle="pill"
+					   th:href="'#' + ${categoria}"
+					   th:text="${categoria}"> </a>
+				</li>
+			</ul>
 		</div>
 	</div>
 
+	<div class="tab-content" id="pills-tabContent">
+		<!-- Iterar sobre las categorías -->
+		<div th:each="categoria, iter : ${categorias}"
+			 class="tab-pane fade"
+			 th:classappend="${iter.first} ? 'show active' : ''"
+			 th:id="${categoria}" role="tabpanel">
+			<div class="row">
+				<!-- Iterar productos por categoría -->
+				<div th:each="producto : ${productos}"
+					 th:if="${producto.categoria == categoria}"
+					 class="col-md-4">
+					
+					<div class="card bg-transparent border my-3 my-md-0">
+						<img th:src="@{${producto.imagenUrl != null ? producto.imagenUrl : '/imgs/default.png'}}"
+							 class="d-block w-100" alt="Imagen de producto">
 
-</body>
-</html>
+						<div class="card-body">
+							<h1 class="text-center mb-4">
+								<!-- Con promoción -->
+								<span th:if="${producto.tienePromocion}">
+									<span class="badge badge-secondary mr-2" style="text-decoration: line-through;">
+										$<span th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 2, 'NONE')}"></span>
+									</span>
+									<span class="badge badge-danger">
+										$<span th:text="${#numbers.formatDecimal(producto.precioConDescuento, 1, 'POINT', 2, 'NONE')}"></span>
+									</span>
+									<span class="badge badge-success ml-1">
+										-<span th:text="${producto.porcentajeDescuento}"></span>%
+									</span>
+								</span>
+
+								<!-- Sin promoción -->
+								<span th:if="${!producto.tienePromocion}">
+									<span class="badge badge-primary">
+										$<span th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 2, 'NONE')}"></span>
+									</span>
+								</span>
+							</h1>
+
+							<h4 class="pt20 pb20" th:text="${producto.productName}"></h4>
+
+							<!-- Selector cantidad -->
+							<div class="mb-3 d-flex align-items-center">
+								<label th:for="'quantity-' + ${producto.id}" class="text-white mr-2">Cantidad:</label>
+								<input type="number"
+									   th:id="'quantity-' + ${producto.id}"
+									   name="quantity"
+									   class="form-control-modern"
+									   min="1"
+									   value="1"
+									   style="width: 3.0rem; text-align: center;">
+							</div>
+
+							<div class="text-center">
+								<button class="btn btn-primary btn-sm px-3 add-to-cart"
+										th:attr="data-name=${producto.productName}, data-price=${producto.price}, data-quantity-id='quantity-' + ${producto.id}">
+									Agregar al carrito
+								</button>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<!-- Fin productos -->
+			</div>
+		</div>
+		<!-- Fin categorías -->
+	</div>
+</div>
