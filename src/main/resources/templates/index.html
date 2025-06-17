@@ -136,6 +136,12 @@
                 max-width: 200px;
             }
         }
+        .category-scroll .active {
+    background-color: #28a745 !important;
+    color: white !important;
+    border: none;
+}
+        
     </style>
 
 </head>
@@ -708,6 +714,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll("[id^='cat-']");
+        const links = document.querySelectorAll(".category-scroll a");
+
+        function onScroll() {
+            let current = "";
+
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                if (sectionTop <= 100) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            links.forEach(link => {
+                link.classList.remove("active");
+                if (link.getAttribute("href") === `#${current}`) {
+                    link.classList.add("active");
+                }
+            });
+        }
+
+        window.addEventListener("scroll", onScroll);
+        onScroll(); // Ejecutar al cargar
+    });
+</script>
+
 
 
 	<!--  About Section  -->
