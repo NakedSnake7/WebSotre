@@ -39,25 +39,29 @@
 
 						<div class="card-body">
 							<h1 class="text-center mb-4">
-								<!-- Con promoción -->
-								<span th:if="${producto.tienePromocion}">
-									<span class="badge badge-secondary mr-2" style="text-decoration: line-through;">
-										$<span th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 2, 'NONE')}"></span>
-									</span>
-									<span class="badge badge-danger">
-										$<span th:text="${#numbers.formatDecimal(producto.precioConDescuento, 1, 'POINT', 2, 'NONE')}"></span>
-									</span>
-									<span class="badge badge-success ml-1">
-										-<span th:text="${producto.porcentajeDescuento}"></span>%
-									</span>
-								</span>
+							
+								<!-- Si tiene promoción -->
+<!-- Si tiene promoción -->
+<span th:if="${producto.tienePromocion}">
+    <span class="badge badge-secondary mr-2" style="text-decoration: line-through;">
+        $<span th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 0, 'NONE')}"></span>
+    </span>
+    <span class="badge badge-danger">
+        $<span th:text="${#numbers.formatDecimal(producto.precioConDescuento, 1, 'POINT', 0, 'NONE')}"></span>
+    </span>
+    <span class="badge badge-success ml-1">
+        -<span th:text="${producto.porcentajeDescuento}"></span>%
+    </span>
+</span>
 
-								<!-- Sin promoción -->
-								<span th:if="${!producto.tienePromocion}">
-									<span class="badge badge-primary">
-										$<span th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 2, 'NONE')}"></span>
-									</span>
-								</span>
+<!-- Si NO tiene promoción -->
+<span th:if="${!producto.tienePromocion}">
+    <span class="badge badge-primary">
+        $<span th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 0, 'NONE')}"></span>
+    </span>
+</span>
+
+
 							</h1>
 
 							<h4 class="pt20 pb20" th:text="${producto.productName}"></h4>
