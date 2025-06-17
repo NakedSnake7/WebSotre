@@ -141,6 +141,35 @@
     color: white !important;
     border: none;
 }
+       .product-scroll::before,
+.product-scroll::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.product-scroll::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.6), transparent);
+}
+
+.product-scroll::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.6), transparent);
+}
+
+.product-scroll {
+    position: relative;
+}
+        .card:hover {
+    transform: scale(1.03);
+    transition: transform 0.2s ease-in-out;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
         
     </style>
 
