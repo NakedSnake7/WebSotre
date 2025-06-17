@@ -26,53 +26,56 @@
                     <!-- Nombre de la categoría -->
                     <h4 class="text-light mb-3" th:text="${categoria}"></h4>
 
-                    <!-- Carrusel horizontal de productos -->
-                    <div class="d-flex product-scroll">
-                        <div th:each="producto : ${productos}" 
-                             th:if="${producto.categoria == categoria}" 
-                             class="card bg-transparent border text-white mr-3"
-                             style="min-width: 250px; max-width: 250px; flex: 0 0 auto;">
-                             <span class="badge badge-warning position-absolute m-2">Nuevo</span>
-                             
-                            <img th:src="@{${producto.imagenUrl != null ? producto.imagenUrl : '/imgs/default.png'}}"
-                                 class="card-img-top" alt="Producto">
+                    <!-- Wrapper con sombra fija -->
+                    <div class="product-wrapper">
+                        <!-- Carrusel horizontal de productos -->
+                        <div class="d-flex product-scroll">
+                            <div th:each="producto : ${productos}" 
+                                 th:if="${producto.categoria == categoria}" 
+                                 class="card bg-transparent border text-white mr-3"
+                                 style="min-width: 250px; max-width: 250px; flex: 0 0 auto;">
+                                <span class="badge badge-warning position-absolute m-2">Nuevo</span>
+                                
+                                <img th:src="@{${producto.imagenUrl != null ? producto.imagenUrl : '/imgs/default.png'}}"
+                                     class="card-img-top" alt="Producto">
 
-                            <div class="card-body text-center">
-                                <h5 class="card-title" th:text="${producto.productName}"></h5>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title" th:text="${producto.productName}"></h5>
 
-                                <!-- Precio -->
-                                <div class="mb-2">
-                                    <span th:if="${producto.tienePromocion}">
-                                        <del class="text-muted">$<span th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 0, 'NONE')}"></span></del>
-                                        <span class="badge badge-danger ml-2">
-                                            $<span th:text="${#numbers.formatDecimal(producto.precioConDescuento, 1, 'POINT', 0, 'NONE')}"></span>
+                                    <!-- Precio -->
+                                    <div class="mb-2">
+                                        <span th:if="${producto.tienePromocion}">
+                                            <del class="text-muted">$<span th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 0, 'NONE')}"></span></del>
+                                            <span class="badge badge-danger ml-2">
+                                                $<span th:text="${#numbers.formatDecimal(producto.precioConDescuento, 1, 'POINT', 0, 'NONE')}"></span>
+                                            </span>
+                                            <span class="badge badge-success ml-1">
+                                                -<span th:text="${producto.porcentajeDescuento}"></span>%
+                                            </span>
                                         </span>
-                                        <span class="badge badge-success ml-1">
-                                            -<span th:text="${producto.porcentajeDescuento}"></span>%
+                                        <span th:if="${!producto.tienePromocion}">
+                                            <span class="badge badge-primary">
+                                                $<span th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 0, 'NONE')}"></span>
+                                            </span>
                                         </span>
-                                    </span>
-                                    <span th:if="${!producto.tienePromocion}">
-                                        <span class="badge badge-primary">
-                                            $<span th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 0, 'NONE')}"></span>
-                                        </span>
-                                    </span>
-                                </div>
+                                    </div>
 
-                                <!-- Cantidad y botón -->
-                                <div class="d-flex justify-content-center align-items-center mb-2">
-                                    <input type="number"
-                                           th:id="'quantity-' + ${producto.id}"
-                                           name="quantity"
-                                           class="form-control form-control-sm text-center mr-2"
-                                           value="1" min="1" style="width: 60px;">
-                                    <button class="btn btn-sm btn-success add-to-cart"
-                                            th:attr="data-name=${producto.productName}, data-price=${producto.price}, data-quantity-id='quantity-' + ${producto.id}">
-                                        +
-                                    </button>
+                                    <!-- Cantidad y botón -->
+                                    <div class="d-flex justify-content-center align-items-center mb-2">
+                                        <input type="number"
+                                               th:id="'quantity-' + ${producto.id}"
+                                               name="quantity"
+                                               class="form-control form-control-sm text-center mr-2"
+                                               value="1" min="1" style="width: 60px;">
+                                        <button class="btn btn-sm btn-success add-to-cart"
+                                                th:attr="data-name=${producto.productName}, data-price=${producto.price}, data-quantity-id='quantity-' + ${producto.id}">
+                                            +
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </div> <!-- Fin .product-scroll -->
+                    </div> <!-- Fin .product-wrapper -->
 
                 </div> <!-- Fin de categoría -->
             </div>

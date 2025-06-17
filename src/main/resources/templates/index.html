@@ -76,102 +76,107 @@
     }
     
 </style>
-    <style>
-        .nav-pills .nav-link.active {
-            background-color: #28a745 !important;
+<style>
+    .nav-pills .nav-link.active {
+        background-color: #28a745 !important;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .tab-pane > .d-flex {
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-pane > .d-flex > .card {
+        scroll-snap-align: start;
+    }
+
+    [id^="cat-"] {
+        scroll-margin-top: 80px;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    .product-wrapper {
+        position: relative;
+    }
+
+    .product-scroll {
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding-bottom: 10px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .product-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    .product-wrapper::before,
+    .product-wrapper::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 40px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .product-wrapper::before {
+        left: 0;
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.6), transparent);
+    }
+
+    .product-wrapper::after {
+        right: 0;
+        background: linear-gradient(to left, rgba(0, 0, 0, 0.6), transparent);
+    }
+
+    .category-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        flex-wrap: nowrap;
+    }
+
+    .category-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    .category-scroll .active {
+        background-color: #28a745 !important;
+        color: white !important;
+        border: none;
+    }
+
+    @media (max-width: 768px) {
+        .product-scroll {
+            gap: 0.5rem;
         }
 
         .card {
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            min-width: 200px;
+            max-width: 200px;
         }
+    }
 
-        .tab-pane > .d-flex {
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-        }
+    .card:hover {
+        transform: scale(1.03);
+        transition: transform 0.2s ease-in-out;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+</style>
 
-        .tab-pane > .d-flex > .card {
-            scroll-snap-align: start;
-        }
-
-        [id^="cat-"] {
-            scroll-margin-top: 80px;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        .product-scroll {
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            padding-bottom: 10px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .product-scroll::-webkit-scrollbar {
-            display: none;
-        }
-
-        .category-scroll {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            flex-wrap: nowrap;
-        }
-
-        .category-scroll::-webkit-scrollbar {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            .product-scroll {
-                gap: 0.5rem;
-            }
-
-            .card {
-                min-width: 200px;
-                max-width: 200px;
-            }
-        }
-        .category-scroll .active {
-    background-color: #28a745 !important;
-    color: white !important;
-    border: none;
-}
-       .product-scroll::before,
-.product-scroll::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 40px;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.product-scroll::before {
-    left: 0;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.6), transparent);
-}
-
-.product-scroll::after {
-    right: 0;
-    background: linear-gradient(to left, rgba(0, 0, 0, 0.6), transparent);
-}
-
-.product-scroll {
-    position: relative;
-}
-        .card:hover {
-    transform: scale(1.03);
-    transition: transform 0.2s ease-in-out;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
-        
-    </style>
 
 </head>
 <body>
