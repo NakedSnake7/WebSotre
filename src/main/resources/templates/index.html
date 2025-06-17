@@ -76,7 +76,67 @@
     }
     
 </style>
+    <style>
+        .nav-pills .nav-link.active {
+            background-color: #28a745 !important;
+        }
 
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-pane > .d-flex {
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-pane > .d-flex > .card {
+            scroll-snap-align: start;
+        }
+
+        [id^="cat-"] {
+            scroll-margin-top: 80px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .product-scroll {
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .product-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-scroll {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            flex-wrap: nowrap;
+        }
+
+        .category-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .product-scroll {
+                gap: 0.5rem;
+            }
+
+            .card {
+                min-width: 200px;
+                max-width: 200px;
+            }
+        }
+    </style>
 
 </head>
 <body>
