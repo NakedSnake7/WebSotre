@@ -40,13 +40,14 @@ public class ProductoService {
     public List<Producto> listarProductos() {
         return productoRepository.findAllWithImages();
     }
-    public List<ProductoResumenDTO> obtenerProductosParaMenu() {
-        return productoRepository.obtenerProductosParaMenu();
-    }
+ 
     public List<String> obtenerCategorias() {
         return productoRepository.obtenerNombresCategoriasVisibles();
     }
 
+    public List<Producto> obtenerProductosVisiblesConTodo() {
+        return productoRepository.findProductosVisiblesConTodo();
+    }
 
     @Transactional
     public Producto obtenerProducto(Long id) {

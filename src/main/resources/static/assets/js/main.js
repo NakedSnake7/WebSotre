@@ -1,23 +1,15 @@
-/*!
-=========================================================
-* FoodHut Landing page
-=========================================================
+import { configurarBotonWhatsApp } from './whatsapp.js';
+import { configurarModal } from './modal.js';
+import { configurarCarrito } from './carrito.js';
+import { configurarDescripciones } from './descripcion.js';
+import { configurarCategorias } from './categorias.js';
+import { configurarSombras } from './sombras.js';
 
-* Copyright: 2019 DevCRUD (https://devcrud.com)
-* Licensed: (https://devcrud.com/licenses)
-* Coded by www.devcrud.com
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// aqui se importan los componentes por separado en uno solo 
-
-import "./carrito.js";
-import "./formulario.js";
-import "./modal.js";
-import "./whatsapp.js";
-import "./foodhut.js";
-
- 
+document.addEventListener("DOMContentLoaded", function () {
+    configurarBotonWhatsApp();
+    configurarModal();
+    configurarCarrito();
+    configurarDescripciones();
+    configurarCategorias();
+    configurarSombras();
+});

@@ -19,17 +19,14 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     @EntityGraph(attributePaths = {"categoria"})
     @Query("SELECT p FROM Producto p WHERE p.id = :id")
     Optional<Producto> findByIdWithCategoria(@Param("id") Long id);
-    
-    @Query("SELECT new com.WeedTitlan.server.dto.ProductoResumenDTO(" +
-    	       "p.id, p.productName, p.price, p.tienePromocion, p.porcentajeDescuento, " +
-    	       "MIN(i.imageUrl), p.categoria.nombre) " +
-    	       "FROM Producto p LEFT JOIN p.imagenes i " +
-    	       "WHERE p.visibleEnMenu = true " +
-    	       "GROUP BY p.id, p.productName, p.price, p.tienePromocion, p.porcentajeDescuento, p.categoria.nombre")
-    	List<ProductoResumenDTO> obtenerProductosParaMenu();
+  
+
 
     @Query("SELECT DISTINCT p.categoria.nombre FROM Producto p WHERE p.visibleEnMenu = true")
     List<String> obtenerNombresCategoriasVisibles();
+    @EntityGraph(attributePaths = {"imagenes", "categoria"})
+    @Query("SELECT p FROM Producto p WHERE p.visibleEnMenu = true")
+    List<Producto> findProductosVisiblesConTodo();
 
 
 }

@@ -9,10 +9,11 @@ public class ProductoResumenDTO {
     private Double porcentajeDescuento;
     private String imagenUrl;
     private String categoria;
+    private String descripcion;
 
 
     public ProductoResumenDTO(Long id, String productName, double price,
-                              Boolean tienePromocion, Double porcentajeDescuento, String imagenUrl, String categoria) {
+                              Boolean tienePromocion, Double porcentajeDescuento, String imagenUrl, String categoria,String descripcion) {
         this.id = id;
         this.productName = productName;
         this.price = price;
@@ -20,6 +21,7 @@ public class ProductoResumenDTO {
         this.porcentajeDescuento = porcentajeDescuento != null ? porcentajeDescuento : 0.0;
         this.imagenUrl = imagenUrl;
         this.categoria = categoria; 
+        this.setDescripcion(descripcion);
     }
 
     public double getPrecioConDescuento() {
@@ -60,5 +62,13 @@ public class ProductoResumenDTO {
 
 	public void setCategoria(String categoria) {
 		this.categoria = categoria;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
 	}
 }
