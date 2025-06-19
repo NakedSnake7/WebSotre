@@ -32,45 +32,48 @@
 					<div class="product-wrapper">
 						<!-- Carrusel horizontal de productos -->
 						<div class="d-flex product-scroll">
-						<div th:each="producto : ${productos}"
-     th:if="${producto.categoria.nombre == categoria}"
-     class="card bg-transparent border text-white mr-3 position-relative"
-     style="min-width: 200px; max-width: 210px; flex: 0 0 auto;">
-
-								
-<span th:if="${producto.tienePromocion}"
-      class="badge badge-descuento badge-pulse position-absolute m-2"
-      style="top: 0.5rem; right: 0.5rem; z-index: 2;">
-    -<span th:text="${producto.porcentajeDescuento}">0</span>%
-</span>
+							<div th:each="producto : ${productos}"
+								th:if="${producto.categoria.nombre == categoria}"
+								class="card bg-transparent border text-white mr-3 position-relative"
+								style="min-width: 250px; max-width: 250px; flex: 0 0 auto;">
 
 
-				<div th:if="${producto.imagenes != null and #lists.size(producto.imagenes) > 0}" 
-     th:id="'carousel-' + ${producto.id}" 
-     class="carousel slide mb-2" data-bs-ride="carousel" data-bs-interval="3000">
-    
-    <div class="carousel-inner">
-        <div th:each="imagen, iterStat : ${producto.imagenes}" 
-             th:classappend="${iterStat.index == 0} ? 'active'" 
-             class="carousel-item">
-            <img th:src="@{${imagen.imageUrl != null ? imagen.imageUrl : '/imgs/default.png'}}"
-                 class="d-block w-100" alt="Imagen producto"
-                 style="max-height: 250px; object-fit: cover;">
-        </div>
-    </div>
+								<span th:if="${producto.tienePromocion}"
+									class="badge badge-descuento badge-pulse position-absolute m-2"
+									style="top: 0.5rem; left: 0.5rem; z-index: 2;"> -<span
+									th:text="${producto.porcentajeDescuento}">0</span>%
+								</span>
 
-    <!-- Controles opcionales -->
-    <button class="carousel-control-prev" type="button" 
-            th:attr="data-bs-target='#carousel-' + ${producto.id}" 
-            data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button class="carousel-control-next" type="button" 
-            th:attr="data-bs-target='#carousel-' + ${producto.id}" 
-            data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
-</div>
+
+								<div
+									th:if="${producto.imagenes != null and #lists.size(producto.imagenes) > 0}"
+									th:id="'carousel-' + ${producto.id}"
+									class="carousel slide mb-2" data-bs-ride="carousel"
+									data-bs-interval="3000">
+
+									<div class="carousel-inner">
+										<div th:each="imagen, iterStat : ${producto.imagenes}"
+											th:classappend="${iterStat.index == 0} ? 'active'"
+											class="carousel-item">
+											<img
+												th:src="@{${imagen.imageUrl != null ? imagen.imageUrl : '/imgs/default.png'}}"
+												class="d-block w-100" alt="Imagen producto"
+												style="max-height: 250px; object-fit: cover;">
+										</div>
+									</div>
+
+									<!-- Controles opcionales -->
+									<button class="carousel-control-prev" type="button"
+										th:attr="data-bs-target='#carousel-' + ${producto.id}"
+										data-bs-slide="prev">
+										<span class="carousel-control-prev-icon"></span>
+									</button>
+									<button class="carousel-control-next" type="button"
+										th:attr="data-bs-target='#carousel-' + ${producto.id}"
+										data-bs-slide="next">
+										<span class="carousel-control-next-icon"></span>
+									</button>
+								</div>
 
 
 
@@ -85,7 +88,7 @@
 													th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 0, 'NONE')}"></span>
 											</del> <span class="badge badge-success ml-2"> $<span
 												th:text="${#numbers.formatDecimal(producto.precioConDescuento, 1, 'POINT', 0, 'NONE')}"></span>
-										</span> 
+										</span>
 										</span> <span th:if="${!producto.tienePromocion}"> <span
 											class="badge badge-primary"> $<span
 												th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 0, 'NONE')}"></span>
@@ -93,40 +96,43 @@
 										</span>
 									</div>
 
-									<!-- Cantidad y botón -->
+									<!-- Cantidad y botón flotante -->
 									<div
-										class="d-flex justify-content-center align-items-center mb-2">
+										class="position-absolute d-flex align-items-center p-1 rounded"
+										style="top: 0.5rem; right: 0.5rem; z-index: 3; background-color: rgba(0, 0, 0, 0.6);">
 										<input type="number" th:id="'quantity-' + ${producto.id}"
 											name="quantity"
 											class="form-control form-control-sm text-center mr-2"
-											value="1" min="1" style="width: 60px;">
+											value="1" min="1"
+											style="width: 45px; height: 28px; font-size: 0.8rem; padding: 0;">
 										<button class="btn btn-sm btn-success add-to-cart"
-											th:attr="data-name=${producto.productName}, data-price=${producto.price}, data-quantity-id='quantity-' + ${producto.id}">
-											+</button>
+											th:attr="data-name=${producto.productName}, 
+             data-price=${producto.tienePromocion} ? ${producto.precioConDescuento} : ${producto.price}, 
+             data-quantity-id='quantity-' + ${producto.id}">
+											<i class="fas fa-cart-plus"></i>
+										</button>
 									</div>
-									<!-- Descripción corta -->
-									<div class="descripcion-corta text-light small mb-2 text-left">
-    <span th:text="${producto.description}"></span>
-</div>
-                                     
+										<!-- Descripción corta -->
+										<div class="descripcion-corta text-light small mb-2 text-left">
+											<span th:text="${producto.description}"></span>
+										</div>
 
-									<!-- Botón ver más / ver menos -->
-									<div class="text-left">
-										<a href="javascript:void(0);" class="ver-mas text-info"
-											onclick="toggleDescripcion(this)"> <span>Ver más</span>
-										</a>
-									</div>
 
+										<!-- Botón ver más / ver menos -->
+										<div class="text-right">
+											<a href="javascript:void(0);" class="ver-mas text-info"
+												onclick="toggleDescripcion(this)"> <span>Ver más</span>
+											</a>
+										</div>
 								</div>
 							</div>
+							<!-- Fin .product-scroll -->
 						</div>
-						<!-- Fin .product-scroll -->
-					</div>
-					<!-- Fin .product-wrapper -->
+						<!-- Fin .product-wrapper -->
 
+					</div>
+					<!-- Fin de categoría -->
 				</div>
-				<!-- Fin de categoría -->
 			</div>
 		</div>
 	</div>
-</div>

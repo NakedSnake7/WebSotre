@@ -1,6 +1,6 @@
 export function configurarBotonWhatsApp() {
     const whatsappButton = document.getElementById('whatsappButton');
-    const phoneNumber = "2213576114";
+    const phoneNumber = "2221519266";
     const message = "Hola, necesito ayuda con mi compra en WeedTlan";
 
     if (whatsappButton) {
