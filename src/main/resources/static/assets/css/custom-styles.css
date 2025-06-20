@@ -1,4 +1,10 @@
+#reseñas-container {
+    flex-wrap: wrap;
+}
 
+#reseñas-extra {
+    flex-wrap: wrap;
+}
 .producto-imagen {
   width: 100%;
   height: 300px;
