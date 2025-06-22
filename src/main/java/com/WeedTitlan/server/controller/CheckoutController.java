@@ -30,6 +30,11 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 
 @RestController
 @RequestMapping("/api")
@@ -121,6 +126,12 @@ public class CheckoutController {
 				logger.error("Error al enviar el correo: ", e);
 			}
 
+			
+			String mensaje = "Hola " + user.getFullName() + ", gracias por tu compra. Tu orden #" + order.getId() +
+	                 " fue recibida correctamente. Total: $" + order.getTotal();
+	enviarMensajeWhatsapp(user.getPhone(), mensaje);
+
+			
 			logger.debug("Orden creada exitosamente para el usuario: {}", user.getEmail());
 
 			return ResponseEntity.status(HttpStatus.CREATED)
@@ -130,8 +141,11 @@ public class CheckoutController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(Map.of("success", false, "message", "Error inesperado al procesar la orden"));
 		}
+		
 	}
-
+    //whatsapp
+	
+	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
 		Map<String, String> errors = new HashMap<>();
@@ -139,4 +153,26 @@ public class CheckoutController {
 				.forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false, "errors", errors));
 	}
+	
+	private void enviarMensajeWhatsapp(String telefono, String mensaje) {
+	    try {
+	    	String apiUrl = "https://whatsapp-bot-kxd6.onrender.com/send-message";
+
+
+	        HttpClient client = HttpClient.newHttpClient();
+	        String json = String.format("{\"phone\":\"%s\",\"message\":\"%s\"}", telefono, mensaje.replace("\"", "'"));
+
+	        HttpRequest request = HttpRequest.newBuilder()
+	                .uri(URI.create(apiUrl))
+	                .header("Content-Type", "application/json")
+	                .POST(HttpRequest.BodyPublishers.ofString(json))
+	                .build();
+
+	        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+	        logger.info("Respuesta WhatsApp: {}", response.body());
+	    } catch (Exception e) {
+	        logger.error("Error al enviar WhatsApp", e);
+	    }
+	}
+
 }
