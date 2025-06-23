@@ -1,2 +1,7 @@
 node_modules/
 whatsapp-bot/
+.classpath
+.project
+.factorypath
+.settings/
+target/
