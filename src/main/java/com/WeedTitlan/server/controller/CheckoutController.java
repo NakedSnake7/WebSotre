@@ -111,29 +111,38 @@ public class CheckoutController {
 			}
 			String template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
-			// Reemplazar datos dinámicos en la plantilla
-			String emailHTML = template.replace("{NOMBRE}", user.getFullName() != null ? user.getFullName() : "Cliente")
-					.replace("{NUMERO_ORDEN}", String.valueOf(order.getId()))
-					.replace("{TOTAL}", "$" + order.getTotal());
+			// Construir tabla HTML de productos
+			StringBuilder tablaProductos = new StringBuilder();
+			for (OrderItem item : order.getItems()) {
+				tablaProductos.append("<tr>")
+					.append("<td>").append(item.getProducto().getProductName()).append("</td>")
+					.append("<td>").append(item.getQuantity()).append("</td>")
+					.append("<td>$").append(item.getPrice()).append("</td>")
+					.append("</tr>");
+			}
 
+			// Reemplazar datos dinámicos en la plantilla
+			String emailHTMLConProductos = template
+			        .replace("{NOMBRE}", user.getFullName())
+			        .replace("{NUMERO_ORDEN}", String.valueOf(order.getId()))
+			        .replace("{TOTAL}", "$" + order.getTotal())
+			        .replace("{LISTADO_PRODUCTOS}", tablaProductos.toString());
 			// Intentar enviar el correo
 			try {
 				logger.info("➡️ Enviando correo a {}", user.getEmail());
-				emailService.enviarCorreoHTML(user.getEmail(), "Confirmación de Compra", emailHTML);
+				emailService.enviarCorreoHTML(user.getEmail(), "Confirmación de Compra", emailHTMLConProductos);
 			} catch (Exception e) {
 				logger.error("Error al enviar el correo: ", e);
 			}
 
-			
-		//	whatsappService.enviarMensajeWhatsapp(user.getPhone(), mensaje);
+			// Desactivar WhatsApp por ahora
+			// whatsappService.enviarMensajeWhatsapp(user.getPhone(), mensaje);
 
-			
 			logger.debug("Orden creada exitosamente para el usuario: {}", user.getEmail());
-			
-		
+
 			return ResponseEntity.status(HttpStatus.CREATED)
-					.body(Map.of("success", true, "message", "Orden procesada exitosamente"));
-		} catch (Exception e) {
+				.body(Map.of("success", true, "message", "¡Orden exitosa!, favor de revisar su correo electrónico."));
+	} catch (Exception e) {
 			logger.error("Error inesperado al procesar la orden: ", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(Map.of("success", false, "message", "Error inesperado al procesar la orden"));

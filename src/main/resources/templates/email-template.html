@@ -20,14 +20,30 @@
     <div class="container">
         <div class="header">¡Gracias por tu compra en WeedTlan!</div>
         <div class="content">
-            <p>Hola <b>!{NOMBRE}¡</b>,</p>
+            <p>¡Hola <b>{NOMBRE}!</b>,</p>
             <p>Tu pedido ha sido recibido, realiza el pago antes de 24 horas papartir de recibir este correo para procesar el pedido. Aquí están los detalles:</p>
             <p><b>Número de Orden:</b> {NUMERO_ORDEN}</p>
             <p><b>Total a depositar:</b> {TOTAL}</p>
             <p><b>Numero de tarjeta :</b>4217 4701 9695 6920</p>
             <p><b>Cuenta :</b>spin</p>
             <p><b>Motivo:</b>{NUMERO_ORDEN}</p>
-            <p>Manda por medio de Whatsapp foto o captura de la transferencia exitosa!  Pronto recibirás  detalles sobre tu envío.Por el momento todos los envios se despachan los lunes gracias por compresión.</p>
+              <hr style="border: 0; height: 1px; background: #333; margin: 20px 0;">
+
+ <h3 style="color:#ffffff;">🛒 Detalles de tu compra:</h3>
+<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+	<thead>
+		<tr style="background-color: #333; color: #ffffff;">
+			<th style="padding: 8px; border: 1px solid #444;">Producto</th>
+			<th style="padding: 8px; border: 1px solid #444;">Cantidad</th>
+			<th style="padding: 8px; border: 1px solid #444;">Precio</th>
+		</tr>
+	</thead>
+	<tbody>
+		{LISTADO_PRODUCTOS}
+	</tbody>
+</table>
+            
+            <p>Manda por medio de Whatsapp foto o captura de la transferencia exitosa!  Pronto recibirás  detalles sobre tu envío.Por el momento todos los envios se realizan los dias lunes gracias por compresión.</p>
             <p style="text-align: center;"><a class="whatsapp-btn" href="https://wa.me/5212221519266?text=Hola,%20quiero%20confirmar%20mi%20pago%20para%20el%20pedido%20{NUMERO_ORDEN}" target="_blank">Confirmar Pago por WhatsApp</a></p>
         </div>
         <div class="footer">WeedTlan © 2025 - Todos los derechos reservados</div>
