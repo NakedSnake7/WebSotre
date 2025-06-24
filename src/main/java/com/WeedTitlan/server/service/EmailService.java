@@ -21,7 +21,7 @@ public class EmailService {
         helper.setTo(destinatario);
         helper.setSubject(asunto);
         helper.setText(htmlCuerpo, true); // `true` indica que el contenido es HTML
-        helper.setFrom("tu_correo@gmail.com");
+        helper.setFrom("weedtlan.customer.service@gmail.com");
 
         mailSender.send(mensaje);
         

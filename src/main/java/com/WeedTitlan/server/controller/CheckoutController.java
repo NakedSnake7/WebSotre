@@ -5,7 +5,9 @@ import com.WeedTitlan.server.service.EmailService;
 import com.WeedTitlan.server.service.OrderService;
 import com.WeedTitlan.server.service.UserService;
 
+
 import jakarta.validation.Valid;
+
 
 import com.WeedTitlan.server.model.Order;
 import com.WeedTitlan.server.model.OrderItem;
@@ -30,10 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+
 
 
 @RestController
@@ -51,11 +50,15 @@ public class CheckoutController {
 
 	@Autowired
 	private ProductoRepository productoRepository;
+	
+	
+	//@Autowired
+	//private WhatsappService whatsappService;
 
 	private static final Logger logger = LoggerFactory.getLogger(CheckoutController.class);
 
 	@PostMapping("/checkout")
-	@CrossOrigin(origins = "http://localhost:8080")
+	@CrossOrigin(origins = {"http://localhost:8080", "https://weedtitlan.com"})
 	public ResponseEntity<?> processCheckout(@Valid @RequestBody CheckoutRequestDTO checkoutRequest ) {
 		  
 		
@@ -69,13 +72,7 @@ public class CheckoutController {
 			}
 
 			// Validar antes de procesar la orden
-			if (checkoutRequest == null || checkoutRequest.getCustomer() == null
-					|| checkoutRequest.getCustomer().getEmail() == null || checkoutRequest.getCart() == null
-					|| checkoutRequest.getCart().isEmpty() || checkoutRequest.getTotalAmount() == null) {
-
-				logger.error("Error: Faltan datos en la orden {}", checkoutRequest);
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Datos incompletos en la orden.");
-			}
+		
               
 			User user = userService.findOrCreateUserByEmail(
 				    checkoutRequest.getCustomer().getEmail(),
@@ -121,19 +118,19 @@ public class CheckoutController {
 
 			// Intentar enviar el correo
 			try {
+				logger.info("➡️ Enviando correo a {}", user.getEmail());
 				emailService.enviarCorreoHTML(user.getEmail(), "Confirmación de Compra", emailHTML);
 			} catch (Exception e) {
 				logger.error("Error al enviar el correo: ", e);
 			}
 
 			
-			String mensaje = "Hola " + user.getFullName() + ", gracias por tu compra. Tu orden #" + order.getId() +
-	                 " fue recibida correctamente. Total: $" + order.getTotal();
-	enviarMensajeWhatsapp(user.getPhone(), mensaje);
+		//	whatsappService.enviarMensajeWhatsapp(user.getPhone(), mensaje);
 
 			
 			logger.debug("Orden creada exitosamente para el usuario: {}", user.getEmail());
-
+			
+		
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.body(Map.of("success", true, "message", "Orden procesada exitosamente"));
 		} catch (Exception e) {
@@ -154,25 +151,6 @@ public class CheckoutController {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false, "errors", errors));
 	}
 	
-	private void enviarMensajeWhatsapp(String telefono, String mensaje) {
-	    try {
-	    	String apiUrl = "https://whatsapp-bot-kxd6.onrender.com/send-message";
-
-
-	        HttpClient client = HttpClient.newHttpClient();
-	        String json = String.format("{\"phone\":\"%s\",\"message\":\"%s\"}", telefono, mensaje.replace("\"", "'"));
-
-	        HttpRequest request = HttpRequest.newBuilder()
-	                .uri(URI.create(apiUrl))
-	                .header("Content-Type", "application/json")
-	                .POST(HttpRequest.BodyPublishers.ofString(json))
-	                .build();
-
-	        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-	        logger.info("Respuesta WhatsApp: {}", response.body());
-	    } catch (Exception e) {
-	        logger.error("Error al enviar WhatsApp", e);
-	    }
-	}
+	
 
 }
