@@ -32,7 +32,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 
 @RestController
@@ -57,6 +59,10 @@ public class CheckoutController {
 
 	private static final Logger logger = LoggerFactory.getLogger(CheckoutController.class);
 
+	private static final double LIMITE_ENVIO_GRATIS = 800.0; // ejemplo
+	private static final double COSTO_ENVIO = 100.0;
+
+	
 	@PostMapping("/checkout")
 	@CrossOrigin(origins = {"http://localhost:8080", "https://weedtitlan.com"})
 	public ResponseEntity<?> processCheckout(@Valid @RequestBody CheckoutRequestDTO checkoutRequest ) {
@@ -84,8 +90,12 @@ public class CheckoutController {
 
 
 			// String customerName = checkoutRequest.getCustomer().getFullName();
+			double subtotal = checkoutRequest.getTotalAmount();
+			double costoEnvio = subtotal >= LIMITE_ENVIO_GRATIS ? 0.0 : COSTO_ENVIO;
+			double totalFinal = subtotal + costoEnvio;
+
 			// Crear la orden
-			Order order = new Order(user, checkoutRequest.getTotalAmount(), OrderStatus.PENDING, LocalDate.now(),
+			Order order = new Order(user, totalFinal, OrderStatus.PENDING, LocalDate.now(),
 					checkoutRequest.getCustomer().getAddress(), checkoutRequest.getCustomer().getFullName());
 
 			// Crear los ítems de la orden
@@ -112,14 +122,32 @@ public class CheckoutController {
 			String template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
 			// Construir tabla HTML de productos
+			DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+			symbols.setDecimalSeparator('.');
+			symbols.setGroupingSeparator(',');
+
+			DecimalFormat formatoMoneda = new DecimalFormat("#,##0.00", symbols);
 			StringBuilder tablaProductos = new StringBuilder();
+			double totalGeneral = 0;
+
 			for (OrderItem item : order.getItems()) {
+				double subtotalItem = item.getPrice() * item.getQuantity();
+				totalGeneral += subtotalItem;
+
 				tablaProductos.append("<tr>")
-					.append("<td>").append(item.getProducto().getProductName()).append("</td>")
-					.append("<td>").append(item.getQuantity()).append("</td>")
-					.append("<td>$").append(item.getPrice()).append("</td>")
-					.append("</tr>");
+				    .append("<td style='padding:8px; border:1px solid #444;'>").append(item.getProducto().getProductName()).append("</td>")
+				    .append("<td style='padding:8px; border:1px solid #444;'>").append(item.getQuantity()).append("</td>")
+				    .append("<td style='padding:8px; border:1px solid #444;'>$").append(formatoMoneda.format(subtotalItem)).append("</td>")
+				    .append("</tr>");
+
 			}
+
+			// Fila final de total
+			tablaProductos.append("<tr style='background-color:#2e7d32; color:#fff; font-weight:bold;'>")
+			    .append("<td colspan='2' style='padding:8px; border:1px solid #444;'>Total</td>")
+			    .append("<td style='padding:8px; border:1px solid #444;'>$").append(formatoMoneda.format(totalGeneral)).append("</td>")
+			    .append("</tr>");
+
 
 			// Reemplazar datos dinámicos en la plantilla
 			String emailHTMLConProductos = template
