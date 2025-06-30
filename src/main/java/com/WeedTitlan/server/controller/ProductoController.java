@@ -26,7 +26,7 @@ public class ProductoController {
     private final ImagenProductoService imagenProductoService;
     private final CloudinaryService cloudinaryService;
     private final CategoriaRepository categoriaRepository;
-    private final CategoriaService categoriaService;
+    //private final CategoriaService categoriaService;
 
     public ProductoController(ProductoService productoService,
                               ImagenProductoService imagenProductoService,
@@ -37,7 +37,7 @@ public class ProductoController {
         this.imagenProductoService = imagenProductoService;
         this.cloudinaryService = cloudinaryService;
         this.categoriaRepository = categoriaRepository;
-        this.categoriaService = categoriaService;
+//        this.categoriaService = categoriaService;
     }
 
     @ResponseBody

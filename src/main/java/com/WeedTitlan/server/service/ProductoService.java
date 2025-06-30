@@ -15,7 +15,7 @@ import com.WeedTitlan.server.model.ImagenProducto;
 import com.WeedTitlan.server.model.Producto;
 import com.WeedTitlan.server.repository.ImagenProductoRepository;
 import com.WeedTitlan.server.repository.ProductoRepository;
-import com.WeedTitlan.server.dto.ProductoResumenDTO;
+//import com.WeedTitlan.server.dto.ProductoResumenDTO;
 
 
 import jakarta.transaction.Transactional;

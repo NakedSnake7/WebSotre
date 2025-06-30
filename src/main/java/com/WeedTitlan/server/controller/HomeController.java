@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model; // Importa el Model correcto
 import com.WeedTitlan.server.service.ProductoService;
-import com.WeedTitlan.server.dto.ProductoResumenDTO;
+//import com.WeedTitlan.server.dto.ProductoResumenDTO;
 import com.WeedTitlan.server.model.Producto;
 
 import java.util.List;

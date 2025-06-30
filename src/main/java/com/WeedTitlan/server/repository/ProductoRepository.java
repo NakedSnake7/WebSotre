@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.repository;
 
-import com.WeedTitlan.server.dto.ProductoResumenDTO;
+//import com.WeedTitlan.server.dto.ProductoResumenDTO;
 import com.WeedTitlan.server.model.Producto; 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
