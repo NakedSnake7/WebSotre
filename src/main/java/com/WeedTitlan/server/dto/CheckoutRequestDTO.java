@@ -19,6 +19,8 @@ public class CheckoutRequestDTO {
     @DecimalMin(value = "0.01", message = "El monto total debe ser mayor a 0")
     @NotNull(message = "El monto total no puede ser nulo")
     private Double totalAmount; // Monto total del pedido
+    // ✅ Nuevo campo: código de cupón
+    private String couponCode;
     // Getters y Setters
     public CustomerDTO getCustomer() {
         return customer;
@@ -43,7 +45,13 @@ public class CheckoutRequestDTO {
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
     }
-  
+    public String getCouponCode() {
+        return couponCode;
+    }
+
+    public void setCouponCode(String couponCode) {
+        this.couponCode = couponCode;
+    }
 
     // Método para derivar los nombres de productos
     public List<String> getProductNames() {

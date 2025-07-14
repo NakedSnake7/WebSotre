@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WeedTlanMx | Promoción Especial 🌿</title>
+
+  <!-- Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Roboto&display=swap" rel="stylesheet"/>
+
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod ?
+    n.callMethod.apply(n,arguments) : n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'TU_PIXEL_ID'); // 👉 Reemplaza con tu ID
+    fbq('track', 'PageView');
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(#0d0d0d, #1f1f1f);
+      color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 2rem 1rem;
+      animation: fadeIn 1s ease-in;
+    }
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      color: #7cff7c;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin-bottom: 2rem;
+    }
+    .cta-btn {
+      background-color: #7cff7c;
+      color: #000;
+      font-weight: bold;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+    .cta-btn:hover {
+      background-color: #5de95d;
+    }
+    .product-image {
+      max-width: 300px;
+      margin-top: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #7cff7c;
+    }
+    .countdown {
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #ff6464;
+    }
+    footer {
+      margin-top: 3rem;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* WhatsApp flotante */
+    .whatsapp-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #25D366;
+      color: white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      z-index: 999;
+      text-decoration: none;
+      box-shadow: 0 0 10px #25D366;
+    }
+
+    /* Popup */
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: #111;
+      border: 2px solid #7cff7c;
+      padding: 2rem;
+      border-radius: 12px;
+      z-index: 1000;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .popup.mostrar {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .popup h2 {
+      margin-bottom: 1rem;
+      color: #7cff7c;
+    }
+
+    .popup button {
+      background: #7cff7c;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌿 WeedTlanMx</h1>
+  <p>¡Promoción exclusiva por tiempo limitado! Descubre nuestros vaporizadores y productos para el bienestar natural.</p>
+
+  <div class="countdown" id="cuenta-regresiva">
+    Oferta termina en: <span id="tiempo"></span>
+  </div>
+
+  <a class="cta-btn" href="https://www.weedtlanmx.com/#cat-Favoritos" target="_blank">
+    Visitar la Tienda
+  </a>
+
+  <img src="/imgs/landing.png"  alt="Vape Jackfruit" class="product-image"/>
+
+  <footer>© 2025 WeedTlanMx. Hecho con 🌱 en México.</footer>
+
+  <!-- 🎁 Popup de cupón -->
+  <div class="popup" id="popupCupon">
+    <h2>🎁 ¡Cupón de Bienvenida!</h2>
+    <p>Usa el código <strong>WEED10</strong> y obtén 10% de descuento en tu primer pedido.</p>
+    <button onclick="document.getElementById('popupCupon').classList.remove('mostrar')">¡Lo usaré!</button>
+  </div>
+
+  <!-- 📲 Botón flotante de WhatsApp -->
+  <a class="whatsapp-btn" href="https://wa.me/2221519266?text=Hola%20WeedTlanMx!%20Vi%20su%20página%20y%20quiero%20más%20info%20sobre%20sus%20productos%20CBD" target="_blank" title="Chatea por WhatsApp">
+    🟢
+  </a>
+
+  <!-- Scripts -->
+  <script>
+    // Cuenta regresiva
+    const fin = new Date();
+    fin.setHours(fin.getHours() + 24);
+
+    function actualizarCuentaRegresiva() {
+      const ahora = new Date().getTime();
+      const diferencia = fin - ahora;
+
+      if (diferencia < 0) {
+        document.getElementById("tiempo").innerHTML = "¡La promoción terminó!";
+        return;
+      }
+
+      const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+      const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
+
+      document.getElementById("tiempo").innerHTML = `${horas}h ${minutos}m ${segundos}s`;
+    }
+
+    setInterval(actualizarCuentaRegresiva, 1000);
+
+    // Mostrar popup a los 6 segundos
+    setTimeout(() => {
+      document.getElementById("popupCupon").classList.add("mostrar");
+    }, 6000);
+  </script>
+
+  <!-- Meta Pixel Fallback -->
+  <noscript>
+    <img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=TU_PIXEL_ID&ev=PageView&noscript=1" />
+  </noscript>
+
+</body>
+</html>
