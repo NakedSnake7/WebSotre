@@ -169,22 +169,45 @@ public class ProductoService {
         return true;
     }
 
-
     @Transactional
     public List<ImagenProducto> subirImagenes(Producto producto, List<MultipartFile> nuevasImagenes) throws IOException {
         List<ImagenProducto> imagenesAgregadas = new ArrayList<>();
+
+        // Tipos permitidos
+        List<String> tiposPermitidos = List.of("image/jpeg", "image/png", "image/webp");
+
         if (nuevasImagenes != null) {
             for (MultipartFile archivo : nuevasImagenes) {
                 if (!archivo.isEmpty()) {
+
+                    // ==== VALIDACIÓN DE TIPO DE ARCHIVO ====
+                    String contentType = archivo.getContentType();
+
+                    if (contentType == null || !tiposPermitidos.contains(contentType)) {
+                        throw new IllegalArgumentException(
+                                "Formato no permitido. Solo se permiten imágenes JPG, PNG o WebP."
+                        );
+                    }
+
+                    // ==== SUBIR A CLOUDINARY ====
                     CloudinaryUploadResult result = cloudinaryService.subirImagen(archivo);
-                    ImagenProducto imagen = new ImagenProducto(result.getSecureUrl(), result.getPublicId(), producto);
+
+                    ImagenProducto imagen = new ImagenProducto(
+                            result.getSecureUrl(),
+                            result.getPublicId(),
+                            producto
+                    );
+
                     imagenProductoRepository.save(imagen);
                     imagenesAgregadas.add(imagen);
                 }
             }
         }
+
         return imagenesAgregadas;
     }
+
+
 
     @Transactional
     public void eliminarImagenesPorProducto(Producto producto) {

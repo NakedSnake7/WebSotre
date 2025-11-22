@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.WeedTitlan.server.dto.CloudinaryUploadResult;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -30,37 +31,47 @@ public class CloudinaryService {
 
     public CloudinaryUploadResult subirImagen(MultipartFile file) throws IOException {
 
-        // ============================
-        //  VALIDACIÓN DE TIPO DE ARCHIVO
-        // ============================
+        // VALIDACIÓN DE TIPO
         String contentType = file.getContentType();
-
-        if (contentType == null || 
+        if (contentType == null ||
             !(contentType.equals("image/jpeg") ||
               contentType.equals("image/png")  ||
               contentType.equals("image/webp"))) {
 
             throw new IllegalArgumentException(
-                    "Formato no permitido. Solo se aceptan JPG, PNG y WEBP."
+                "Formato no permitido. Solo JPG, PNG y WEBP."
             );
         }
 
+        String nombre = file.getOriginalFilename().toLowerCase();
+        if (!(nombre.endsWith(".jpg") || nombre.endsWith(".jpeg")
+                || nombre.endsWith(".png") || nombre.endsWith(".webp"))) {
+            throw new IllegalArgumentException("Extensión no permitida.");
+        }
 
-        // ============================
-        //  SUBIDA A CLOUDINARY CON COMPRESIÓN
-        // ============================
+        // ARCHIVO TEMPORAL
+        File tempFile = File.createTempFile("upload-", nombre);
+        file.transferTo(tempFile);
+
+        // SUBIDA CON COMPRESIÓN MÁXIMA
         Map<?, ?> result = cloudinary.uploader().upload(
-            file.getBytes(),
+            tempFile,
             ObjectUtils.asMap(
                 "folder", "productos",
                 "resource_type", "image",
-                "quality", "auto",        // compresión inteligente
-                "fetch_format", "auto",   // convierte a webp/avif si es posible
-                "crop", "limit",          // limita tamaño máximo
+
+                // 🔥 COMPRESIÓN REAL
+                "quality", "auto:eco",   // eco = muy optimizado sin perder calidad
+                "format", "webp",        // conversión obligatoria a WebP (muy ligero)
+
+                // 🔥 Limitar tamaño final
                 "width", 1000,
-                "height", 1000
+                "height", 1000,
+                "crop", "limit"
             )
         );
+
+        tempFile.delete();
 
         return new CloudinaryUploadResult(
             result.get("secure_url").toString(),
@@ -69,8 +80,6 @@ public class CloudinaryService {
     }
 
 
-
-    
     public boolean eliminarImagen(String publicId) {
         try {
             Map<?, ?> result = cloudinary.uploader().destroy(
@@ -81,7 +90,6 @@ public class CloudinaryService {
                     "invalidate", true
                 )
             );
-
             return "ok".equals(result.get("result"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,13 +97,12 @@ public class CloudinaryService {
         }
     }
 
-    
     public String extraerPublicIdDesdeUrl(String url) {
         if (url == null || url.isEmpty()) return null;
+
         int startIndex = url.indexOf("/upload/") + 8;
         String pathWithExtension = url.substring(startIndex);
-        return pathWithExtension.replaceFirst("\\.[a-zA-Z0-9]+$", ""); // Quita la extensión .jpg, .png, etc.
+
+        return pathWithExtension.replaceFirst("\\.[a-zA-Z0-9]+$", "");
     }
-
-
 }
