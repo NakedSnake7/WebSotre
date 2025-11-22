@@ -1,26 +1,26 @@
-# Usa una imagen base con Maven y Java para la construcción
-FROM maven:latest AS builder
+# --- Etapa 1: Builder con Maven y Java ---
+FROM maven:3.9.5-eclipse-temurin-21 AS builder
+# Usa Maven + JDK 21 (imagen oficial que sí existe)
 
-# Configura el directorio de trabajo
 WORKDIR /app
 
-# Copia todo el proyecto al contenedor
-COPY . .
+# Copia los archivos de proyecto
+COPY pom.xml .
+COPY src ./src
 
-# Construye el archivo JAR
+# Construye el JAR sin tests
 RUN mvn clean package -DskipTests
 
-# Usa una imagen más ligera para la ejecución
-FROM openjdk:21-jdk-slim
+# --- Etapa 2: Imagen ligera para ejecución ---
+FROM eclipse-temurin:21-jre-jammy
 
-# Configura el directorio de trabajo
 WORKDIR /app
 
-# Copia el archivo JAR generado desde el builder
+# Copia el JAR generado
 COPY --from=builder /app/target/server-0.0.1-SNAPSHOT.jar /app/server.jar
 
-# Exponer el puerto de la aplicación
+# Expone el puerto
 EXPOSE 8080
 
-# Comando para ejecutar la aplicación
+# Ejecuta la app
 CMD ["java", "-jar", "server.jar"]
