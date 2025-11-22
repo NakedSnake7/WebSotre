@@ -24,3 +24,4 @@ EXPOSE 8080
 
 # Ejecuta la app
 CMD ["java", "-jar", "server.jar"]
+
