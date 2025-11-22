@@ -1,7 +1,49 @@
-node_modules/
-whatsapp-bot/
+# --- Archivos de Eclipse ---
 .classpath
 .project
-.factorypath
 .settings/
-target/
+.factorypath
+
+# --- Archivos de compilación ---
+/target/
+/build/
+
+# --- Archivos temporales ---
+*.log
+*.tmp
+*.cache
+*.swp
+*.swo
+
+# --- Sistema operativo ---
+.DS_Store
+Thumbs.db
+
+# --- Maven ---
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+# --- Archivos de entorno y configuraciones sensibles ---
+application.properties
+application.yml
+*.env
+*.key
+*.pem
+*.crt
+*.p12
+
+# --- Credenciales (Google, Cloudinary, otros) ---
+src/main/resources/credenciales.json
+src/main/resources/*.json
+
+# --- Archivos específicos del proyecto ---
+whatsapp-bot/
+
+# --- IDEs (VSCode, IntelliJ, Netbeans) ---
+.vscode/
+.idea/
+nbproject/
+
+# --- Carpeta META-INF generada si no la usas ---
+src/main/resources/META-INF/
+

@@ -1,246 +1,126 @@
 package com.WeedTitlan.server.controller;
 
-import com.WeedTitlan.server.model.Categoria;
-import com.WeedTitlan.server.model.ImagenProducto;
+import com.WeedTitlan.server.dto.ProductoDTO;
 import com.WeedTitlan.server.model.Producto;
-import com.WeedTitlan.server.repository.CategoriaRepository;
-import com.WeedTitlan.server.service.CategoriaService;
-import com.WeedTitlan.server.service.CloudinaryService;
-import com.WeedTitlan.server.service.ImagenProductoService;
+import com.WeedTitlan.server.model.ImagenProducto;
 import com.WeedTitlan.server.service.ProductoService;
-import org.springframework.http.HttpStatus;
+import com.WeedTitlan.server.service.CategoriaService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
-@Controller
-@RequestMapping("/productos")
+@RestController
+@RequestMapping("/api/productos")
 public class ProductoController {
 
-    private final ProductoService productoService;
-    private final ImagenProductoService imagenProductoService;
-    private final CloudinaryService cloudinaryService;
-    private final CategoriaRepository categoriaRepository;
-    //private final CategoriaService categoriaService;
+    @Autowired private ProductoService productoService;
+    @Autowired private CategoriaService categoriaService;
 
-    public ProductoController(ProductoService productoService,
-                              ImagenProductoService imagenProductoService,
-                              CloudinaryService cloudinaryService,
-                              CategoriaRepository categoriaRepository,
-                              CategoriaService categoriaService) {
-        this.productoService = productoService;
-        this.imagenProductoService = imagenProductoService;
-        this.cloudinaryService = cloudinaryService;
-        this.categoriaRepository = categoriaRepository;
-//        this.categoriaService = categoriaService;
+    @GetMapping
+    public List<Producto> listarProductos() {
+        return productoService.obtenerTodosLosProductos();
     }
 
-    @ResponseBody
-    @PutMapping("/{id}/stock/{cantidad}")
-    public ResponseEntity<String> actualizarStock(@PathVariable Long id, @PathVariable int cantidad) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtenerProducto(@PathVariable Long id) {
         try {
-            productoService.actualizarStock(id, cantidad);
-            return ResponseEntity.ok("Stock actualizado correctamente");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.ok(productoService.obtenerProducto(id));
+        } catch (ProductoService.ProductoNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
-    @ResponseBody
-    @PostMapping("/{id}/subirImagen")
-    public ResponseEntity<String> subirImagen(@PathVariable Long id, @RequestParam("imagen") MultipartFile file) {
-        try {
-            Producto producto = productoService.obtenerProducto(id);
-            if (producto == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
-            }
-
-            if (file.isEmpty() || !file.getContentType().startsWith("image/")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El archivo no es una imagen válida");
-            }
-
-            String urlCloudinary = cloudinaryService.subirImagen(file);
-            ImagenProducto imagen = new ImagenProducto(urlCloudinary, producto);
-            imagenProductoService.guardarImagen(imagen);
-
-            return ResponseEntity.ok("Imagen subida con éxito: " + urlCloudinary);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir la imagen");
-        }
-    }
-
-    @PostMapping("/subirProducto")
-    public String subirProducto(
-    		@RequestParam(value = "porcentajeDescuento", required = false) Double porcentajeDescuento,
-            @RequestParam("productName") String productName,
-            @RequestParam("price") double price,
-            @RequestParam("stock") int stock,
-            @RequestParam(value = "categoriaId", required = false) String categoriaIdStr,
-            @RequestParam("description") String description,
-            @RequestParam(value = "nuevaCategoria", required = false) String nuevaCategoria,
-            @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes)
-    {
-            
-        try {
-            Categoria categoria = obtenerOCrearCategoria(nuevaCategoria, categoriaIdStr);
-            if (categoria == null) return "redirect:/VerProductos?error=CategoriaNoValida";
-
-            Producto nuevoProducto = new Producto(productName, price, stock, description, categoria);
-
-            if (porcentajeDescuento != null && porcentajeDescuento > 0 && porcentajeDescuento <= 100) {
-                nuevoProducto.setTienePromocion(true);
-                nuevoProducto.setPorcentajeDescuento(porcentajeDescuento);
-            } else {
-                nuevoProducto.setTienePromocion(false);
-                nuevoProducto.setPorcentajeDescuento(0.0);
-            }
-
-
-            
-            Producto productoGuardado = productoService.guardarProducto(nuevoProducto);
-
-            if (imagenes != null) {
-                for (MultipartFile imagen : imagenes) {
-                    if (!imagen.isEmpty()) {
-                        String urlImagen = cloudinaryService.subirImagen(imagen);
-                        imagenProductoService.guardarImagen(new ImagenProducto(urlImagen, productoGuardado));
-                    }
-                }
-            }
-            return "redirect:/VerProductos?success=subido";
-        } catch (Exception e) {
-            return "redirect:/VerProductos?error=errorInterno";
-        }
-    }
-
-    @ResponseBody
-    @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<String> eliminarProducto(@PathVariable Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarProducto(@PathVariable Long id) {
         try {
             productoService.eliminarProducto(id);
-            return ResponseEntity.ok("Producto eliminado correctamente");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.noContent().build();
+        } catch (ProductoService.ProductoNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
-    @PostMapping("/actualizar")
-    public String actualizarProducto(
-            @ModelAttribute Producto producto,
-            @RequestParam(value = "nuevasImagenes", required = false) MultipartFile[] imagenes,
-            @RequestParam(value = "eliminarImagenes", required = false) List<Long> imagenesAEliminar,
-            @RequestParam(value = "porcentajeDescuento", required = false) Double porcentajeDescuento
-    ) {
-
-        Producto productoExistente = productoService.obtenerProducto(producto.getId());
-        if (productoExistente == null) return "redirect:/VerProductos?error=ProductoNoEncontrado";
+    @PostMapping("/editar/{id}")
+    public ResponseEntity<?> actualizarProducto(
+            @PathVariable Long id,
+            @Valid @ModelAttribute ProductoDTO dto,
+            @RequestParam(value = "imagenes", required = false) List<MultipartFile> nuevasImagenes,
+            @RequestParam(value = "eliminarImagenes", required = false) List<Long> eliminarImagenes,
+            @RequestParam(value = "porcentajeDescuento", defaultValue = "0") int porcentajeDescuento) {
 
         try {
-            // Eliminar imágenes marcadas
-            if (imagenesAEliminar != null) {
-                for (Long imagenId : imagenesAEliminar) {
-                    imagenProductoService.eliminarPorId(imagenId);
-                }
+
+            // Obtener el producto
+            Producto producto = productoService.obtenerProducto(id);
+
+            // === DATOS BÁSICOS ===
+            producto.setCategoria(
+                    categoriaService.obtenerOCrearCategoria(dto.getCategoriaNombre())
+            );
+            producto.setProductName(dto.getProductName());
+            producto.setPrice(dto.getPrice());
+            producto.setDescription(dto.getDescription());
+            producto.setPorcentajeDescuento((double) porcentajeDescuento);
+
+            // === SUBIR NUEVAS IMÁGENES (si vienen) ===
+            List<ImagenProducto> agregadas = List.of(); // por si es null
+
+            if (nuevasImagenes != null && !nuevasImagenes.isEmpty()) {
+                agregadas = productoService.subirImagenes(producto, nuevasImagenes);
             }
 
-            // Subir nuevas imágenes si se enviaron
-            if (imagenes != null) {
-                for (MultipartFile imagen : imagenes) {
-                    if (!imagen.isEmpty()) {
-                        String url = cloudinaryService.subirImagen(imagen);
-                        imagenProductoService.guardarImagen(new ImagenProducto(url, productoExistente));
-                    }
-                }
+            // === ELIMINAR IMÁGENES SELECCIONADAS (si vienen) ===
+            if (eliminarImagenes != null && !eliminarImagenes.isEmpty()) {
+                productoService.eliminarImagenesPorIds(eliminarImagenes);
             }
 
-            if (porcentajeDescuento != null && porcentajeDescuento > 0 && porcentajeDescuento <= 100) {
-                productoExistente.setTienePromocion(true);
-                productoExistente.setPorcentajeDescuento(porcentajeDescuento);
-            } else {
-                productoExistente.setTienePromocion(false);
-                productoExistente.setPorcentajeDescuento(0.0);
-            }
+            // === GUARDAR CAMBIOS ===
+            productoService.guardarProducto(producto);
 
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "id", producto.getId(),
+                    "imagenesAgregadas", agregadas.size(),
+                    "imagenesEliminadas", eliminarImagenes == null ? 0 : eliminarImagenes.size(),
+                    "message", "Producto actualizado correctamente"
+            ));
 
-            // Actualizar datos del producto
-            productoExistente.setProductName(producto.getProductName());
-            productoExistente.setPrice(producto.getPrice());
-            productoExistente.setStock(producto.getStock());
-            productoExistente.setDescription(producto.getDescription());
-
-            productoService.guardarProducto(productoExistente);
-
-            return "redirect:/VerProductos?success=ProductoActualizado";
         } catch (IOException e) {
-            return "redirect:/VerProductos?error=ErrorAlGuardarImagen";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error subiendo imágenes"));
+        } catch (ProductoService.ProductoNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
         }
     }
+    @DeleteMapping("/eliminar-imagen/{idImagen}")
+    public ResponseEntity<?> eliminarImagenInmediato(@PathVariable Long idImagen) {
+        boolean ok = productoService.eliminarImagenPorIdInmediato(idImagen);
 
-    @GetMapping("/subirProducto")
-    public String redirigirAFormulario() {
-        return "redirect:/nuevo";
+        return ok
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.status(404).body(Map.of("error", "Imagen no encontrada"));
     }
-
-
-
-    @ResponseBody
-    @PostMapping("/toggle-visibility")
-    public ResponseEntity<String> toggleVisibility(@RequestParam Long id, @RequestParam boolean visibleEnMenu) {
-        Producto producto = productoService.obtenerPorId(id);
-        if (producto != null) {
-            producto.setVisibleEnMenu(visibleEnMenu);
-            productoService.save(producto);
-            return ResponseEntity.ok("Visibilidad actualizada correctamente.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado.");
-        }
-    }
-    @GetMapping("/nuevo")
-    public String mostrarFormularioNuevoProducto(Model model) {
-        model.addAttribute("producto", new Producto()); // necesario para evitar errores en Thymeleaf
-        model.addAttribute("categorias", categoriaRepository.findAll());// o categoriaRepository.findAll()
-        return "subirProducto";
-    }
-    @GetMapping("/editar/{id}")
-    public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
-    	Producto producto = productoService.obtenerPorIdConCategoria(id);
-        if (producto == null) {
-            return "redirect:/VerProductos?error=ProductoNoEncontrado";
-        }
-
-        model.addAttribute("producto", producto);
-        model.addAttribute("categorias", categoriaRepository.findAll());
-        return "editarProducto"; // Este debe ser el nombre exacto de tu archivo HTML (editarProducto.html)
-    }
+    
     @PostMapping("/togglePromocion")
-    public String togglePromocion(@RequestParam Long id, @RequestParam boolean activar) {
-        Producto producto = productoService.obtenerProductoPorId(id);
-        producto.setTienePromocion(activar);
-
-        if (activar && producto.getPorcentajeDescuento() == 0) {
-            producto.setPorcentajeDescuento(10.0); // Valor por defecto si estaba en 0
-        }
-
-        productoService.guardarProducto(producto);
-        return "redirect:/VerProductos";
+    public ResponseEntity<Boolean> togglePromocion(@RequestParam Long productoId) {
+        boolean enPromocion = productoService.togglePromocion(productoId);
+        return ResponseEntity.ok(enPromocion);
     }
 
 
-    // Helpers
-    private Categoria obtenerOCrearCategoria(String nuevaCategoria, Object categoriaIdObj) {
-        if (nuevaCategoria != null && !nuevaCategoria.trim().isEmpty()) {
-            return categoriaRepository.findByNombre(nuevaCategoria.trim()) != null ?
-                    categoriaRepository.findByNombre(nuevaCategoria.trim()) :
-                    categoriaRepository.save(new Categoria(nuevaCategoria.trim()));
-        } else if (categoriaIdObj != null) {
-            Long categoriaId = (categoriaIdObj instanceof Long) ? (Long) categoriaIdObj : Long.parseLong(categoriaIdObj.toString());
-            return categoriaRepository.findById(categoriaId).orElse(null);
-        }
-        return null;
-    }
-} 
+
+
+}

@@ -1,23 +1,19 @@
 package com.WeedTitlan.server.model;
 
-import java.util.ArrayList;    
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;  
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
-
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
-
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "productos")
@@ -27,48 +23,58 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "product_name")
+    @Column(name = "product_name", nullable = false)
     private String productName;
 
+    @Column(nullable = false)
     private double price;
+
+    @Column(nullable = false)
     private int stock;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "categoria_id") // clave foránea
+    // 🔥 CAMBIO IMPORTANTE: LAZY para evitar N+1
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    // 🔥 CAMBIO IMPORTANTE: LAZY para evitar N+1
+    @OneToMany(
+        mappedBy = "producto",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
     private List<ImagenProducto> imagenes = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean visibleEnMenu = true;
-    
+
     @Column(name = "tiene_promocion", nullable = false)
-    private Boolean tienePromocion;
+    private Boolean tienePromocion = false;
 
     @Column(name = "porcentaje_descuento", nullable = false)
-    private Double porcentajeDescuento;
+    private Double porcentajeDescuento = 0.0;
 
-    
+
+    // 🔥 Calcula descuento seguro
     public double getPrecioConDescuento() {
-        if (tienePromocion && porcentajeDescuento != null) {
+        if (Boolean.TRUE.equals(tienePromocion)
+                && porcentajeDescuento != null
+                && porcentajeDescuento > 0) {
+
             return price - (price * porcentajeDescuento / 100);
         }
         return price;
-    } 
-
-    
-    //vacio
-    public Producto() {
-        this.visibleEnMenu = true;
-        this.tienePromocion = false;
-        this.porcentajeDescuento = 0.0;
     }
 
- // Constructor completo
+
+    // Constructor vacío
+    public Producto() {}
+
+    // Constructor útil
     public Producto(String productName, double price, int stock, String description, Categoria categoria) {
         this.productName = productName;
         this.price = price;
@@ -76,6 +82,8 @@ public class Producto {
         this.description = description;
         this.categoria = categoria;
     }
+
+    // Método para actualizar productos
     public void actualizarDatosDesde(Producto producto, Categoria categoria) {
         this.productName = producto.getProductName();
         this.price = producto.getPrice();
@@ -85,8 +93,8 @@ public class Producto {
     }
 
 
+    // Getters y Setters ------------------
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -147,9 +155,10 @@ public class Producto {
         return visibleEnMenu;
     }
 
-    public void setVisibleEnMenu(Boolean visibleEnMenu) {
+    public void setVisibleEnMenu(boolean visibleEnMenu) {
         this.visibleEnMenu = visibleEnMenu;
     }
+
     public Boolean getTienePromocion() {
         return tienePromocion;
     }
@@ -165,5 +174,4 @@ public class Producto {
     public void setPorcentajeDescuento(Double porcentajeDescuento) {
         this.porcentajeDescuento = porcentajeDescuento;
     }
-
 }

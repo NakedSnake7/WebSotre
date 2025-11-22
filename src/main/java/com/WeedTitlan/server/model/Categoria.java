@@ -6,16 +6,12 @@ import java.util.List;
 @Entity
 @Table(name = "categorias")
 public class Categoria {
-	
-	
-	// 🛠 Constructor vacío requerido por Hibernate
-    public Categoria() {
-    }
-	// Constructor que acepta solo el nombre
-	public Categoria(String nombre) {
-	    this.nombre = nombre;
-	}
 
+    public Categoria() {}
+
+    public Categoria(String nombre) {
+        this.nombre = nombre;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +19,10 @@ public class Categoria {
 
     private String nombre;
 
-    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
+    // 🔥 LAZY evita N+1 cuando consultes categorías
+    @OneToMany(mappedBy = "categoria", fetch = FetchType.LAZY)
     private List<Producto> productos;
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }

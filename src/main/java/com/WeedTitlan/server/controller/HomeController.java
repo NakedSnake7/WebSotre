@@ -14,41 +14,48 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Controller
 public class HomeController {
-	@Autowired
-	private ProductoService productoService;
 
+    @Autowired
+    private ProductoService productoService;
 
-	@GetMapping({"/", "/inicio"})
-	public String home(Model model) {
-	    List<String> categorias = productoService.obtenerCategorias();
-	    List<Producto> productos = productoService.obtenerProductosVisiblesConTodo();
+    private void cargarDatosMenu(Model model) {
+        List<String> categorias = productoService.obtenerCategorias();
+        List<Producto> productos = productoService.obtenerProductosVisiblesConTodo();
 
-	    model.addAttribute("categorias", categorias);
-	    model.addAttribute("productos", productos);
-	    return "index";
-	}
+        model.addAttribute("categorias", categorias);
+        model.addAttribute("productos", productos);
+    }
 
-	@GetMapping("/menu")
-	public String verMenu(Model model) {
-	    List<String> categorias = productoService.obtenerCategorias();
-	    List<Producto> productos = productoService.obtenerProductosVisiblesConTodo();
+    @GetMapping({"/", "/inicio"})
+    public String home(Model model) {
+        cargarDatosMenu(model);
+        return "index";
+    }
 
-	    model.addAttribute("categorias", categorias);
-	    model.addAttribute("productos", productos);
-	    model.addAttribute("categorias", categorias);
-	    return "index";
-	}
-
-
+    @GetMapping("/menu")
+    public String verMenu(Model model) {
+        cargarDatosMenu(model);
+        return "index";
+    }
 
     @GetMapping("/subirProducto")
     public String subirProducto(Model model, @AuthenticationPrincipal UserDetails user) {
         if (user == null) {
-            return "redirect:/login"; // Si no está autenticado, redirige al login
+            return "redirect:/login";
         }
-        return "subirProducto";  // Devuelve la vista protegida
-        
+        return "subirProducto";
     }
-    
-    
+    @GetMapping("/fragmento-menu")
+    public String cargarFragmentoMenu(Model model) {
+        List<String> categorias = productoService.obtenerCategorias();
+        List<Producto> productos = productoService.obtenerProductosVisiblesConTodo();
+
+        model.addAttribute("categorias", categorias);
+        model.addAttribute("productos", productos);
+
+        // archivo: templates/fragments/menu.html
+        // fragmento: menuFragment
+        return "fragments/menu :: menu";
+    }
+
 }

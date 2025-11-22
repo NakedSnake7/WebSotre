@@ -1,17 +1,36 @@
 export function configurarModal() {
-    const modal = document.getElementById("modal");
+    const modalElement = document.getElementById("modal");
+    const bsModal = modalElement ? new bootstrap.Modal(modalElement) : null;
+
     const ageCheck = document.getElementById("ageCheck");
     const submitBtn = document.getElementById("submitBtn");
     const subscribeForm = document.getElementById("subscribeForm");
+    const closeModalBtn = document.getElementById("closeModalBtn");
 
-    if (!localStorage.getItem("usuarioRegistrado") && modal) {
-        setTimeout(() => modal.style.display = "block", 2000);
+    // 📌 Mostrar automáticamente si NO está registrado y NO lo cerró manualmente
+    if (!localStorage.getItem("usuarioRegistrado") &&
+        !sessionStorage.getItem("modalClosed") &&
+        bsModal) {
+
+        setTimeout(() => bsModal.show(), 2000);
     }
 
+    // 📌 Habilitar botón cuando marque el checkbox
     if (ageCheck && submitBtn) {
-        ageCheck.addEventListener("change", () => submitBtn.disabled = !ageCheck.checked);
+        ageCheck.addEventListener("change", () => {
+            submitBtn.disabled = !ageCheck.checked;
+        });
     }
 
+    // 📌 Acción del botón cerrar
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener("click", () => {
+            bsModal.hide();
+            sessionStorage.setItem("modalClosed", "true");
+        });
+    }
+
+    // 📌 Enviar formulario
     if (subscribeForm) {
         subscribeForm.addEventListener("submit", function (event) {
             event.preventDefault();
@@ -21,9 +40,8 @@ export function configurarModal() {
                 return;
             }
 
-            const submitButton = submitBtn;
-            submitButton.disabled = true;
-            submitButton.textContent = 'Registrando...';
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Registrando...";
 
             const fullName = document.getElementById("Costumer").value.trim();
             const email = document.getElementById("email").value.trim();
@@ -37,19 +55,11 @@ export function configurarModal() {
             .then(data => {
                 alert(data.message);
                 localStorage.setItem("usuarioRegistrado", "true");
-                cerrarModal();
+
+                bsModal.hide();
                 sessionStorage.setItem("modalClosed", "true");
             })
             .catch(error => console.error("Error:", error));
         });
-    }
-
-    function cerrarModal() {
-        if (!modal) return;
-        modal.style.display = "none";
-        document.body.classList.remove("modal-open");
-        document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
-        subscribeForm.reset();
-        submitBtn.disabled = true;
     }
 }

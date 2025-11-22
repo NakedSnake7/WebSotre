@@ -1,22 +1,23 @@
 <div th:fragment="menu">
 	<!-- Encabezado del Menú -->
-	<div id="menu"
-		class="text-center bg-dark text-light has-height-md middle-items wow fadeIn">
-		<h2 class="section-title">
-			<a href="/menu" class="text-light text-decoration-none">MENU</a>
-		</h2>
-	</div>
+<div id="menu"
+     class="text-center custom-menu-bg text-light has-height-md middle-items wow fadeIn">
+    <h2 class="section-title">
+        <a href="/menu" class="text-light text-decoration-none">MENU</a>
+    </h2>
+</div>
+
 
 	<!-- Barra de categorías superior -->
-	<div class="bg-dark text-light py-2 px-3 sticky-top"
-		style="z-index: 1000;">
-		<div class="d-flex flex-wrap justify-content-center category-scroll">
-			<a th:each="categoria : ${categorias}"
-				class="btn btn-outline-light btn-sm mx-2 mb-2"
-				th:href="'#cat-' + ${#strings.replace(categoria, ' ', '-')}"
-				th:text="${categoria}"></a>
-		</div>
-	</div>
+	<div class="categories-bar text-light py-2 px-3 sticky-top" style="z-index: 1000;">
+    <div class="d-flex flex-wrap justify-content-center category-scroll">
+        <a th:each="categoria : ${categorias}"
+           class="btn btn-outline-light btn-sm mx-2 mb-2"
+           th:href="'#cat-' + ${#strings.replace(categoria, ' ', '-')}"
+           th:text="${categoria}"></a>
+    </div>
+</div>
+
 
 	<!-- Contenedor principal -->
 	<div class="container-fluid mt-4">

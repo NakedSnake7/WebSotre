@@ -6,204 +6,166 @@
 <title>Subir Producto</title>
 
 <!-- Bootstrap 4 (CDN) para diseño moderno -->
-<link
-	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-	rel="stylesheet">
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- Iconos de Fuente -->
-<link rel="stylesheet"
-	href="/assets/vendors/themify-icons/css/themify-icons.css">
+<!-- Iconos y estilos personalizados -->
+<link rel="stylesheet" href="/assets/vendors/themify-icons/css/themify-icons.css">
 <link rel="stylesheet" href="/assets/vendors/animate/animate.css">
-
-<!-- Estilos personalizados -->
 <link rel="stylesheet" href="/assets/css/custom-styles.css">
 
 <style>
-body {
-	background-color: #2c2c2c;
-	color: #fff;
-	font-family: 'Arial', sans-serif;
-}
-
-.form-container {
-	max-width: 800px;
-	margin: 50px auto;
-	padding: 30px;
-	background-color: #333;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-	border-radius: 8px;
-}
-
-.form-container h2 {
-	text-align: center;
-	color: #fff;
-	margin-bottom: 30px;
-}
-
-.form-group label {
-	font-weight: bold;
-	color: #ccc;
-}
-
-.form-group input, .form-group textarea {
-	border-radius: 8px;
-	padding: 12px;
-	width: 100%;
-	border: 1px solid #555;
-	font-size: 16px;
-	background-color: #444;
-	color: #fff;
-}
-
-.form-group input:focus, .form-group textarea:focus {
-	border-color: #4CAF50;
-	outline: none;
-}
-
-.form-group textarea {
-	height: 150px;
-}
-
-.btn-custom {
-	background-color: #4CAF50;
-	color: white;
-	padding: 10px 20px;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-	width: 100%;
-}
-
-.btn-custom:hover {
-	background-color: #45a049;
-}
-
-.ver-productos-btn {
-	position: fixed;
-	bottom: 10px;
-	right: 10px;
-	background-color: #4CAF50;
-	color: white;
-	padding: 10px 20px;
-	border-radius: 5px;
-	text-decoration: none;
-	font-size: 16px;
-	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-	/* Efecto de sombra para resaltar */
-}
-
-.ver-productos-btn:hover {
-	background-color: #45a049;
-}
+body { background-color: #2c2c2c; color: #fff; font-family: 'Arial', sans-serif; }
+.form-container { max-width: 800px; margin: 50px auto; padding: 30px; background-color: #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-radius: 8px; }
+.form-container h2 { text-align: center; color: #fff; margin-bottom: 30px; }
+.form-group label { font-weight: bold; color: #ccc; }
+.form-group input, .form-group textarea, .form-group select { border-radius: 8px; padding: 12px; width: 100%; border: 1px solid #555; font-size: 16px; background-color: #444; color: #fff; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #4CAF50; outline: none; }
+.form-group textarea { height: 150px; }
+.btn-custom { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+.btn-custom:hover { background-color: #45a049; }
+.ver-productos-btn { position: fixed; bottom: 10px; right: 10px; background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-size: 16px; box-shadow: 0px 4px 6px rgba(0,0,0,0.3); }
+.ver-productos-btn:hover { background-color: #45a049; }
 </style>
 </head>
 <body>
-	<div class="container">
-		<!-- Botón para ver productos -->
-		<a href="/VerProductos" class="btn btn-primary ver-productos-btn">Ver
-			Productos</a>
-	</div>
-	<div th:if="${#lists.isEmpty(categorias)}">
-		<p>No se cargaron categorías. Asegúrate de acceder desde
-			/productos/nuevo.</p>
-	</div>
 
-	<div class="form-container">
-		<h2>Formulario para Subir Productos</h2>
-
-<form th:action="@{/productos/subirProducto}" th:object="${producto}" method="post" enctype="multipart/form-data">
-    
-    <!-- Nombre del producto -->
-    <div class="form-group">
-        <label for="productName">Nombre del producto</label>
-        <input type="text" th:field="*{productName}" class="form-control" required />
-    </div>
-
-    <!-- Precio -->
-    <div class="form-group">
-        <label for="price">Precio</label>
-        <input type="number" step="0.01" th:field="*{price}" class="form-control" required />
-    </div>
-
-    <!-- Stock -->
-    <div class="form-group">
-        <label for="stock">Stock</label>
-        <input type="number" th:field="*{stock}" class="form-control" required />
-    </div>
-
-    <!-- Descripción -->
-    <div class="form-group">
-        <label for="description">Descripción</label>
-        <textarea th:field="*{description}" rows="4" cols="50" class="form-control"></textarea>
-    </div>
-
-    <!-- Categoría existente -->
-    <div class="form-group">
-        <label for="categoriaId">Categoría</label>
-        <select class="form-control" name="categoriaId">
-            <option value="">Selecciona una categoría</option>
-            <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}"></option>
-        </select>
-    </div>
-
-    <!-- Nueva categoría -->
-    <div class="form-group">
-        <label for="nuevaCategoria">O crear nueva categoría</label>
-        <input type="text" class="form-control" name="nuevaCategoria" />
-    </div>
-
-    <!-- Promoción -->
-<div class="form-group">
-    <label for="porcentajeDescuento">Porcentaje de Descuento (opcional)</label>
-    <input type="number" min="0" max="100" class="form-control" id="porcentajeDescuento" name="porcentajeDescuento" step="0.01" placeholder="Ej. 15">
+<div class="container">
+    <a href="/VerProductos" class="btn btn-primary ver-productos-btn">Ver Productos</a>
 </div>
 
-    <!-- Imágenes -->
-    <div class="form-group">
-        <label for="imagenes">Imágenes</label>
-        <input type="file" class="form-control" name="imagenes" multiple />
-    </div>
+<div th:if="${#lists.isEmpty(categorias)}">
+    <p>No se cargaron categorías. Asegúrate de acceder desde /nuevo.</p>
+</div>
 
-    <button type="submit" class="btn btn-success">Subir producto</button>
-</form>
+<div class="form-container">
+    <h2>Formulario para Subir Productos</h2>
+
+<form id="productoForm" th:action="@{/nuevo}" th:object="${producto}" method="post" enctype="multipart/form-data">
+        <!-- Nombre -->
+        <div class="form-group">
+            <label>Nombre del producto</label>
+<input type="text" th:field="*{productName}" class="form-control" required />
+        </div>
+
+        <!-- Precio -->
+        <div class="form-group">
+            <label>Precio</label>
+            <input type="number" step="0.01" th:field="*{price}" class="form-control" required />
+        </div>
+
+        <!-- Stock -->
+        <div class="form-group">
+            <label>Stock</label>
+            <input type="number" th:field="*{stock}" class="form-control" th:value="0" required />
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group">
+            <label>Descripción</label>
+            <textarea th:field="*{description}" rows="4" class="form-control"></textarea>
+        </div>
+
+        <!-- Categoría existente -->
+        <div class="form-group">
+            <label>Categoría</label>
+            <select id="categoria" class="form-control" th:field="*{categoriaNombre}">
+                <option value="">Selecciona una categoría</option>
+                <option th:each="cat : ${categorias}" th:value="${cat.nombre}" th:text="${cat.nombre}"></option>
+            </select>
+        </div>
+
+        <!-- Nueva categoría -->
+        <div class="form-group">
+            <label>O crear nueva categoría</label>
+<input type="text" class="form-control" th:field="*{nuevaCategoria}" id="nuevaCategoria" />
+
+        </div>
+
+        <!-- Porcentaje de descuento -->
+        <div class="form-group">
+            <label>Porcentaje de Descuento (opcional)</label>
+<input type="number" min="0" max="100" th:field="*{porcentajeDescuento}" class="form-control" step="1" placeholder="Ej. 15">
+        </div>
+
+        <!-- Imágenes -->
+        <div class="form-group">
+            <label>Imágenes</label>
+            <input type="file" class="form-control" name="imagenes" multiple />
+        </div>
+
+        <button type="submit" class="btn btn-success btn-custom">Subir producto</button>
+    </form>
+</div>
+
+<div th:if="${param.success}" class="alert alert-success mt-3">Producto subido correctamente.</div>
+<div th:if="${param.error}" class="alert alert-danger mt-3">Error al subir el producto.</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("productoForm");
+
+    // Campos reales según tu DTO
+    const productName = document.querySelector("input[name='productName']");
+    const descripcion = document.querySelector("textarea[name='descripcion']");
+    const categoriaSelect = document.getElementById("categoria");
+    const nuevaCategoria = document.getElementById("nuevaCategoria");
+
+    form.addEventListener("submit", function(e) {
+        let errores = [];
+
+        // Validar nombre
+        if (!productName.value.trim()) {
+            errores.push("Debes ingresar el nombre del producto.");
+            productName.style.border = "2px solid #ff5555";
+        } else {
+            productName.style.border = "1px solid #555";
+        }
+
+        // Validar descripción
+        if (!descripcion.value.trim()) {
+            errores.push("Debes ingresar una descripción.");
+            descripcion.style.border = "2px solid #ff5555";
+        } else {
+            descripcion.style.border = "1px solid #555";
+        }
+
+        // Validar categoría o nueva categoría
+        if (!nuevaCategoria.value.trim() && !categoriaSelect.value.trim()) {
+            errores.push("Selecciona una categoría o escribe una nueva.");
+            categoriaSelect.style.border = "2px solid #ff5555";
+        } else {
+            categoriaSelect.style.border = "1px solid #555";
+        }
+
+        // Si hay errores, evitar el envío
+        if (errores.length > 0) {
+            e.preventDefault();
+            mostrarAlerta(errores.join(" "), true);
+        }
+    });
+
+    // Mostrar alerta visual
+    function mostrarAlerta(mensaje, error = false) {
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `alert ${error ? 'alert-danger' : 'alert-success'} mt-3`;
+        alertDiv.textContent = mensaje;
+
+        const existingAlert = document.querySelector(".alert");
+        if (existingAlert) existingAlert.remove();
+
+        form.parentNode.insertBefore(alertDiv, form);
+        setTimeout(() => alertDiv.remove(), 4000);
+    }
+});
+</script>
 
 
-	</div>
-	<div th:if="${param.success}" class="alert alert-success">
-		Producto subido correctamente.</div>
 
-	<div th:if="${param.error}" class="alert alert-danger">Error al
-		subir el producto.</div>
-
-
-	<!-- Scripts de Bootstrap -->
-	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-	<script
-		src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-	<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			const categoriaSelect = document.getElementById("categoria");
-			const nuevaCategoriaInput = document
-					.getElementById("nuevaCategoria");
-
-			categoriaSelect.addEventListener("change", function() {
-				if (this.value !== "") {
-					nuevaCategoriaInput.value = ""; // Borra la nueva categoría si se selecciona una existente
-				}
-			});
-
-			nuevaCategoriaInput.addEventListener("input", function() {
-				if (this.value.trim() !== "") {
-					categoriaSelect.value = ""; // Borra la selección si empieza a escribir una nueva
-				}
-			});
-		});
-	</script>
 
 </body>
-
-
 </html>

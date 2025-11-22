@@ -5,8 +5,8 @@ import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.WeedTitlan.server.dto.CloudinaryUploadResult;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -28,13 +28,74 @@ public class CloudinaryService {
         ));
     }
 
-    public String subirImagen(MultipartFile file) throws IOException {
-        File tempFile = File.createTempFile("temp-", file.getOriginalFilename());
-        file.transferTo(tempFile);
+    public CloudinaryUploadResult subirImagen(MultipartFile file) throws IOException {
 
-        Map<?, ?> result = cloudinary.uploader().upload(tempFile, ObjectUtils.emptyMap());
+        // ============================
+        //  VALIDACIÓN DE TIPO DE ARCHIVO
+        // ============================
+        String contentType = file.getContentType();
 
-        tempFile.delete(); // Limpieza del archivo temporal
-        return result.get("secure_url").toString();
+        if (contentType == null || 
+            !(contentType.equals("image/jpeg") ||
+              contentType.equals("image/png")  ||
+              contentType.equals("image/webp"))) {
+
+            throw new IllegalArgumentException(
+                    "Formato no permitido. Solo se aceptan JPG, PNG y WEBP."
+            );
+        }
+
+
+        // ============================
+        //  SUBIDA A CLOUDINARY CON COMPRESIÓN
+        // ============================
+        Map<?, ?> result = cloudinary.uploader().upload(
+            file.getBytes(),
+            ObjectUtils.asMap(
+                "folder", "productos",
+                "resource_type", "image",
+                "quality", "auto",        // compresión inteligente
+                "fetch_format", "auto",   // convierte a webp/avif si es posible
+                "crop", "limit",          // limita tamaño máximo
+                "width", 1000,
+                "height", 1000
+            )
+        );
+
+        return new CloudinaryUploadResult(
+            result.get("secure_url").toString(),
+            result.get("public_id").toString()
+        );
     }
+
+
+
+    
+    public boolean eliminarImagen(String publicId) {
+        try {
+            Map<?, ?> result = cloudinary.uploader().destroy(
+                publicId,
+                ObjectUtils.asMap(
+                    "resource_type", "image",
+                    "type", "upload",
+                    "invalidate", true
+                )
+            );
+
+            return "ok".equals(result.get("result"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
+    public String extraerPublicIdDesdeUrl(String url) {
+        if (url == null || url.isEmpty()) return null;
+        int startIndex = url.indexOf("/upload/") + 8;
+        String pathWithExtension = url.substring(startIndex);
+        return pathWithExtension.replaceFirst("\\.[a-zA-Z0-9]+$", ""); // Quita la extensión .jpg, .png, etc.
+    }
+
+
 }

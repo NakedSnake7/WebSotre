@@ -10,19 +10,25 @@ public class ImagenProducto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "image_url", nullable = false) // Guarda la URL de la imagen
+    @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
-    @ManyToOne
+    @Column(name = "public_id", nullable = false)
+    private String publicId;
+
+    // 🔥 LAZY para evitar cargar el producto entero en cada imagen
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
- // Constructor que acepta la URL y el producto
-    public ImagenProducto(String imageUrl, Producto producto) {
+
+    // Constructor vacío necesario para JPA
+    public ImagenProducto() {}
+
+    // Constructor recomendado
+    public ImagenProducto(String imageUrl, String publicId, Producto producto) {
         this.imageUrl = imageUrl;
+        this.publicId = publicId;
         this.producto = producto;
-    }
-    public ImagenProducto() {
-        // Constructor vacío necesario para JPA y otras instancias manuales
     }
 
     // Getters y Setters
@@ -40,6 +46,14 @@ public class ImagenProducto {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getPublicId() {
+        return publicId;
+    }
+
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
     }
 
     public Producto getProducto() {

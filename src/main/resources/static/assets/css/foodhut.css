@@ -24,7 +24,7 @@
   --cyan: #47D8E0;
   --white: #fff;
   --gray: #6c757d;
-  --gray-dark: #343a40;
+  --gray-dark: #14141a;
   --primary: #A3C14A;
   --secondary: #6c757d;
   --success: #A3C14A;
@@ -32,7 +32,7 @@
   --warning: #FF8882;
   --danger: #F85C70;
   --light: #f8f9fa;
-  --dark: #343a40;
+  --dark: #14141a;
   --breakpoint-xs: 0;
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;
@@ -68,7 +68,7 @@ body {
   line-height: 1.5;
   color: #f8f9fa;
   text-align: left;
-  background-color: #343a40 !important;
+  background-color: #14141a !important;
 }
 .descripcion-producto {
   background-color: #2b2b2b; /* Fondo oscuro neutro */
@@ -87,6 +87,27 @@ body {
 .descripcion-producto:hover {
   border-color: #a2d729;
   box-shadow: 0 6px 16px rgba(162, 215, 41, 0.3);
+}
+/* Fondo del encabezado "MENU" */
+#menu.custom-menu-bg {
+    background-color: #14141a !important;
+}
+
+/* Barra de categorías superior */
+.categories-bar {
+    background-color: #14141a !important;
+}
+
+/* Que los botones de categorías combinen con tu nuevo estilo */
+.categories-bar .btn-outline-light {
+    border-color: #6c7075 !important;
+    color: #f1f1f1 !important;
+}
+
+.categories-bar .btn-outline-light:hover {
+    background-color: #2a2a2d !important;
+    border-color: #bcbfc4 !important;
+    color: white !important;
 }
 
 

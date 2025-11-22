@@ -7,97 +7,94 @@
 <link
 	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
 	rel="stylesheet">
-	
 </head>
 
 <body class="bg-dark text-light">
 
-	<p th:text="'Producto: ' + ${producto.productName}">Producto cargando...</p>
-	<p th:text="'Categorías: ' + ${categorias}">Categorias cargando...</p>
-
 	<div class="container mt-5">
-		<h2 class="text-center">Editar Producto</h2>
-		<form th:action="@{/productos/actualizar}" th:object="${producto}"
-			method="post" enctype="multipart/form-data">
-			<input type="hidden" th:field="*{id}">
-
+		<h2 class="text-center mb-4">Editar Producto</h2>
+		<!-- Info del producto -->
+		<p th:text="'Producto: ' + ${productoDTO.productName}">Producto
+			cargando...</p>
+		<p th:text="'Categorías: ' + ${categorias}">Categorías cargando...</p>
+		<form th:action="@{'/api/productos/editar/' + ${productoDTO.id}}"
+			th:object="${productoDTO}" method="post"
+			enctype="multipart/form-data">
+			<input type="hidden" th:field="*{id}" />
+			<!-- Nombre -->
 			<div class="form-group">
 				<label>Nombre:</label> <input type="text" class="form-control"
-					th:field="*{productName}" required>
+					th:field="*{productName}" required />
 			</div>
+			<!-- Precio -->
 			<div class="form-group">
 				<label>Precio:</label> <input type="number" class="form-control"
-					th:field="*{price}" step="0.01" required>
+					th:field="*{price}" step="0.01" min="0" required />
 			</div>
+			<!-- Stock -->
 			<div class="form-group">
 				<label>Stock:</label> <input type="number" class="form-control"
-					th:field="*{stock}" required>
+					th:field="*{stock}" min="0" required />
 			</div>
+			<!-- Descripción -->
 			<div class="form-group">
 				<label>Descripción:</label>
 				<textarea class="form-control" th:field="*{description}" rows="4"
 					required></textarea>
-			</div>	
-
+			</div>
 			<!-- Categoría -->
-<!--
-<div class="form-group">
-    <label for="categoria">Categoría:</label>
-    <select th:field="*{categoria.id}" class="form-control" id="categoria">
-        <option value="">Selecciona una categoría</option>
-        <option th:each="categoria : ${categorias}"
-                th:value="${categoria.id}"
-                th:text="${categoria.nombre}">
-        </option>
-    </select>
-</div>
--->
-
-
-<div class="form-group">
-    <label for="porcentajeDescuento">Porcentaje de Descuento (%)</label>
-    <input type="number" class="form-control" id="porcentajeDescuento"
-           name="porcentajeDescuento"
-           th:value="${producto.porcentajeDescuento}"
-           min="0" max="100" step="1"/>
-</div>
-
-
-
-
-
-
-			<!-- Imágenes actuales -->
 			<div class="form-group">
-				<label>Imágenes actuales:</label>
+				<label>Categoría:</label> <select class="form-control"
+					th:field="*{categoriaNombre}" required>
+					<option value="" disabled>Selecciona una categoría</option>
+					<option th:each="cat : ${categorias}" th:value="${cat.nombre}"
+						th:text="${cat.nombre}"
+						th:selected="${productoDTO.categoriaNombre != null and cat.nombre == productoDTO.categoriaNombre}">
+					</option>
+				</select>
+			</div>
+			<!-- Porcentaje de descuento -->
+			<div class="form-group">
+				<label for="porcentajeDescuento">Porcentaje de Descuento (%)</label>
+				<input type="number" class="form-control" id="porcentajeDescuento"
+					th:field="*{porcentajeDescuento}" min="0" max="100" step="1" />
+			</div>
+			<!-- Imágenes existentes -->
+			<div class="form-group">
+				<label>Imágenes existentes:</label>
 				<div class="row">
-					<div class="col-md-4 mb-3" th:each="img : ${producto.imagenes}">
+					<div class="col-md-4 mb-3"
+						th:each="img, iterStat : ${productoDTO.urlsImagenesExistentes}">
 						<div class="card bg-secondary">
-							<img th:src="${img.imageUrl}" class="card-img-top" alt="Imagen">
+							<img th:src="${img}" class="card-img-top" alt="Imagen">
 							<div class="card-body text-center">
-								<div class="form-check">
+								<!-- Checkbox para eliminar al guardar cambios -->
+								<div class="form-check mb-2">
 									<input class="form-check-input" type="checkbox"
-										name="eliminarImagenes" th:value="${img.id}"
-										th:id="'imgCheck__' + ${img.id}"> <label
-										class="form-check-label" th:for="'imgCheck__' + ${img.id}">
-										Eliminar </label>
-
+										name="imagenesExistentes"
+										th:value="${productoDTO.imagenesExistentes[iterStat.index]}"
+										th:id="'imgCheck__' + ${productoDTO.imagenesExistentes[iterStat.index]}">
+									<label class="form-check-label"
+										th:for="'imgCheck__' + ${productoDTO.imagenesExistentes[iterStat.index]}">
+										Marcar para eliminar </label>
 								</div>
+								<!-- Botón de eliminación inmediata -->
+								<button type="button"
+									class="btn btn-danger btn-sm eliminar-img-btn"
+									th:attr="data-id=${productoDTO.imagenesExistentes[iterStat.index]}">
+									Eliminar ahora</button>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-
 			<!-- Nuevas imágenes -->
 			<div class="form-group">
 				<label>Nuevas imágenes (opcional):</label> <input type="file"
-					name="nuevasImagenes" multiple class="form-control-file"
-					accept="image/*">
+					name="imagenes" multiple class="form-control-file" accept="image/*">
 			</div>
-
 			<!-- Botones -->
-			<div class="text-center">
+			<div class="text-center mt-3">
 				<button type="submit" class="btn btn-success">Guardar
 					Cambios</button>
 				<a href="/VerProductos" class="btn btn-secondary">Cancelar</a>
@@ -105,5 +102,65 @@
 		</form>
 
 	</div>
+
+	<!-- JS para eliminación inmediata -->
+
+	<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.querySelectorAll(".eliminar-img-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+
+            const idImg = btn.getAttribute("data-id");
+
+            if (!confirm("¿Eliminar esta imagen permanentemente?")) return;
+
+            try {
+                const resp = await fetch("/api/productos/eliminar-imagen/" + idImg, {
+                    method: "DELETE"
+                });
+
+                if (resp.ok) {
+                    // Eliminar la tarjeta visualmente
+                    btn.closest(".col-md-4").remove();
+                } else {
+                    alert("No se pudo eliminar la imagen.");
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Error al eliminar la imagen.");
+            }
+
+        });
+    });
+
+});
+</script>
+<script>
+document.querySelector("form").addEventListener("submit", async function(e) {
+    e.preventDefault(); // Evita submit normal
+
+    const form = e.target;
+    const url = form.getAttribute("action");
+    const formData = new FormData(form);
+
+    const resp = await fetch(url, {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await resp.json();
+
+    if (data.success) {
+        window.location.href = "/VerProductos"; // 🔥 Redirección final
+    } else {
+        alert("Error al guardar: " + (data.message || "Desconocido"));
+    }
+});
+</script>
+
+
 </body>
 </html>

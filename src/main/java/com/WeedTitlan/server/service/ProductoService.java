@@ -1,46 +1,47 @@
 package com.WeedTitlan.server.service;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.WeedTitlan.server.model.ImagenProducto;
 import com.WeedTitlan.server.model.Producto;
 import com.WeedTitlan.server.repository.ImagenProductoRepository;
 import com.WeedTitlan.server.repository.ProductoRepository;
-//import com.WeedTitlan.server.dto.ProductoResumenDTO;
-
+import com.WeedTitlan.server.dto.CloudinaryUploadResult;
 
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductoService {
-
-    private static final String IMAGE_UPLOAD_DIR = "src/main/resources/static/assets/imgs/";
 
     @Autowired
     private ProductoRepository productoRepository;
 
     @Autowired
-    
     private ImagenProductoRepository imagenProductoRepository;
 
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
+    // --------------------------------------------------------------------
+    // LISTADOS
+    // --------------------------------------------------------------------
+
     public List<Producto> obtenerTodosLosProductos() {
-        return productoRepository.findAll();
+        return productoRepository.findAllConTodo();
     }
+
 
     @Transactional
     public List<Producto> listarProductos() {
-        return productoRepository.findAllWithImages();
+        return productoRepository.findAllConTodo();
     }
- 
+
     public List<String> obtenerCategorias() {
         return productoRepository.obtenerNombresCategoriasVisibles();
     }
@@ -49,132 +50,193 @@ public class ProductoService {
         return productoRepository.findProductosVisiblesConTodo();
     }
 
+    public Producto obtenerProductoConTodo(Long id) {
+        return productoRepository.findByIdConTodo(id).orElse(null);
+    }
+
+    // --------------------------------------------------------------------
+    // OBTENCIONES POR ID
+    // --------------------------------------------------------------------
+
     @Transactional
     public Producto obtenerProducto(Long id) {
-    	return productoRepository.findById(id)
-    		    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-
-    }
-
-    // ✅ Nuevo método que tu controlador busca: findById
-    @Transactional
-    public Producto findById(Long id) {
-        return productoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Producto no encontrado")); 
-        
+        return productoRepository.findByIdConTodo(id)
+                .orElseThrow(() -> new ProductoNotFoundException(id));
     }
 
     @Transactional
-    public Producto obtenerPorId(Long id) {
+    public Producto obtenerProductoConCategoria(Long id) {
         return productoRepository.findByIdWithCategoria(id)
-            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-    }
-    public Producto obtenerPorIdConCategoria(Long id) {
-        Producto producto = productoRepository.findByIdWithCategoria(id)
-            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-
-        System.out.println("✔ Producto: " + producto.getProductName());
-        System.out.println("✔ Categoría del producto: " +
-            (producto.getCategoria() != null ? producto.getCategoria().getNombre() : "NULL"));
-
-        return producto;
+                .orElseThrow(() -> new ProductoNotFoundException(id));
     }
 
-
-
-    @Transactional
-    public void actualizarStock(Long id, int cantidad) {
-        Producto producto = obtenerProducto(id);
-        if (producto.getStock() >= cantidad) {
-            producto.setStock(producto.getStock() - cantidad);
-            productoRepository.save(producto);
-        } else {
-            throw new RuntimeException("Stock insuficiente");
-        }
+    public Optional<Producto> buscarPorNombre(String nombre) {
+        return productoRepository.findByProductName(nombre);
     }
 
-    // ✅ Método usado por el controlador para guardar producto (nombre genérico: save)
-    @Transactional
-    public Producto save(Producto producto) {
-        return productoRepository.save(producto);
-    }
+    // --------------------------------------------------------------------
+    // CRUD
+    // --------------------------------------------------------------------
 
-    // Método ya existente
     @Transactional
     public Producto guardarProducto(Producto producto) {
+        validarProducto(producto);
         return productoRepository.save(producto);
     }
 
-    // Subida de imagen
-    @Transactional
-    public String guardarImagen(Long productoId, MultipartFile file) {
-        Optional<Producto> productoOpt = productoRepository.findById(productoId);
-
-        if (productoOpt.isEmpty()) {
-            throw new RuntimeException("Producto no encontrado");
-        }
-
-        if (file.isEmpty()) {
-            throw new RuntimeException("El archivo está vacío");
-        }
-
-        try {
-            Producto producto = productoOpt.get();
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path path = Paths.get(IMAGE_UPLOAD_DIR + fileName);
-
-            // 🔥 Crear directorio si no existe
-            if (!Files.exists(Paths.get(IMAGE_UPLOAD_DIR))) {
-                Files.createDirectories(Paths.get(IMAGE_UPLOAD_DIR));
-            }
-
-            Files.write(path, file.getBytes());
-
-            ImagenProducto imagen = new ImagenProducto();
-            imagen.setImageUrl(fileName);
-            imagen.setProducto(producto);
-            imagenProductoRepository.save(imagen);
-
-            return "Imagen subida con éxito: " + fileName;
-        } catch (IOException e) {
-            throw new RuntimeException("Error al guardar la imagen", e);
-        }
-    }
-
-    public void eliminarProducto(Long id) {
-        if (productoRepository.existsById(id)) {
-            productoRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Producto no encontrado con ID: " + id);
-        }
-    }
-
-    public void eliminarImagenesPorProducto(Long productoId) {
-        List<ImagenProducto> imagenes = imagenProductoRepository.findByProductoId(productoId);
-        imagenProductoRepository.deleteAll(imagenes);
-    }
     @Transactional
     public Producto actualizarProducto(Producto producto) {
         if (!productoRepository.existsById(producto.getId())) {
-            throw new RuntimeException("Producto no encontrado con ID: " + producto.getId());
+            throw new ProductoNotFoundException(producto.getId());
         }
+        validarProducto(producto);
         return productoRepository.save(producto);
     }
-    public void actualizarCamposBasicos(Producto nuevoProducto) {
-        Producto existente = productoRepository.findById(nuevoProducto.getId())
-            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-        existente.setProductName(nuevoProducto.getProductName());
-        existente.setPrice(nuevoProducto.getPrice());
-        existente.setStock(nuevoProducto.getStock());
-        existente.setDescription(nuevoProducto.getDescription());
+    @Transactional
+    public void actualizarCamposBasicos(Producto datos) {
+        Producto existente = obtenerProducto(datos.getId());
 
+        existente.setProductName(datos.getProductName());
+        existente.setPrice(datos.getPrice());
+        existente.setStock(datos.getStock());
+        existente.setDescription(datos.getDescription());
+
+        validarProducto(existente);
         productoRepository.save(existente);
     }
-    public Producto obtenerProductoPorId(Long id) {
-        return productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
+
+    @Transactional
+    public void actualizarStock(Long id, int cantidad) {
+        if (cantidad < 0) throw new IllegalArgumentException("Cantidad no puede ser negativa");
+
+        Producto producto = obtenerProducto(id);
+        if (producto.getStock() < cantidad) {
+            throw new RuntimeException("Stock insuficiente");
+        }
+
+        producto.setStock(producto.getStock() - cantidad);
+        productoRepository.save(producto);
+    }
+    
+    
+    @Transactional
+    public boolean togglePromocion(Long id) {
+        Producto producto = obtenerProducto(id); // usa tu método ya existente
+
+        boolean nuevoEstado = !Boolean.TRUE.equals(producto.getTienePromocion());
+        producto.setTienePromocion(nuevoEstado);
+
+        productoRepository.save(producto);
+        return nuevoEstado;
     }
 
+    
+
+    @Transactional
+    public void eliminarProducto(Long id) {
+        Producto producto = obtenerProducto(id);
+
+        // Eliminar imágenes en Cloudinary
+        eliminarImagenesPorProducto(producto);
+
+        productoRepository.delete(producto);
+    }
+
+    // --------------------------------------------------------------------
+    // IMÁGENES
+    // --------------------------------------------------------------------
+    @Transactional
+    public boolean eliminarImagenPorIdInmediato(Long idImagen) {
+        ImagenProducto img = imagenProductoRepository.findById(idImagen).orElse(null);
+        if (img == null) return false;
+
+        // 1. Eliminar de Cloudinary
+        boolean cloudDeleted = cloudinaryService.eliminarImagen(img.getPublicId());
+        if (!cloudDeleted) {
+            System.out.println("⚠ No se pudo eliminar en Cloudinary: " + img.getPublicId());
+        }
+
+        // 2. Quitar referencia del Producto (MUY IMPORTANTE)
+        Producto producto = img.getProducto();
+        if (producto != null) {
+            producto.getImagenes().remove(img);
+        }
+
+        // 3. Eliminar de BD
+        imagenProductoRepository.delete(img);
+
+        return true;
+    }
+
+
+    @Transactional
+    public List<ImagenProducto> subirImagenes(Producto producto, List<MultipartFile> nuevasImagenes) throws IOException {
+        List<ImagenProducto> imagenesAgregadas = new ArrayList<>();
+        if (nuevasImagenes != null) {
+            for (MultipartFile archivo : nuevasImagenes) {
+                if (!archivo.isEmpty()) {
+                    CloudinaryUploadResult result = cloudinaryService.subirImagen(archivo);
+                    ImagenProducto imagen = new ImagenProducto(result.getSecureUrl(), result.getPublicId(), producto);
+                    imagenProductoRepository.save(imagen);
+                    imagenesAgregadas.add(imagen);
+                }
+            }
+        }
+        return imagenesAgregadas;
+    }
+
+    @Transactional
+    public void eliminarImagenesPorProducto(Producto producto) {
+        List<ImagenProducto> imagenes = imagenProductoRepository.findByProductoId(producto.getId());
+        for (ImagenProducto img : imagenes) {
+            cloudinaryService.eliminarImagen(img.getPublicId());
+        }
+        imagenProductoRepository.deleteAll(imagenes);
+    }
+
+    @Transactional
+    public void eliminarImagenesPorIds(List<Long> ids) {
+
+        if (ids == null || ids.isEmpty()) return;
+
+        // 1 sola query para traer TODAS las imágenes
+        List<ImagenProducto> imagenes = imagenProductoRepository.findAllById(ids);
+
+        // Borrar de Cloudinary primero
+        for (ImagenProducto img : imagenes) {
+            cloudinaryService.eliminarImagen(img.getPublicId());
+        }
+
+        // 1 sola query para eliminar TODAS en lote
+        imagenProductoRepository.deleteAllInBatch(imagenes);
+    }
+
+    // --------------------------------------------------------------------
+    // VALIDACIONES
+    // --------------------------------------------------------------------
+
+    private void validarProducto(Producto producto) {
+        if (producto.getProductName() == null || producto.getProductName().isBlank()) {
+            throw new IllegalArgumentException("El nombre del producto no puede estar vacío");
+        }
+        if (producto.getPrice() < 0) {
+            throw new IllegalArgumentException("El precio no puede ser negativo");
+        }
+        if (producto.getStock() < 0) {
+            throw new IllegalArgumentException("El stock no puede ser negativo");
+        }
+    }
+
+    // --------------------------------------------------------------------
+    // EXCEPCIONES PERSONALIZADAS
+    // --------------------------------------------------------------------
+
+    public static class ProductoNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L; 
+        public ProductoNotFoundException(Long id) {
+            super("Producto no encontrado con ID: " + id);
+        }
+    }
 
 }

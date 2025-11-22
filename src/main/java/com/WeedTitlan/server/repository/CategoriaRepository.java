@@ -2,10 +2,8 @@ package com.WeedTitlan.server.repository;
 
 import com.WeedTitlan.server.model.Categoria;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-
+import java.util.Optional;
 
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
-    Categoria findByNombre(String nombre);
+    Optional<Categoria> findByNombre(String nombre);
 }
-
