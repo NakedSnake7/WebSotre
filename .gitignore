@@ -24,6 +24,7 @@ Thumbs.db
 .mvn/wrapper/maven-wrapper.properties
 
 # --- Archivos de entorno y configuraciones sensibles ---
+git rm --cached src/main/resources/application.properties
 application.properties
 application.yml
 *.env
