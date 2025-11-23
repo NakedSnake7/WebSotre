@@ -7,10 +7,12 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.auth.oauth2.ServiceAccountCredentials;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,21 +26,22 @@ public class GoogleSheetsService {
     @Value("${google.sheets.spreadsheet-id}")
     private String spreadsheetId;
 
-    @Value("${google.sheets.credentials}")
-    private String credentialsPath;
+    @Value("#{systemEnvironment['GOOGLE_SHEET_CREDENTIALS_JSON']}")
+    private String credentialsJson;
 
     @Value("${google.sheets.range:Hoja1!A:B}")
-    private String rango; // por defecto Hoja1!A:B, se puede cambiar desde properties
+    private String rango;
 
     public Map<String, Integer> obtenerStockDesdeSheet() throws Exception {
 
-        // Cargar credenciales
-        InputStream serviceAccount = getClass().getResourceAsStream(credentialsPath);
-        if(serviceAccount == null){
-            throw new RuntimeException("⚠ Archivo de credenciales no encontrado: " + credentialsPath);
+        if (credentialsJson == null || credentialsJson.isEmpty()) {
+            throw new RuntimeException("⚠ Variable de entorno GOOGLE_SHEET_CREDENTIALS_JSON no definida");
         }
 
-        GoogleCredentials credential = GoogleCredentials.fromStream(serviceAccount)
+        // Convertimos la variable de entorno en InputStream
+        ByteArrayInputStream serviceAccount = new ByteArrayInputStream(credentialsJson.getBytes(StandardCharsets.UTF_8));
+
+        GoogleCredentials credential = ServiceAccountCredentials.fromStream(serviceAccount)
                 .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS_READONLY));
 
         Sheets sheetsService = new Sheets.Builder(
