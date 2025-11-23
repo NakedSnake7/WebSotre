@@ -30,6 +30,12 @@
 
     <dependencies>
     
+    <dependency>
+    <groupId>com.sendgrid</groupId>
+    <artifactId>sendgrid-java</artifactId>
+</dependency>
+
+    
     
     <dependency>
     <groupId>org.projectlombok</groupId>
