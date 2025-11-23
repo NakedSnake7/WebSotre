@@ -14,11 +14,9 @@ import java.util.*;
 @Service
 public class ProveedorStockService {
 
-    // Variable de entorno con JSON de credenciales
-    @Value("${google.sheets.spreadsheet-id:}") 
+    @Value("${google.sheets.spreadsheet-id:}")
     private String spreadsheetId;
 
-    // Lista de rangos de todas las tablas
     private static final String[] RANGOS_TABLAS = {
         "'Hoja 1'!A4:B15", "'Hoja 1'!D4:E15", "'Hoja 1'!G4:H15", "'Hoja 1'!J4:K15", "'Hoja 1'!M4:N15",
         "'Hoja 1'!A18:B29", "'Hoja 1'!D18:E29", "'Hoja 1'!G18:H29", "'Hoja 1'!J18:K29", "'Hoja 1'!M18:N29",
@@ -44,23 +42,29 @@ public class ProveedorStockService {
         Map<String, List<ProductoStock>> inventarioPorMarca = new LinkedHashMap<>();
 
         try {
-            if (spreadsheetId.isBlank()) {
-                System.out.println("⚠ Google Sheets deshabilitado: spreadsheet ID no configurado.");
+            if (spreadsheetId == null || spreadsheetId.isBlank()) {
+                System.out.println("⚠ Google Sheets deshabilitado: Spreadsheet ID vacío.");
                 return inventarioPorMarca;
             }
 
-            // Leer variable de entorno
+            // 1️⃣ Intentar primero leer variable de entorno (modo Render)
             String credentialsJson = System.getenv("GOOGLE_SHEET_CREDENTIALS_JSON");
+            InputStream credentialsStream = null;
 
-            InputStream credentialsStream;
-            if (credentialsJson != null && !credentialsJson.isEmpty()) {
-                // Producción: usar variable de entorno
+            if (credentialsJson != null && !credentialsJson.isBlank()) {
+                System.out.println("✔ Usando credenciales desde variable de entorno (Render).");
                 credentialsStream = new ByteArrayInputStream(credentialsJson.getBytes(StandardCharsets.UTF_8));
-            } else {
-                // Local: fallback a archivo físico
+            }
+
+            // 2️⃣ Si no existe variable de entorno → intentar archivo local (modo local)
+            if (credentialsStream == null) {
                 credentialsStream = getClass().getResourceAsStream("/credenciales.json");
-                if (credentialsStream == null) {
-                    throw new RuntimeException("No se pudo encontrar credenciales.json en classpath ni variable de entorno GOOGLE_SHEET_CREDENTIALS_JSON definida");
+
+                if (credentialsStream != null) {
+                    System.out.println("✔ Usando credenciales desde archivo local (desarrollo).");
+                } else {
+                    System.out.println("❌ No se encontró variable de entorno ni archivo credenciales.json.");
+                    return inventarioPorMarca; // <-- IMPORTANTE: no lanzar excepción, solo deshabilitar
                 }
             }
 
@@ -92,14 +96,14 @@ public class ProveedorStockService {
                     if (fila.size() < 2) continue;
 
                     String stockStr = fila.get(0).toString().trim();
-                    String nombreProducto = fila.get(1).toString().trim();
+                    String nombre = fila.get(1).toString().trim();
 
-                    if (stockStr.equalsIgnoreCase("TOTAL") || nombreProducto.isEmpty()) continue;
+                    if (stockStr.equalsIgnoreCase("TOTAL") || nombre.isEmpty()) continue;
 
                     int stock = 0;
                     try { stock = Integer.parseInt(stockStr); } catch (Exception ignored) {}
 
-                    listaProductos.add(new ProductoStock(nombreProducto, stock));
+                    listaProductos.add(new ProductoStock(nombre, stock));
                 }
             }
 
