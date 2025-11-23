@@ -52,6 +52,18 @@ public class Order {
     @NotNull(message = "La fecha de la orden no puede ser nula")
     private LocalDate orderDate;
 
+    @NotNull
+    private Boolean emailSent = false; // Por defecto falso
+
+    public Boolean getEmailSent() {
+        return emailSent;
+    }
+
+    public void setEmailSent(Boolean emailSent) {
+        this.emailSent = emailSent;
+    }
+
+    
     // Constructor vacío necesario para JPA
     public Order() {}
 

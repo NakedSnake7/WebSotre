@@ -1,15 +1,22 @@
 <div th:fragment="menu">
 	<!-- Encabezado del Menú -->
-<div id="menu"
-     class="text-center custom-menu-bg text-light has-height-md middle-items wow fadeIn">
-    <h2 class="section-title">
-        <a href="/menu" class="text-light text-decoration-none">MENU</a>
-    </h2>
-</div>
+	<div id="menu"
+		class="text-center custom-menu-bg text-light has-height-md middle-items wow fadeIn">
+		<h2 class="section-title">
+			<a href="/menu" class="text-light text-decoration-none">MENU</a>
+		</h2>
+	</div>
+<div th:fragment="menu">
+    <!-- Encabezado del Menú -->
+    <div id="menu" class="text-center custom-menu-bg text-light has-height-md middle-items wow fadeIn">
+        <h2 class="section-title">
+            <a href="/menu" class="text-light text-decoration-none">MENU</a>
+        </h2>
+    </div>
 
-
-	<!-- Barra de categorías superior -->
-	<div class="categories-bar text-light py-2 px-3 sticky-top" style="z-index: 1000;">
+```
+<!-- Barra de categorías superior -->
+<div class="categories-bar text-light py-2 px-3 sticky-top" style="z-index: 1000;">
     <div class="d-flex flex-wrap justify-content-center category-scroll">
         <a th:each="categoria : ${categorias}"
            class="btn btn-outline-light btn-sm mx-2 mb-2"
@@ -18,122 +25,113 @@
     </div>
 </div>
 
+<!-- Contenedor principal -->
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div th:each="categoria : ${categorias}" class="mb-5"
+                 th:id="'cat-' + ${#strings.replace(categoria, ' ', '-')}">
+                <!-- Nombre de la categoría -->
+                <h4 class="text-light mb-3" th:text="${categoria}"></h4>
 
-	<!-- Contenedor principal -->
-	<div class="container-fluid mt-4">
-		<div class="row">
-			<div class="col-12">
-				<div th:each="categoria : ${categorias}" class="mb-5"
-					th:id="'cat-' + ${#strings.replace(categoria, ' ', '-')}">
+                <!-- Wrapper con sombra fija -->
+                <div class="product-wrapper">
+                    <div class="d-flex product-scroll">
+                        <div th:each="producto : ${productos}"
+                             th:if="${producto.categoria.nombre == categoria}"
+                             class="card bg-transparent border text-white mr-3 position-relative"
+                             style="min-width: 250px; max-width: 250px; flex: 0 0 auto;">
 
-					<!-- Nombre de la categoría -->
-					<h4 class="text-light mb-3" th:text="${categoria}"></h4>
+                            <!-- Badge de promoción -->
+                            <span th:if="${producto.tienePromocion}"
+                                  class="badge badge-descuento badge-pulse position-absolute m-2"
+                                  style="top: 0.5rem; left: 0.5rem; z-index: 2;">
+                                -<span th:text="${producto.porcentajeDescuento}">0</span>%
+                            </span>
 
-					<!-- Wrapper con sombra fija -->
-					<div class="product-wrapper">
-						<!-- Carrusel horizontal de productos -->
-						<div class="d-flex product-scroll">
-							<div th:each="producto : ${productos}"
-								th:if="${producto.categoria.nombre == categoria}"
-								class="card bg-transparent border text-white mr-3 position-relative"
-								style="min-width: 250px; max-width: 250px; flex: 0 0 auto;">
+                            <!-- Carousel de imágenes -->
+                            <div th:if="${producto.imagenes != null and #lists.size(producto.imagenes) > 0}"
+                                 th:id="'carousel-' + ${producto.id}"
+                                 class="carousel slide mb-2" data-bs-ride="carousel" data-bs-interval="3000">
+                                <div class="carousel-inner">
+                                    <div th:each="imagen, iterStat : ${producto.imagenes}"
+                                         th:classappend="${iterStat.index == 0} ? 'active'"
+                                         class="carousel-item">
+                                        <img th:src="@{${imagen.imageUrl != null ? imagen.imageUrl : '/imgs/default.png'}}"
+                                             class="d-block w-100" alt="Imagen producto"
+                                             style="max-height: 250px; object-fit: cover;">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                        th:attr="data-bs-target='#carousel-' + ${producto.id}"
+                                        data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon"></span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                        th:attr="data-bs-target='#carousel-' + ${producto.id}"
+                                        data-bs-slide="next">
+                                    <span class="carousel-control-next-icon"></span>
+                                </button>
+                            </div>
 
+                            <!-- Card body -->
+                            <div class="card-body text-center">
+                                <h5 class="card-title" th:text="${producto.productName}"></h5>
 
-								<span th:if="${producto.tienePromocion}"
-									class="badge badge-descuento badge-pulse position-absolute m-2"
-									style="top: 0.5rem; left: 0.5rem; z-index: 2;"> -<span
-									th:text="${producto.porcentajeDescuento}">0</span>%
-								</span>
+                                <!-- Precio -->
+                                <div class="mb-2">
+                                    <span th:if="${producto.tienePromocion}">
+                                        <del class="text-muted">
+                                            $<span th:text="${#numbers.formatDecimal(producto.price,1,'POINT',0,'NONE')}"></span>
+                                        </del>
+                                        <span class="badge badge-success ml-2">
+                                            $<span th:text="${#numbers.formatDecimal(producto.precioConDescuento,1,'POINT',0,'NONE')}"></span>
+                                        </span>
+                                    </span>
+                                    <span th:if="${!producto.tienePromocion}">
+                                        <span class="badge badge-primary">
+                                            $<span th:text="${#numbers.formatDecimal(producto.price,1,'POINT',0,'NONE')}"></span>
+                                        </span>
+                                    </span>
+                                </div>
 
+                                <!-- Cantidad y botón flotante -->
+                                <div class="d-flex align-items-center justify-content-center mb-2">
+                                    <input type="number" th:id="'quantity-' + ${producto.id}"
+                                           name="quantity"
+                                           class="form-control form-control-sm text-center mr-2"
+                                           value="1" min="1"
+                                           th:attr="max=${producto.stock}"
+                                           style="width: 45px; height: 28px; font-size: 0.8rem; padding: 0;">
 
-								<div
-									th:if="${producto.imagenes != null and #lists.size(producto.imagenes) > 0}"
-									th:id="'carousel-' + ${producto.id}"
-									class="carousel slide mb-2" data-bs-ride="carousel"
-									data-bs-interval="3000">
+                                    <button class="btn btn-sm btn-success add-to-cart"
+                                            th:data-name="${producto.productName}"
+                                            th:data-price="${producto.tienePromocion ? producto.precioConDescuento : producto.price}"
+                                            th:data-quantity-id="'quantity-' + ${producto.id}"
+                                            th:data-stock="${producto.stock}">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                </div>
 
-									<div class="carousel-inner">
-										<div th:each="imagen, iterStat : ${producto.imagenes}"
-											th:classappend="${iterStat.index == 0} ? 'active'"
-											class="carousel-item">
-											<img
-												th:src="@{${imagen.imageUrl != null ? imagen.imageUrl : '/imgs/default.png'}}"
-												class="d-block w-100" alt="Imagen producto"
-												style="max-height: 250px; object-fit: cover;">
-										</div>
-									</div>
+                                <!-- Descripción corta -->
+                                <div class="descripcion-corta text-light small mb-2 text-left">
+                                    <span th:text="${producto.description}"></span>
+                                </div>
 
-									<!-- Controles opcionales -->
-									<button class="carousel-control-prev" type="button"
-										th:attr="data-bs-target='#carousel-' + ${producto.id}"
-										data-bs-slide="prev">
-										<span class="carousel-control-prev-icon"></span>
-									</button>
-									<button class="carousel-control-next" type="button"
-										th:attr="data-bs-target='#carousel-' + ${producto.id}"
-										data-bs-slide="next">
-										<span class="carousel-control-next-icon"></span>
-									</button>
-								</div>
+                                <!-- Ver más / Ver menos -->
+                                <div class="text-right">
+                                    <a href="javascript:void(0);" class="ver-mas text-info"
+                                       onclick="toggleDescripcion(this)"> <span>Ver más</span></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+            </div> <!-- end categoria -->
+        </div>
+    </div>
+</div>
+```
 
-
-								<div class="card-body text-center">
-									<h5 class="card-title" th:text="${producto.productName}"></h5>
-
-									<!-- Precio -->
-									<div class="mb-2">
-										<span th:if="${producto.tienePromocion}"> <del
-												class="text-muted">
-												$<span
-													th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 0, 'NONE')}"></span>
-											</del> <span class="badge badge-success ml-2"> $<span
-												th:text="${#numbers.formatDecimal(producto.precioConDescuento, 1, 'POINT', 0, 'NONE')}"></span>
-										</span>
-										</span> <span th:if="${!producto.tienePromocion}"> <span
-											class="badge badge-primary"> $<span
-												th:text="${#numbers.formatDecimal(producto.price, 1, 'POINT', 0, 'NONE')}"></span>
-										</span>
-										</span>
-									</div>
-
-									<!-- Cantidad y botón flotante -->
-									<div
-										class="position-absolute d-flex align-items-center p-1 rounded"
-										style="top: 0.5rem; right: 0.5rem; z-index: 3; background-color: rgba(0, 0, 0, 0.6);">
-										<input type="number" th:id="'quantity-' + ${producto.id}"
-											name="quantity"
-											class="form-control form-control-sm text-center mr-2"
-											value="1" min="1"
-											style="width: 45px; height: 28px; font-size: 0.8rem; padding: 0;">
-										<button class="btn btn-sm btn-success add-to-cart"
-											th:attr="data-name=${producto.productName}, 
-             data-price=${producto.tienePromocion} ? ${producto.precioConDescuento} : ${producto.price}, 
-             data-quantity-id='quantity-' + ${producto.id}">
-											<i class="fas fa-cart-plus"></i>
-										</button>
-									</div>
-										<!-- Descripción corta -->
-										<div class="descripcion-corta text-light small mb-2 text-left">
-											<span th:text="${producto.description}"></span>
-										</div>
-
-
-										<!-- Botón ver más / ver menos -->
-										<div class="text-right">
-											<a href="javascript:void(0);" class="ver-mas text-info"
-												onclick="toggleDescripcion(this)"> <span>Ver más</span>
-											</a>
-										</div>
-								</div>
-							</div>
-							<!-- Fin .product-scroll -->
-						</div>
-						<!-- Fin .product-wrapper -->
-
-					</div>
-					<!-- Fin de categoría -->
-				</div>
-			</div>
-		</div>
-	</div>
+</div>
