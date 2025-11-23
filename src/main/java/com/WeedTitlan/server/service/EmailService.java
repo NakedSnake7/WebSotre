@@ -22,9 +22,6 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Autowired
-    private Environment env;
-
     @Value("${sendgrid.api.key:}")
     private String sendgridApiKey;
 
@@ -35,12 +32,21 @@ public class EmailService {
     private String fromName;
 
     public void enviarCorreoHTML(String destinatario, String asunto, String htmlCuerpo) throws MessagingException, IOException {
-        // Detecta si estamos en producción (variable de entorno SENDGRID_API_KEY definida)
+
+        // Si SendGrid está configurado → usarlo
         if (sendgridApiKey != null && !sendgridApiKey.isEmpty()) {
-            enviarConSendGrid(destinatario, asunto, htmlCuerpo);
-        } else {
-            enviarConGmail(destinatario, asunto, htmlCuerpo);
+            try {
+                enviarConSendGrid(destinatario, asunto, htmlCuerpo);
+                return;
+            } catch (Exception e) {
+                // fallback a Gmail
+                enviarConGmail(destinatario, asunto, htmlCuerpo);
+                return;
+            }
         }
+
+        // Si no hay SendGrid, usar Gmail
+        enviarConGmail(destinatario, asunto, htmlCuerpo);
     }
 
     private void enviarConGmail(String destinatario, String asunto, String htmlCuerpo) throws MessagingException {
@@ -49,19 +55,24 @@ public class EmailService {
 
         helper.setTo(destinatario);
         helper.setSubject(asunto);
-        helper.setText(htmlCuerpo, true); // HTML
-        helper.setFrom("weedtlan.customer.service@gmail.com"); // tu correo de Gmail
+        helper.setText(htmlCuerpo, true);
+        helper.setFrom("weedtlan.customer.service@gmail.com");
 
         mailSender.send(mensaje);
     }
 
     private void enviarConSendGrid(String destinatario, String asunto, String htmlCuerpo) throws IOException {
+        if (fromEmail == null || fromEmail.isBlank()) {
+            throw new IllegalStateException("SENDGRID_FROM_EMAIL está vacío o no definido.");
+        }
+
         Email from = new Email(fromEmail, fromName);
         Email to = new Email(destinatario);
         Content content = new Content("text/html", htmlCuerpo);
         Mail mail = new Mail(from, asunto, to, content);
 
         SendGrid sg = new SendGrid(sendgridApiKey);
+
         Request request = new Request();
         request.setMethod(Method.POST);
         request.setEndpoint("mail/send");
