@@ -1,4 +1,4 @@
-/* Contenedor del aura glow */
+/* --- CONFIGURACIÓN BASE (igual que la tuya) --- */
 .glow-aura {
     position: relative;
     z-index: 1;
@@ -9,7 +9,7 @@
 .glow-aura::after {
     content: "";
     position: absolute;
-    inset: -40px;  /* Expansión del brillo */
+    inset: -40px;
     border-radius: 50%;
     filter: blur(40px);
     z-index: -1;
@@ -17,31 +17,71 @@
     opacity: 0.8;
 }
 
-/* Primera capa: Verde-maya */
+/* Verde-maya */
 .glow-aura::before {
     background: radial-gradient(circle, rgba(0,255,200,0.45), transparent 70%);
 }
 
-/* Segunda capa: Azul turquesa */
+/* Azul turquesa */
 .glow-aura::after {
     background: radial-gradient(circle, rgba(0,180,255,0.35), transparent 75%);
     animation-duration: 8s;
 }
 
-/* Animación respirante */
 @keyframes auraBreath {
-    0%   { transform: scale(1);    opacity: 0.65; }
+    0%   { transform: scale(1); opacity: 0.65; }
     50%  { transform: scale(1.15); opacity: 0.95; }
-    100% { transform: scale(1);    opacity: 0.65; }
+    100% { transform: scale(1); opacity: 0.65; }
 }
 
-/* Glow más intenso al pasar el mouse */
+/* Hover */
 .glow-aura:hover::before,
 .glow-aura:hover::after {
     filter: blur(55px);
     opacity: 1;
     transition: 0.4s ease-in-out;
 }
+
+
+/* --- AJUSTES RESPONSIVOS --- */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 768px) {
+    .glow-aura::before,
+    .glow-aura::after {
+        inset: -25px;
+        filter: blur(25px);
+    }
+    .glow-aura {
+        font-size: 2.3rem !important;
+    }
+}
+
+/* Teléfonos */
+@media (max-width: 480px) {
+    .glow-aura::before,
+    .glow-aura::after {
+        inset: -15px;
+        filter: blur(18px);
+    }
+    .glow-aura {
+        font-size: 1.9rem !important;
+        letter-spacing: 1px;
+    }
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 360px) {
+    .glow-aura::before,
+    .glow-aura::after {
+        inset: -10px;
+        filter: blur(14px);
+    }
+    .glow-aura {
+        font-size: 1.7rem !important;
+    }
+}
+
 
 /* Contenedor de partículas con brillo difuso */
 #particles-js {
