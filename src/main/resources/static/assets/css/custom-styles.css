@@ -1,3 +1,23 @@
+/* Ajuste del tamaño del título y subtítulo */
+.glow-aura.display-2 {
+    font-size: 3rem;      /* Título más grande */
+}
+
+header .display-4 {
+    font-size: 1.8rem;    /* Subtítulo más pequeño */
+}
+
+/* Ajustes en pantallas pequeñas */
+@media (max-width: 576px) {
+    .glow-aura.display-2 {
+        font-size: 2.4rem; 
+    }
+
+    header .display-4 {
+        font-size: 1.4rem;
+    }
+}
+
 /* --- CONFIGURACIÓN BASE (igual que la tuya) --- */
 .glow-aura {
     position: relative;
@@ -141,15 +161,7 @@
     border-radius: 50%;
     animation: spin 1s linear infinite, glow 1s ease-in-out infinite alternate;
 }
-#particles-js {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background: #060606; /* Fondo oscuro */
-}
+
 
 /* Aro interior girando al revés */
 .maya-spinner .ring2 {
