@@ -33,6 +33,15 @@
     border-radius: 50%;
     animation: spin 1s linear infinite, glow 1s ease-in-out infinite alternate;
 }
+#particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: #060606; /* Fondo oscuro */
+}
 
 /* Aro interior girando al revés */
 .maya-spinner .ring2 {
