@@ -568,19 +568,27 @@
 
 <script>
 function cargarMenu() {
+    document.getElementById("loader").style.display = "flex";
+
     fetch("/fragmento-menu")
         .then(resp => resp.text())
         .then(html => {
             const contenedor = document.getElementById("contenedor-menu");
             contenedor.innerHTML = html;
 
-            contenedor.scrollIntoView({
-                behavior: "smooth"
-            });
+            contenedor.scrollIntoView({ behavior: "smooth" });
+
+            document.getElementById("loader").style.display = "none";
         })
-        .catch(err => console.error("Error cargando el menú:", err));
+        .catch(err => {
+            console.error("Error cargando el menú:", err);
+            document.getElementById("loader").style.display = "none";
+        });
 }
+
+
 </script>
+
 
 	<script>
 		function mostrarResenas() {
@@ -599,6 +607,84 @@ function cargarMenu() {
 	<script src="assets/vendors/wow/wow.js"></script>
 	<!-- FoodHut js -->
 	<script src="assets/js/foodhut.js"></script>
+	
+<!-- Símbolo Maya de Protección -->
+<svg class="maya-symbol" width="70" height="70" viewBox="0 0 100 100">
+    <!-- Escudo exterior -->
+    <path 
+        d="M50 10 
+           L80 30 
+           L80 60 
+           L50 90 
+           L20 60 
+           L20 30 Z"
+        fill="none"
+        stroke="#00ffbf"
+        stroke-width="4"
+        stroke-linejoin="round"
+    />
+
+    <!-- Anillo protector interior -->
+    <circle 
+        cx="50" cy="50" r="18"
+        fill="none"
+        stroke="#00ffe0"
+        stroke-width="3"
+    />
+
+    <!-- Centro energético -->
+    <circle 
+        cx="50" cy="50" r="6"
+        fill="#00ffd5"
+        stroke="#00fff2"
+        stroke-width="2"
+    />
+
+    <!-- Líneas de energía protectora -->
+    <path 
+        d="M50 32 L50 20
+           M68 50 L80 50
+           M50 68 L50 80
+           M20 50 L32 50"
+        stroke="#00ffbf"
+        stroke-width="3"
+        stroke-linecap="round"
+    />
+</svg>
+<!-- Loader Maya Futurista -->
+<div id="loader" class="loader-overlay" style="display:none;">
+
+    <div class="maya-spinner">
+
+        <!-- Aros giratorios -->
+        <div class="ring"></div>
+        <div class="ring2"></div>
+
+        <!-- Símbolo Maya de Protección -->
+        <svg class="maya-symbol" width="70" height="70" viewBox="0 0 100 100">
+            <path d="M50 10 L80 30 L80 60 L50 90 L20 60 L20 30 Z"
+                fill="none" stroke="#00ffbf" stroke-width="4" stroke-linejoin="round"/>
+
+            <circle cx="50" cy="50" r="18"
+                fill="none" stroke="#00ffe0" stroke-width="3"/>
+
+            <circle cx="50" cy="50" r="6"
+                fill="#00ffd5" stroke="#00fff2" stroke-width="2"/>
+
+            <path d="M50 32 L50 20
+                    M68 50 L80 50
+                    M50 68 L50 80
+                    M20 50 L32 50"
+                stroke="#00ffbf" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+
+    </div>
+
+    <p class="loader-text">Cargando nuestros productos...</p>
+</div>
+
+
+
 
 </body>
 </html>
