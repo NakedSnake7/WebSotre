@@ -22,17 +22,22 @@ public class EmailService {
     private String fromName;
 
     /**
-     * Envía un correo HTML usando SendGrid exclusivamente.
+     * Envía un correo HTML usando únicamente SendGrid.
      */
     public void enviarCorreoHTML(String destinatario, String asunto, String htmlCuerpo) throws IOException {
 
+        System.out.println("🔍 [EmailService] Validando configuración SendGrid...");
+
         if (sendgridApiKey == null || sendgridApiKey.isBlank()) {
-            throw new IllegalStateException("SendGrid API Key no configurada.");
+            throw new IllegalStateException("❌ SendGrid API Key no configurada.");
         }
 
         if (fromEmail == null || fromEmail.isBlank()) {
-            throw new IllegalStateException("SENDGRID_FROM_EMAIL no está configurado.");
+            throw new IllegalStateException("❌ SENDGRID_FROM_EMAIL no está configurado.");
         }
+
+        System.out.println("✔️ API Key cargada");
+        System.out.println("✔️ From Email: " + fromEmail);
 
         Email from = new Email(fromEmail, fromName);
         Email to = new Email(destinatario);
@@ -46,11 +51,22 @@ public class EmailService {
         request.setEndpoint("mail/send");
         request.setBody(mail.build());
 
+        System.out.println("📨 [EmailService] Enviando correo a: " + destinatario);
+
         Response response = sg.api(request);
 
+        System.out.println("📡 SendGrid Status: " + response.getStatusCode());
+        System.out.println("📡 SendGrid Body: " + response.getBody());
+        System.out.println("📡 SendGrid Headers: " + response.getHeaders());
+
         int code = response.getStatusCode();
+
         if (code < 200 || code >= 300) {
-            throw new IOException("Error SendGrid → Código: " + code + " | Respuesta: " + response.getBody());
+            throw new IOException(
+                    "❌ Error SendGrid → Código: " + code + " | Respuesta: " + response.getBody()
+            );
         }
+
+        System.out.println("✅ Correo enviado correctamente a " + destinatario);
     }
 }
