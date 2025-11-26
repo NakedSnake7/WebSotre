@@ -4,14 +4,7 @@ import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,51 +12,26 @@ import java.io.IOException;
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
-
-    @Value("${sendgrid.api.key:}")
+    @Value("${sendgrid.api.key}")
     private String sendgridApiKey;
 
-    @Value("${sendgrid.from.email:}")
+    @Value("${sendgrid.from.email}")
     private String fromEmail;
 
     @Value("${sendgrid.from.name:WeedTlan}")
     private String fromName;
 
-    public void enviarCorreoHTML(String destinatario, String asunto, String htmlCuerpo) throws MessagingException, IOException {
+    /**
+     * Envía un correo HTML usando SendGrid exclusivamente.
+     */
+    public void enviarCorreoHTML(String destinatario, String asunto, String htmlCuerpo) throws IOException {
 
-        // Si SendGrid está configurado → usarlo
-        if (sendgridApiKey != null && !sendgridApiKey.isEmpty()) {
-            try {
-                enviarConSendGrid(destinatario, asunto, htmlCuerpo);
-                return;
-            } catch (Exception e) {
-                // fallback a Gmail
-                enviarConGmail(destinatario, asunto, htmlCuerpo);
-                return;
-            }
+        if (sendgridApiKey == null || sendgridApiKey.isBlank()) {
+            throw new IllegalStateException("SendGrid API Key no configurada.");
         }
 
-        // Si no hay SendGrid, usar Gmail
-        enviarConGmail(destinatario, asunto, htmlCuerpo);
-    }
-
-    private void enviarConGmail(String destinatario, String asunto, String htmlCuerpo) throws MessagingException {
-        MimeMessage mensaje = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");
-
-        helper.setTo(destinatario);
-        helper.setSubject(asunto);
-        helper.setText(htmlCuerpo, true);
-        helper.setFrom("weedtlan.customer.service@gmail.com");
-
-        mailSender.send(mensaje);
-    }
-
-    private void enviarConSendGrid(String destinatario, String asunto, String htmlCuerpo) throws IOException {
         if (fromEmail == null || fromEmail.isBlank()) {
-            throw new IllegalStateException("SENDGRID_FROM_EMAIL está vacío o no definido.");
+            throw new IllegalStateException("SENDGRID_FROM_EMAIL no está configurado.");
         }
 
         Email from = new Email(fromEmail, fromName);
@@ -79,8 +47,10 @@ public class EmailService {
         request.setBody(mail.build());
 
         Response response = sg.api(request);
-        if (response.getStatusCode() >= 400) {
-            throw new IOException("Error enviando correo: " + response.getStatusCode() + " - " + response.getBody());
+
+        int code = response.getStatusCode();
+        if (code < 200 || code >= 300) {
+            throw new IOException("Error SendGrid → Código: " + code + " | Respuesta: " + response.getBody());
         }
     }
 }
