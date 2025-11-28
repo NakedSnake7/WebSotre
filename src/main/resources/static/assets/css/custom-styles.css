@@ -1,6 +1,173 @@
+    /* GLOW FUTURISTA */
+    .maya-card {
+background: rgba(255, 255, 255, 0.02);
+    border-radius: 18px;
+
+    padding: 10px;
+
+    border: 1px solid rgba(0, 255, 120, 0.25);
+    box-shadow: 0 0 10px rgba(0, 255, 120, 0.20);
+
+    backdrop-filter: blur(4px); /* Glass blur suave */
+    -webkit-backdrop-filter: blur(4px);
+
+    transition: 0.25s ease;
+    position: relative;
+}
+
+
+    /* Hover con vibración energética */
+    .maya-card:hover {
+    transform: translateY(-6px) scale(1.03);
+background: rgba(255, 255, 255, 0.02);
+    box-shadow: 0 0 18px rgba(0, 255, 180, 0.55);
+    border-color: rgba(0, 255, 180, 0.55);
+}
+
+
+    /* Subtítulo categoría */
+    .maya-category-title {
+        font-family: 'Cinzel', serif;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: #98ffcc;
+        text-shadow: 0 0 6px #00ff9d;
+    }
+
+    /* Carrusel futurista */
+    .maya-carousel img {
+        border-radius: 14px;
+        border: 1px solid rgba(0, 255, 150, 0.35);
+        box-shadow: 0 0 14px rgba(0, 255, 150, 0.3);
+    }
+
+    /* Descripción */
+  .descripcion-corta {
+    max-height: 60px;
+    overflow: hidden;
+    transition: max-height 0.35s ease-in-out, opacity 0.35s ease;
+    opacity: 0.85;
+}
+
+.descripcion-corta.expandida {
+    max-height: 500px;
+    opacity: 1;
+}
+
+
+    /* Botón más futurista */
+    .btn-maya {
+        background: linear-gradient(90deg, #00c67a, #0affb4);
+        color: #000;
+        font-weight: bold;
+        border-radius: 6px;
+        box-shadow: 0 0 10px #00ff9d;
+        transition: 0.25s ease;
+    }
+
+    .btn-maya:hover {
+        filter: brightness(1.2);
+        box-shadow: 0 0 16px #0affc5;
+    }
+
+/* Badge descuento estilo neón realista */
+.badge-descuento {
+    background: #ff0000;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 6px 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: 
+        0 0 5px #ff4d4d,
+        0 0 10px #ff1a1a,
+        0 0 20px #ff0000,
+        0 0 30px #ff0000,
+        0 0 40px #ff3333;
+    box-shadow: 
+        0 0 10px #ff0000,
+        0 0 20px #ff1a1a,
+        0 0 30px #ff3333;
+    animation: neónTitilar 2s infinite;
+}
+.maya-carousel .carousel-item img {
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.maya-carousel .carousel-item {
+    object-fit: cover;
+    height: 250px;
+}
+
+/* Animación de parpadeo irregular */
+@keyframes neónTitilar {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        text-shadow: 
+            0 0 5px #ff4d4d,
+            0 0 10px #ff1a1a,
+            0 0 20px #ff0000,
+            0 0 30px #ff0000,
+            0 0 40px #ff3333;
+        box-shadow: 
+            0 0 10px #ff0000,
+            0 0 20px #ff1a1a,
+            0 0 30px #ff3333;
+    }
+    20%, 22%, 24%, 55% {
+        text-shadow: 
+            0 0 8px #ff6666,
+            0 0 15px #ff3333,
+            0 0 25px #ff1a1a,
+            0 0 35px #ff0000,
+            0 0 45px #ff4d4d;
+        box-shadow: 
+            0 0 15px #ff3333,
+            0 0 25px #ff1a1a,
+            0 0 35px #ff0000;
+    }
+}
+
+.badge-descuento:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s;
+}
+/* Scroll horizontal suave */
+.category-scroll {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* Botones de categoría */
+.category-scroll .btn {
+    transition: all 0.2s;
+}
+
+.category-scroll .btn:hover {
+    background: #ff0000;
+    color: #fff;
+    box-shadow: 0 0 10px #ff4d4d;
+    transform: scale(1.05);
+}
+
+/* Categoría activa */
+.category-scroll .btn.active {
+    background: #ff4d4d;
+    color: #fff;
+    box-shadow: 0 0 12px #ff6666;
+}
+.categories-bar.sticky-top {
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+}
+
 /* Ajuste del tamaño del título y subtítulo */
 .glow-aura.display-2 {
-    font-size: 4.5rem;      /* Título más grande */
+    font-size: 5.5rem;      /* Título más grande */
 }
 
 header .display-4 {
