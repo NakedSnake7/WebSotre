@@ -78,7 +78,7 @@ public class CheckoutController {
 
             // Agregar los items
             checkoutRequest.getCart().forEach(cartItem -> {
-                Producto producto = productoRepository.findByProductName(cartItem.getName())
+                Producto producto = productoRepository.findByProductNameConTodo(cartItem.getName())
                         .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + cartItem.getName()));
                 OrderItem item = new OrderItem(producto, cartItem.getQuantity(), cartItem.getPrice(), order);
                 order.addItem(item);

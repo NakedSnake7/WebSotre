@@ -59,10 +59,13 @@ public class Producto {
     private Double porcentajeDescuento = 0.0;
 
     public String getImageUrl() {
-        if (imagenes == null || imagenes.isEmpty()) {
-            return null;
+        if (imagenes != null && !imagenes.isEmpty()) {
+            ImagenProducto img = imagenes.stream().findFirst().orElse(null);
+            if (img != null && img.getImageUrl() != null) {
+                return img.getImageUrl();
+            }
         }
-        return imagenes.get(0).getImageUrl(); // Asegúrate que ImagenProducto tenga getUrl()
+        return "/img/default.jpg";
     }
 
     

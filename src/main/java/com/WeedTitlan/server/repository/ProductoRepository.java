@@ -35,5 +35,12 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     @EntityGraph(attributePaths = {"categoria", "imagenes"})
     @Query("SELECT DISTINCT p FROM Producto p")
     List<Producto> findAllConTodo();
+    
+    @Query("SELECT DISTINCT p FROM Producto p " +
+    	       "LEFT JOIN FETCH p.imagenes " +
+    	       "LEFT JOIN FETCH p.categoria " +
+    	       "WHERE p.productName = :name")
+    	Optional<Producto> findByProductNameConTodo(@Param("name") String name);
+
 
 }
