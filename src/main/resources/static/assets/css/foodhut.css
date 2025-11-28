@@ -11412,42 +11412,24 @@ pre {
 .navbar .nav-link.active {
   color: #A3C14A;
 }
-
+/* ============================ */
+/* Navbar principal desktop      */
+/* ============================ */
 .custom-navbar {
   min-height: 140px;
+  background-color: transparent; /* transparente al inicio */
+  transition: all 0.3s ease;
+  border-bottom: none; /* sin barra al inicio */
+  z-index: 1040;
 }
 
-@media (max-width: 1199.98px) {
-  .custom-navbar {
-    min-height: auto !important;
-    padding: 1rem;
-    background-color: #343a40;
-  }
-  .custom-navbar .navbar-brand {
-    display: none !important;
-  }
-}
-
-.custom-navbar .collapse {
-  -webkit-flex-basis: 0 !important;
-      -ms-flex-preferred-size: 0 !important;
-          flex-basis: 0 !important;
-}
-
-.custom-navbar .collapse .navbar-nav,
-.custom-navbar .collapse .navbar-brand {
-  width: 100%;
-}
-
-.custom-navbar .collapse .navbar-nav:last-child {
-  -webkit-box-pack: end;
-  -webkit-justify-content: flex-end;
-      -ms-flex-pack: end;
-          justify-content: flex-end;
-}
-
+/* Logo centrado desktop */
 .navbar-brand {
-  text-align: center;
+  position: absolute;
+  left: 50%;
+  top: 40%; /* subido desde 50% */
+  transform: translateX(-50%) translateY(-50%);
+  transition: all 0.3s ease;
 }
 
 .navbar-brand .brand-img {
@@ -11456,40 +11438,36 @@ pre {
   margin: auto;
   opacity: 1;
   visibility: visible;
-  -webkit-transition: all 0.2s linear 0s;
-  transition: all 0.2s linear 0s;
+  transition: all 0.3s ease;
 }
 
 .navbar-brand .brand-txt {
   position: absolute;
-  bottom: 0%;
+  bottom: 7%; /* subido desde 0% */
   left: 50%;
-  -webkit-transform: translate(-50%, 50%);
-      -ms-transform: translate(-50%, 50%);
-          transform: translate(-50%, 50%);
+  transform: translate(-50%, 50%);
   font-weight: bold;
   font-size: 2rem;
   color: #A3C14A;
   opacity: 0;
   visibility: hidden;
-  -webkit-transition: all 0.2s linear 0s;
-  transition: all 0.2s linear 0s;
+  transition: all 0.3s ease;
   font-family: "Oswald", sans-serif;
 }
 
+/* Navbar al hacer scroll */
 .affix {
-  min-height: 80px;
-  background: #343a40;
+  background-color: #343a40; /* barra visible */
+  min-height: 80px;          /* más delgada */
   border-bottom: 1px solid #495057;
+  transition: all 0.3s ease;
 }
 
+/* Logo al hacer scroll */
 .affix .navbar-brand .brand-img {
-  -webkit-transform: translateY(-30px);
-      -ms-transform: translateY(-30px);
-          transform: translateY(-30px);
+  width: 50px;
   opacity: 0;
   visibility: hidden;
-  width: 50px;
 }
 
 .affix .navbar-brand .brand-txt {
@@ -11497,6 +11475,83 @@ pre {
   visibility: visible;
   bottom: 50%;
 }
+
+/* ============================ */
+/* Navbar móvil futurista        */
+/* ============================ */
+@media (max-width: 991.98px) {
+
+  /* Navbar transparente en móvil */
+  .custom-navbar {
+    min-height: auto !important;
+    padding: 0.5rem 0;
+    background-color: transparent !important;
+    border-bottom: none;
+  }
+
+  /* Ocultar logo en móvil */
+  .custom-navbar .navbar-brand {
+    display: none !important;
+  }
+
+  /* Botón hamburguesa a la izquierda con neón pulsante */
+  .navbar-toggler {
+    margin-left: 0.5rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background-color: #111;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px #00ff9d, 0 0 20px #00ff9d, 0 0 30px #00ff9d;
+    animation: neonPulse 1.5s infinite alternate;
+    transition: all 0.3s ease;
+  }
+
+  @keyframes neonPulse {
+    0% { box-shadow: 0 0 5px #00ff9d, 0 0 10px #00ff9d; }
+    100% { box-shadow: 0 0 15px #00ff9d, 0 0 25px #00ff9d; }
+  }
+
+  .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255,255,255,1%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+  }
+
+  /* Menú colapsado lateral con slide-in */
+  .custom-navbar .collapse.navbar-collapse {
+    position: fixed;
+    top: 56px;
+    left: -260px; /* fuera de pantalla */
+    width: 250px;
+    height: calc(100% - 56px);
+    background-color: rgba(0,0,0,0.85);
+    padding: 1rem;
+    overflow-y: auto;
+    box-shadow: 2px 0 15px rgba(0,255,120,0.3);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 1050;
+    transition: left 0.3s ease-in-out;
+  }
+
+  /* Menú abierto */
+  .custom-navbar .collapse.navbar-collapse.show {
+    left: 0;
+  }
+
+  /* Elementos verticales */
+  .custom-navbar .collapse .navbar-nav {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .custom-navbar .collapse .nav-item {
+    margin-bottom: 1rem;
+  }
+}
+
 
 .header {
   height: 100vh;
