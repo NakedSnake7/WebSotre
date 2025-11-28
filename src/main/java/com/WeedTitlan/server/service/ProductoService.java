@@ -35,6 +35,15 @@ public class ProductoService {
     public List<Producto> obtenerTodosLosProductos() {
         return productoRepository.findAllConTodo();
     }
+    @Transactional
+    public boolean toggleVisibility(Long id) {
+        Producto producto = obtenerProducto(id);
+        boolean nuevoEstado = !Boolean.TRUE.equals(producto.isVisibleEnMenu());
+        producto.setVisibleEnMenu(nuevoEstado);
+        guardarProducto(producto);
+        return nuevoEstado;
+    }
+
 
 
     @Transactional

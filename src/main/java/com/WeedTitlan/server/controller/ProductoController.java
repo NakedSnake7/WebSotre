@@ -119,6 +119,12 @@ public class ProductoController {
         boolean enPromocion = productoService.togglePromocion(productoId);
         return ResponseEntity.ok(enPromocion);
     }
+    @PostMapping("/toggleVisibility")
+    public ResponseEntity<Boolean> toggleVisibility(@RequestParam Long productoId) {
+        boolean visible = productoService.toggleVisibility(productoId);
+        return ResponseEntity.ok(visible);
+    }
+
 
 
 

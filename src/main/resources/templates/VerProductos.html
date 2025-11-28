@@ -180,74 +180,66 @@ body {
 		src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 	<script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // Eliminar producto
-      document.querySelectorAll(".delete-product").forEach(button => {
-        button.addEventListener("click", function () {
-          let productId = this.getAttribute("data-id");
-          if (confirm("¿Estás seguro de que quieres eliminar este producto?")) {
-        	  fetch(`/api/productos/${productId}`, {
-              method: "DELETE",
-            })
-              .then(response => {
-                if (response.ok) {
-                  alert("Producto eliminado correctamente.");
-                  location.reload();
-                } else {
-                  alert("Error al eliminar el producto.");
-                }
-              })
-              .catch(error => console.error("Error:", error));
-          }
-        });
-      });
+	document.addEventListener("DOMContentLoaded", function () {
+	    // Eliminar producto
+	    document.querySelectorAll(".delete-product").forEach(button => {
+	        button.addEventListener("click", function () {
+	            let productId = this.getAttribute("data-id");
+	            if (confirm("¿Estás seguro de que quieres eliminar este producto?")) {
+	                fetch(`/api/productos/${productId}`, { method: "DELETE" })
+	                .then(response => {
+	                    if (response.ok) {
+	                        alert("Producto eliminado correctamente.");
+	                        location.reload();
+	                    } else {
+	                        alert("Error al eliminar el producto.");
+	                    }
+	                })
+	                .catch(error => console.error("Error:", error));
+	            }
+	        });
+	    });
 
-      // Alternar visibilidad
-      document.querySelectorAll(".toggle-visibility").forEach(checkbox => {
-        checkbox.addEventListener("change", function () {
-          const id = this.getAttribute("data-id");
-          const visible = this.checked;
+	    // Alternar visibilidad
+	    document.querySelectorAll(".toggle-visibility").forEach(checkbox => {
+	        checkbox.addEventListener("change", function () {
+	            const id = this.getAttribute("data-id");
+	            const checkboxEl = this;
 
-          fetch('/api/productos/toggleVisibility', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `productoId=${id}&visibleEnMenu=${visible}`
-          })
-            .then(response => {
-              if (!response.ok) {
-                alert("Error al actualizar visibilidad.");
-                this.checked = !visible;
-              }
-            })
-            .catch(error => {
-              console.error("Error:", error);
-              alert("Error al comunicar con el servidor.");
-              this.checked = !visible;
-            });
-        });
-      });
-    });
-    
-    function togglePromocion(productoId) {
-        fetch('/api/productos/togglePromocion', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({ productoId: productoId })
-        })
-        .then(response => response.json())
-        .then(enPromocion => {
-            const btn = document.getElementById('togglePromo-' + productoId);
-            // Cambia el texto
-            btn.textContent = enPromocion ? 'Desactivar Promo' : 'Activar Promo';
-            // Cambia la clase
-            btn.className = 'btn btn-sm ' + (enPromocion ? 'btn-danger' : 'btn-success');
-        })
-        .catch(error => console.error('Error al alternar promoción:', error));
-    }
+	            fetch('/api/productos/toggleVisibility', {
+	                method: 'POST',
+	                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	                body: `productoId=${id}`
+	            })
+	            .then(response => response.json())
+	            .then(nuevoEstado => {
+	                checkboxEl.checked = nuevoEstado;
+	            })
+	            .catch(error => {
+	                console.error("Error:", error);
+	                alert("Error al comunicar con el servidor.");
+	                checkboxEl.checked = !checkboxEl.checked;
+	            });
+	        });
+	    });
+	});
+
+	// Toggle promoción
+	function togglePromocion(productoId) {
+	    fetch('/api/productos/togglePromocion', {
+	        method: 'POST',
+	        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	        body: new URLSearchParams({ productoId: productoId })
+	    })
+	    .then(response => response.json())
+	    .then(enPromocion => {
+	        const btn = document.getElementById('togglePromo-' + productoId);
+	        btn.textContent = enPromocion ? 'Desactivar Promo' : 'Activar Promo';
+	        btn.className = 'btn btn-sm ' + (enPromocion ? 'btn-danger' : 'btn-success');
+	    })
+	    .catch(error => console.error('Error al alternar promoción:', error));
+	}
+
   </script>
 
 </body>
