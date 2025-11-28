@@ -16,10 +16,13 @@ public class EmailService {
     private String sendgridApiKey;
 
     @Value("${sendgrid.from.email}")
-    private String fromEmail;
+    private String fromEmail;  // pedidos@weedtlanmx.com
 
-    @Value("${sendgrid.from.name:WeedTlan}")
-    private String fromName;
+    @Value("${sendgrid.from.name:WeedTlan Ventas}")
+    private String fromName;   // WeedTlan Ventas
+
+    @Value("${sendgrid.reply.to}")
+    private String replyToEmail; // weedtlanmx@gmail.com
 
     /**
      * Envía un correo HTML usando únicamente SendGrid.
@@ -38,11 +41,17 @@ public class EmailService {
 
         System.out.println("✔️ API Key cargada");
         System.out.println("✔️ From Email: " + fromEmail);
+        System.out.println("✔️ Reply-To: " + replyToEmail);
 
         Email from = new Email(fromEmail, fromName);
         Email to = new Email(destinatario);
+        Email replyTo = new Email(replyToEmail);
+
         Content content = new Content("text/html", htmlCuerpo);
         Mail mail = new Mail(from, asunto, to, content);
+
+        // ➕ Agregar Reply-To real
+        mail.setReplyTo(replyTo);
 
         SendGrid sg = new SendGrid(sendgridApiKey);
 
