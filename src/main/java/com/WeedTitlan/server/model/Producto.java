@@ -58,6 +58,14 @@ public class Producto {
     @Column(name = "porcentaje_descuento", nullable = false)
     private Double porcentajeDescuento = 0.0;
 
+    public String getImageUrl() {
+        if (imagenes == null || imagenes.isEmpty()) {
+            return null;
+        }
+        return imagenes.get(0).getImageUrl(); // Asegúrate que ImagenProducto tenga getUrl()
+    }
+
+    
 
     // 🔥 Calcula descuento seguro
     public double getPrecioConDescuento() {

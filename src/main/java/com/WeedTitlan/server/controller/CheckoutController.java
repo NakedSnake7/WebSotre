@@ -111,11 +111,17 @@ public class CheckoutController {
                 totalGeneral += subtotalItem;
 
                 tablaProductos.append("<tr>")
-                        .append("<td style='padding:8px; border:1px solid #444;'>").append(item.getProducto().getProductName()).append("</td>")
-                        .append("<td style='padding:8px; border:1px solid #444;'>").append(item.getQuantity()).append("</td>")
-                        .append("<td style='padding:8px; border:1px solid #444;'>$").append(formatoMoneda.format(subtotalItem)).append("</td>")
+                        .append("<td>")
+                            .append("<div class='product-row'>")
+                                .append("<img src='").append(item.getProducto().getImageUrl()).append("' class='product-img'>")
+                                .append("<span>").append(item.getProducto().getProductName()).append("</span>")
+                            .append("</div>")
+                        .append("</td>")
+                        .append("<td>").append(item.getQuantity()).append("</td>")
+                        .append("<td>$").append(formatoMoneda.format(subtotalItem)).append("</td>")
                         .append("</tr>");
             }
+
 
             tablaProductos.append("<tr style='background-color:#2e7d32; color:#fff; font-weight:bold;'>")
                     .append("<td colspan='2' style='padding:8px; border:1px solid #444;'>Total</td>")

@@ -134,9 +134,10 @@ public class ProductoViewController {
         dto.setStock(producto.getStock());
         dto.setPorcentajeDescuento(
                 producto.getPorcentajeDescuento() != null 
-                ? producto.getPorcentajeDescuento().intValue() 
-                : 0
+                ? producto.getPorcentajeDescuento() 
+                : 0.0
         );
+
         dto.setVisibleEnMenu(producto.isVisibleEnMenu());
         dto.setTienePromocion(producto.getTienePromocion());
 
@@ -180,7 +181,7 @@ public class ProductoViewController {
         producto.setDescription(productoDTO.getDescription());
         producto.setCategoria(categoria);
         producto.setStock(productoDTO.getStock());
-        producto.setPorcentajeDescuento((double) productoDTO.getPorcentajeDescuento());
+        producto.setPorcentajeDescuento(productoDTO.getPorcentajeDescuento());
         producto.setVisibleEnMenu(Boolean.TRUE.equals(productoDTO.getVisibleEnMenu()));
         producto.setTienePromocion(Boolean.TRUE.equals(productoDTO.getTienePromocion()));
 

@@ -18,7 +18,7 @@ public class EmailService {
     @Value("${sendgrid.from.email}")
     private String fromEmail;  // pedidos@weedtlanmx.com
 
-    @Value("${sendgrid.from.name:WeedTlan Ventas}")
+    @Value("${sendgrid.from.name:WeedTlan Pedidos}")
     private String fromName;   // WeedTlan Ventas
 
     @Value("${sendgrid.reply.to}")

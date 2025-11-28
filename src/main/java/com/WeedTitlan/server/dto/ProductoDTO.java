@@ -38,9 +38,10 @@ public class ProductoDTO {
     private Integer stock;
 
     // Descuento
-    @Min(value = 0, message = "El descuento mínimo es 0%")
-    @Max(value = 100, message = "El descuento máximo es 100%")
-    private Integer porcentajeDescuento;
+    @DecimalMin("0.0")
+    @DecimalMax("100.0")
+    private Double porcentajeDescuento;
+
 
     private Boolean visibleEnMenu;
     private Boolean tienePromocion;
@@ -101,12 +102,18 @@ public class ProductoDTO {
         this.stock = stock;
     }
 
-    public Integer getPorcentajeDescuento() {
+    public Double getPorcentajeDescuento() {
         return porcentajeDescuento;
     }
-    public void setPorcentajeDescuento(Integer porcentajeDescuento) {
+
+    public void setPorcentajeDescuento(Double porcentajeDescuento) {
         this.porcentajeDescuento = porcentajeDescuento;
     }
+    public void setPorcentajeDescuento(Integer porcentajeDescuento) {
+        this.porcentajeDescuento = porcentajeDescuento != null ? porcentajeDescuento.doubleValue() : null;
+    }
+
+
 
     public Boolean getVisibleEnMenu() {
         return visibleEnMenu;
