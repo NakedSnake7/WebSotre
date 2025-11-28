@@ -11427,7 +11427,7 @@ pre {
 .navbar-brand {
   position: absolute;
   left: 50%;
-  top: 40%; /* subido desde 50% */
+  top: 30%; /* subido desde 50% */
   transform: translateX(-50%) translateY(-50%);
   transition: all 0.3s ease;
 }
@@ -11443,7 +11443,7 @@ pre {
 
 .navbar-brand .brand-txt {
   position: absolute;
-  bottom: 7%; /* subido desde 0% */
+  bottom: 25%; /* subido desde 0% */
   left: 50%;
   transform: translate(-50%, 50%);
   font-weight: bold;
