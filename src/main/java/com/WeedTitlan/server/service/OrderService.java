@@ -21,12 +21,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductoRepository productoRepository;
 
-    public OrderService(OrderRepository orderRepository, ProductoRepository productoRepository) {
+    public OrderService(OrderRepository orderRepository,
+                        ProductoRepository productoRepository) {
         this.orderRepository = orderRepository;
         this.productoRepository = productoRepository;
     }
 
-    // Guardar una orden con sus productos
+    // Guardar orden con items
     @Transactional
     public Order saveOrderWithItems(Order order, List<OrderItem> orderItems) {
         for (OrderItem item : orderItems) {
@@ -36,65 +37,67 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    // Guardar una orden sin productos
+    // Guardar solo la orden
     @Transactional
     public Order saveOrder(Order order) {
         return orderRepository.save(order);
     }
 
-    // Buscar una orden por su ID
-    public Optional<Order> findOrderById(Long id) {
-        return orderRepository.findById(id);
+    // Obtener por ID
+    public Order getOrderById(Long id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() ->
+                        new OrderNotFoundException("Orden no encontrada con ID: " + id));
     }
 
-    // Buscar todas las órdenes
+    // Obtener todas las órdenes
     public List<Order> findAllOrders() {
-        return orderRepository.findAll();
+        return orderRepository.findAllWithUser();
     }
 
-    // Buscar órdenes por estado
+
+    // Buscar por estado
     public List<Order> findOrdersByStatus(String status) {
         try {
             OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
             return orderRepository.findByStatus(orderStatus);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Estado de orden no válido: " + status, e);
+            throw new RuntimeException("Estado inválido: " + status);
         }
     }
 
-    // Actualizar el estado de una orden y manejar stock
+    // Actualizar estado incluyendo manejo de stock
     @Transactional
     public Order updateOrderStatus(Long orderId, String newStatus) {
-        Optional<Order> orderOptional = orderRepository.findById(orderId);
 
-        if (orderOptional.isPresent()) {
-            Order order = orderOptional.get();
+        Order order = getOrderById(orderId);
 
-            try {
-                OrderStatus status = OrderStatus.valueOf(newStatus.toUpperCase());
+        try {
+            OrderStatus status = OrderStatus.valueOf(newStatus.toUpperCase());
 
-                if (status == OrderStatus.DELIVERED) {
-                    restarStock(order);
-                }
-
-                order.setStatus(status);
-                return orderRepository.save(order);
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException("Estado de orden no válido: " + newStatus);
+            // Si se entrega, bajar stock
+            if (status == OrderStatus.DELIVERED) {
+                restarStock(order);
             }
-        } else {
-            throw new OrderNotFoundException("Orden no encontrada con ID: " + orderId);
+
+            order.setStatus(status);
+            return orderRepository.save(order);
+
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Estado de orden no válido: " + newStatus);
         }
     }
 
-    // Restar stock de los productos cuando la orden se confirme
+    // Restar stock cuando se entrega la orden
     private void restarStock(Order order) {
         for (OrderItem item : order.getItems()) {
-            Producto producto = item.getProducto(); 
+            Producto producto = item.getProducto();
             int cantidadComprada = item.getQuantity();
 
             if (producto.getStock() < cantidadComprada) {
-                throw new InsufficientStockException("Stock insuficiente para el producto: " + producto.getProductName());
+                throw new InsufficientStockException(
+                        "Stock insuficiente para el producto: " + producto.getProductName()
+                );
             }
 
             producto.setStock(producto.getStock() - cantidadComprada);
@@ -102,12 +105,23 @@ public class OrderService {
         }
     }
 
-    // Eliminar una orden
-    public void deleteOrder(Long orderId) {
-        if (orderRepository.existsById(orderId)) {
-            orderRepository.deleteById(orderId);
-        } else {
-            throw new OrderNotFoundException("Orden no encontrada con ID: " + orderId);
+    // Eliminar orden
+    public void deleteOrder(Long id) {
+        if (!orderRepository.existsById(id)) {
+            throw new OrderNotFoundException(
+                    "Orden no encontrada con ID: " + id
+            );
         }
+        orderRepository.deleteById(id);
     }
+    public Order getOrderByIdWithUser(Long id) {
+        return orderRepository.findByIdWithUser(id)
+                .orElseThrow(() -> new OrderNotFoundException("Orden no encontrada con ID: " + id));
+    }
+    public Order getOrderByIdWithUserAndItems(Long id) {
+        return orderRepository.findByIdWithUserAndItems(id)
+                .orElseThrow(() -> new RuntimeException("Orden no encontrada con ID: " + id));
+    }
+
+
 }

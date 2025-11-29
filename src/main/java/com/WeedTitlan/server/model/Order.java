@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.CascadeType;      
+import jakarta.persistence.CascadeType;       
 import jakarta.persistence.Entity;   
 import jakarta.validation.constraints.Size;
 import jakarta.persistence.GeneratedValue;
@@ -156,8 +156,11 @@ public class Order {
     // Método toString para depuración
     @Override
     public String toString() {
-        return "Order{id=" + id + ", user=" + user.getFullName() +
-               ", total=" + total + ", status=" + status +
+        return "Order{id=" + id +
+               ", user=" + (user != null ? user.getFullName() : "null") +
+               ", total=" + total +
+               ", status=" + status +
                ", orderDate=" + orderDate + "}";
     }
+
 }

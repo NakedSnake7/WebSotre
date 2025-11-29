@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Gestión de Órdenes | WeedTlan</title>
+
+<!-- Bootstrap -->
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- GOOGLE FONT & ESTILOS -->
+<link rel="stylesheet" href="/assets/css/custom-styles.css">
+
+</head>
+
+<body class="container mt-5">
+
+	<h2>📦 Gestión de Órdenes – WeedTlan</h2>
+
+	<div class="tabla-contenedor">
+		<table class="table table-dark table-hover">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Cliente</th>
+					<th>Correo</th>
+					<th>Telefono</th>
+					<th>Estado</th>
+					<th>Total</th>
+					<th>Fecha</th>
+					<th>Acciones</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<tr th:each="order : ${orders}">
+					<td th:text="${order.id}"></td>
+
+					<td th:text="${order.user?.fullName} ?: 'Sin nombre'"></td>
+					<td th:text="${order.user?.email} ?: 'Sin correo'"></td>
+					<td th:text="${order.user?.phone} ?: 'Sin teléfono'"></td>
+
+
+					<td class="glow" th:text="${order.status}"></td>
+					<td>$<span th:text="${order.total}"></span></td>
+					<td th:text="${order.orderDate}"></td>
+
+					<td><a class="btn btn-maya btn-sm"
+						th:href="@{/orders/{id}(id=${order.id})}"> Ver </a>
+
+						<form th:action="@{/orders/{id}/status(id=${order.id})}"
+							method="post" style="display: inline-block;">
+
+							<select name="status"
+								class="form-control form-control-sm d-inline-block"
+								style="width: 140px;">
+								<option th:selected="${order.status == 'PENDING'}"
+									th:value="PENDING">Pendiente</option>
+								<option th:selected="${order.status == 'PROCESSED'}"
+									th:value="PROCESSED">Procesada</option>
+								<option th:selected="${order.status == 'DELIVERED'}"
+									th:value="DELIVERED">Entregada</option>
+								<option th:selected="${order.status == 'SHIPPED'}"
+									th:value="SHIPPED">Envío</option>
+							</select>
+
+
+							<button class="btn btn-success btn-sm">✔</button>
+						</form> <a class="btn btn-danger btn-sm"
+						th:href="@{/orders/{id}/delete(id=${order.id})}"
+						onclick="return confirm('¿Seguro que deseas eliminar esta orden?');">
+							✖ </a></td>
+				</tr>
+			</tbody>
+
+
+
+		</table>
+	</div>
+    <!-- Botón para regresar a servicio.html -->
+    <a href="/servicio" class="btn btn-maya btn-fixed">⬅ Volver a Servicios</a>
+
+</body>
+</html>
