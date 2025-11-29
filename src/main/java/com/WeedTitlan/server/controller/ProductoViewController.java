@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.controller;
-
 import com.WeedTitlan.server.dto.ProductoDTO;
+
 import com.WeedTitlan.server.model.Producto;
 import com.WeedTitlan.server.model.Categoria;
 import com.WeedTitlan.server.model.ImagenProducto;
@@ -41,10 +41,17 @@ public class ProductoViewController {
         model.addAttribute("productos", productoService.obtenerTodosLosProductos());
         return "VerProductos";
     }
-
+    
+    //menu servicio
+    @GetMapping("/servicio")
+    public String servicio() {
+        return "servicio"; // ← nombre del archivo sin .html
+    }
     // ========================
     // FORMULARIO NUEVO
     // ========================
+    
+    
     @GetMapping("/nuevo")
     public String formularioNuevoProducto(
             @RequestParam(required = false) String nombre,

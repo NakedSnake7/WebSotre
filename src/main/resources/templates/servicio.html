@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Menú - Gestión de Productos</title>
+  <style>
+  
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --accent:#22c55e;
+      --muted:#94a3b8;
+      --text:#e6eef6;
+    }
+    
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:linear-gradient(180deg,#071026 0%, #0b1220 100%);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:2rem;
+    }
+
+    .menu-card{
+      width:100%;
+      max-width:920px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);
+      border-radius:12px;
+      padding:1rem;
+      box-shadow:0 8px 30px rgba(2,6,23,0.6);
+    }
+
+    .menu-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:1rem;
+      padding:0.5rem 0.25rem;
+    }
+    .brand{
+      display:flex;
+      gap:0.75rem;
+      align-items:center;
+    }
+    .brand .logo{
+      width:44px;
+      height:44px;
+      border-radius:8px;
+      background:linear-gradient(135deg,var(--accent),#06b6d4);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      color:#012;
+      box-shadow:0 4px 12px rgba(0,0,0,0.5);
+    }
+    .brand h1{font-size:1.1rem;margin:0}
+    .brand p{margin:0;font-size:0.8rem;color:var(--muted)}
+
+    /* Nav */
+    nav { display:flex; align-items:center; gap:1rem; }
+    .nav-list{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:flex;
+      gap:0.5rem;
+    }
+    .nav-list a{
+      display:inline-block;
+      padding:0.6rem 0.9rem;
+      border-radius:8px;
+      text-decoration:none;
+      color:var(--text);
+      font-weight:600;
+      background:transparent;
+      transition:all .18s ease;
+      border:1px solid transparent;
+    }
+    .nav-list a:hover,
+    .nav-list a:focus{
+      transform:translateY(-2px);
+      box-shadow:0 6px 18px rgba(0,0,0,0.45);
+      border-color:rgba(255,255,255,0.03);
+    }
+    .nav-list a.active{
+      background:linear-gradient(90deg, rgba(34,197,94,0.14), rgba(6,182,212,0.06));
+      color:var(--accent);
+      border:1px solid rgba(34,197,94,0.12);
+    }
+
+    /* Mobile */
+    .hamburger{
+      display:none;
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.03);
+      padding:0.45rem;
+      border-radius:8px;
+      cursor:pointer;
+    }
+    .hamburger svg{display:block}
+
+    .actions{display:flex;gap:0.5rem;align-items:center}
+
+    @media (max-width:720px){
+      .nav-list{display:none; flex-direction:column; gap:0.4rem; margin-top:0.75rem;}
+      .nav-list.show{display:flex;}
+      .hamburger{display:inline-flex}
+      .menu-header{flex-direction:column; align-items:flex-start;}
+      .actions{width:100%; justify-content:space-between;}
+    }
+
+    /* Footer note */
+    .note{
+      margin-top:1rem;
+      color:var(--muted);
+      font-size:0.87rem;
+      display:flex;
+      justify-content:space-between;
+      gap:1rem;
+      align-items:center;
+    }
+  </style>
+</head>
+<body>
+  <main class="menu-card" role="main">
+    <header class="menu-header">
+      <div class="brand" aria-hidden="false">
+        <div class="logo">W</div>
+        <div>
+          <h1>Panel Productos</h1>
+          <p>Accede rápido a las acciones más comunes</p>
+        </div>
+      </div>
+
+      <div class="actions" aria-hidden="false">
+        <button class="hamburger" id="hambtn" aria-controls="main-nav" aria-expanded="false" aria-label="Abrir menú">
+          <!-- simple icon -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)">
+            <path d="M3 6h18M3 12h18M3 18h18"/>
+          </svg>
+        </button>
+
+        <nav id="main-nav" aria-label="Navegación principal">
+          <ul class="nav-list" id="navList">
+          <li><a th:href="@{/proveedor/stock}">Ver Stock del Proveedor</a></li>
+          <li><a th:href="@{/nuevo}">Subir Productos</a></li>
+          <li><a th:href="@{/VerProductos}" id="link-ver">Ver productos</a></li>
+          </ul>
+
+        </nav>
+      </div>
+    </header>
+
+    <section style="padding:0.6rem 0">
+      <p style="margin:0;color:var(--muted);line-height:1.5">
+        Consejo: abre las páginas en pestañas nuevas si vas a hacer varias acciones seguidas. Mantén el control de cambios cuando edites productos.
+      </p>
+    </section>
+
+    <div class="note">
+      <span>Usuario: <strong>Administrador</strong></span>
+      <span style="font-style:italic">Atajos: Ctrl + 1..4</span>
+    </div>
+  </main>
+
+  <script>
+    // Toggle mobile menu
+    const hambtn = document.getElementById('hambtn');
+    const navList = document.getElementById('navList');
+    hambtn?.addEventListener('click', () => {
+      const expanded = hambtn.getAttribute('aria-expanded') === 'true';
+      hambtn.setAttribute('aria-expanded', String(!expanded));
+      navList.classList.toggle('show');
+    });
+
+    // Set active link based on location (useful when this file is included)
+    const map = {
+      'editarproducto.html':'link-editar',
+      'importar_stock.html':'link-importar',
+      'subirproducto.html':'link-subir',
+      'verproductos.html':'link-ver'
+    };
+    function setActiveFromPath(){
+      const path = window.location.pathname.split('/').pop().toLowerCase();
+      const id = map[path];
+      if(id){
+        const el = document.getElementById(id);
+        if(el) el.classList.add('active');
+      }
+    }
+    setActiveFromPath();
+
+    // Keyboard shortcuts Ctrl+1..4
+    window.addEventListener('keydown', (e) => {
+      if(e.ctrlKey){
+        if(e.key === '1') window.location.href = 'EditarProducto.html';
+        if(e.key === '2') window.location.href = 'importar_stock.html';
+        if(e.key === '3') window.location.href = 'subirProducto.html';
+        if(e.key === '4') window.location.href = 'VerProductos.html';
+      }
+    });
+  </script>
+</body>
+</html>

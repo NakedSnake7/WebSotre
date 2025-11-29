@@ -14,7 +14,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/index", "/inicio", "/productos/**", "/css/**", "/js/**", "/images/**").permitAll() // Rutas públicas
-                .requestMatchers("/subirProducto", "/VerProductos").authenticated() // Solo subirProducto requiere login
+                .requestMatchers("/subirProducto", "/VerProductos", "/servicio").authenticated()
                 .anyRequest().permitAll() // Todo lo demás es accesible
             )
             .formLogin(form -> form
