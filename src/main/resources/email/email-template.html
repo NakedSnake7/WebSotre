@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Compra</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; background-color: #0f0f0f; color: #e6e6e6; margin: 0; padding: 25px;">
+
+<div style="background-color: #1a1a1a; max-width: 650px; margin: auto; border-radius: 12px; overflow: hidden; box-shadow: 0 0 25px rgba(0,0,0,0.4);">
+
+    <!-- HEADER -->
+    <div style="background: linear-gradient(135deg, #1eae98, #159c83); color: white; text-align: center; padding: 20px; font-size: 26px; font-weight: bold;">
+        ¡Gracias por tu compra en WeedTlan!
+    </div>
+
+    <!-- CONTENT -->
+    <div style="padding: 25px; line-height: 1.65; font-size: 16px;">
+
+        <p>Hola <b>{NOMBRE}</b>,</p>
+
+        <p>Hemos recibido tu pedido correctamente. Para procesarlo, realiza el pago dentro de las próximas <b>24 horas</b>. Aquí tienes los detalles:</p>
+
+        <p><b>Número de Orden:</b> {NUMERO_ORDEN}</p>
+        <p><b>Total a depositar:</b> {TOTAL}</p>
+        <p><b>Número de tarjeta:</b> 4217 4701 9695 6920</p>
+        <p><b>Cuenta:</b> Spin</p>
+        <p><b>Motivo:</b> {NUMERO_ORDEN}</p>
+
+        <!-- SEPARATOR COMPATIBLE -->
+        <div style="border-bottom:1px solid #333; margin:25px 0;"></div>
+
+        <h3 style="margin-bottom: 12px;">🛒 Detalles de tu compra:</h3>
+
+        <!-- TABLE -->
+        <table style="width: 100%; border-collapse: collapse; margin-top: 18px;">
+            <thead>
+                <tr>
+                    <th style="background-color:#2a2a2a; color:#fff; padding:10px; text-align:left; border-bottom:2px solid #333;">Producto</th>
+                    <th style="background-color:#2a2a2a; color:#fff; padding:10px; text-align:left; border-bottom:2px solid #333;">Cant.</th>
+                    <th style="background-color:#2a2a2a; color:#fff; padding:10px; text-align:left; border-bottom:2px solid #333;">Subtotal</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {LISTADO_PRODUCTOS}
+            </tbody>
+        </table>
+
+        <!-- WHATSAPP BUTTON -->
+        <div style="text-align:center;">
+            <a href="https://wa.me/5212221519266?text=Hola,%20quiero%20confirmar%20mi%20pago%20del%20pedido%20{NUMERO_ORDEN}"
+               target="_blank"
+               style="display:inline-block; background-color:#25D366; color:white; padding:12px 28px; text-decoration:none; font-size:16px; border-radius:8px; font-weight:bold; margin:20px auto; text-align:center;">
+                Confirmar Pago por WhatsApp
+            </a>
+        </div>
+
+        <!-- IMPORTANT BOX -->
+        <div style="background-color:#262626; padding:15px; margin-top:20px; border-left:4px solid #27ae60; border-radius:8px; font-size:14px; color:#dcdcdc;">
+            <b>IMPORTANTE:</b><br>
+            Tu pedido se reserva por <b>24 horas</b>. Si no recibimos el pago dentro de ese tiempo, el pedido se liberará automáticamente.<br><br>
+            Los envíos se realizan únicamente los días <b>lunes</b>. Te avisaremos tan pronto tu paquete sea enviado.
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="text-align:center; padding:12px; font-size:14px; color:#9c9c9c; border-top:1px solid #333;">
+        WeedTlan © 2026 - Todos los derechos reservados
+    </div>
+</div>
+
+</body>
+</html>

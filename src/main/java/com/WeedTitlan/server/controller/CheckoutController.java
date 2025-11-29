@@ -50,10 +50,11 @@ public class CheckoutController {
     @CrossOrigin(origins = {"http://localhost:8080", "https://weedtitlan.com"})
     public ResponseEntity<?> processCheckout(@Valid @RequestBody CheckoutRequestDTO checkoutRequest) {
         try {
+
             // Validación mínima de dirección
-            if (checkoutRequest.getCustomer().getAddress() == null ||
-                checkoutRequest.getCustomer().getAddress().length() < 5) {
-                logger.error("Error: La dirección debe tener entre 5 y 255 caracteres.");
+            String direccion = checkoutRequest.getCustomer().getAddress();
+            if (direccion == null || direccion.trim().length() < 5) {
+                logger.error("Dirección inválida: {}", direccion);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Error: La dirección debe tener al menos 5 caracteres.");
             }
@@ -66,49 +67,65 @@ public class CheckoutController {
             );
             userService.saveUser(user);
 
-            // Calcular total con envío
+            // Totales
             double subtotal = checkoutRequest.getTotalAmount();
             double costoEnvio = subtotal >= LIMITE_ENVIO_GRATIS ? 0.0 : COSTO_ENVIO;
             double totalFinal = subtotal + costoEnvio;
 
-            // Crear la orden
-            Order order = new Order(user, totalFinal, OrderStatus.PENDING,
-                    LocalDate.now(), checkoutRequest.getCustomer().getAddress(),
-                    checkoutRequest.getCustomer().getFullName());
+            logger.info("Subtotal: {}, Envío: {}, Total Final: {}", subtotal, costoEnvio, totalFinal);
 
-            // Agregar los items
+            // Crear Orden
+            Order order = new Order(
+                    user,
+                    totalFinal,
+                    OrderStatus.PENDING,
+                    LocalDate.now(),
+                    direccion,
+                    checkoutRequest.getCustomer().getFullName()
+            );
+
+            // Agregar productos
             checkoutRequest.getCart().forEach(cartItem -> {
                 Producto producto = productoRepository.findByProductNameConTodo(cartItem.getName())
                         .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + cartItem.getName()));
-                OrderItem item = new OrderItem(producto, cartItem.getQuantity(), cartItem.getPrice(), order);
+
+                OrderItem item = new OrderItem(
+                        producto,
+                        cartItem.getQuantity(),
+                        cartItem.getPrice(),
+                        order
+                );
+
                 order.addItem(item);
             });
 
             // Guardar la orden
             orderService.saveOrder(order);
 
-            // Preparar plantilla de correo
+            // Cargar plantilla
             InputStream inputStream = getClass().getClassLoader()
-                    .getResourceAsStream("templates/email-template.html");
+                    .getResourceAsStream("email/email-template.html");
             if (inputStream == null) {
-                logger.error("Error: No se pudo cargar la plantilla de email.");
+                logger.error("No se encontró la plantilla email/email-template.html");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Error: No se pudo cargar la plantilla de email.");
+                        .body("Error al cargar la plantilla de correo.");
             }
 
             String template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
-            // Construir tabla HTML de productos
+            // Formato de moneda
             DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
             symbols.setDecimalSeparator('.');
             symbols.setGroupingSeparator(',');
             DecimalFormat formatoMoneda = new DecimalFormat("#,##0.00", symbols);
 
+            // Construir tabla de productos
             StringBuilder tablaProductos = new StringBuilder();
-            double totalGeneral = 0;
+            double totalSinEnvio = 0;
+
             for (OrderItem item : order.getItems()) {
                 double subtotalItem = item.getPrice() * item.getQuantity();
-                totalGeneral += subtotalItem;
+                totalSinEnvio += subtotalItem;
 
                 tablaProductos.append("<tr>")
                         .append("<td>")
@@ -122,40 +139,55 @@ public class CheckoutController {
                         .append("</tr>");
             }
 
-
-            tablaProductos.append("<tr style='background-color:#2e7d32; color:#fff; font-weight:bold;'>")
-                    .append("<td colspan='2' style='padding:8px; border:1px solid #444;'>Total</td>")
-                    .append("<td style='padding:8px; border:1px solid #444;'>$").append(formatoMoneda.format(totalGeneral)).append("</td>")
+            // Subtotal
+            tablaProductos.append("<tr>")
+                    .append("<td colspan='2' style='font-weight:bold;'>Subtotal</td>")
+                    .append("<td>$").append(formatoMoneda.format(totalSinEnvio)).append("</td>")
                     .append("</tr>");
 
-            // Reemplazar datos en plantilla
-            String emailHTMLConProductos = template
+            // Envío
+            tablaProductos.append("<tr>")
+                    .append("<td colspan='2' style='font-weight:bold;'>Envío</td>")
+                    .append("<td>")
+                    .append(costoEnvio == 0 ? "GRATIS" : "$" + formatoMoneda.format(costoEnvio))
+                    .append("</td></tr>");
+
+            // Total Final
+            tablaProductos.append("<tr style='background-color:#2e7d32; color:white; font-weight:bold;'>")
+                    .append("<td colspan='2'>Total Final</td>")
+                    .append("<td>$").append(formatoMoneda.format(totalFinal)).append("</td>")
+                    .append("</tr>");
+
+            // Reemplazar datos
+            String emailHTML = template
                     .replace("{NOMBRE}", user.getFullName())
                     .replace("{NUMERO_ORDEN}", String.valueOf(order.getId()))
-                    .replace("{TOTAL}", "$" + order.getTotal())
-                    .replace("{LISTADO_PRODUCTOS}", tablaProductos.toString());
+                    .replace("{LISTADO_PRODUCTOS}", tablaProductos.toString())
+                    .replace("{TOTAL}", "$" + formatoMoneda.format(totalFinal));
 
-            // Intentar enviar correo sin romper la compra
+            // Enviar correo
             try {
-                logger.info("➡️ Enviando correo a {}", user.getEmail());
-                emailService.enviarCorreoHTML(user.getEmail(), "Confirmación de Compra", emailHTMLConProductos);
+                logger.info("Enviando correo a {}", user.getEmail());
+                emailService.enviarCorreoHTML(user.getEmail(), "Confirmación de Compra", emailHTML);
                 order.setEmailSent(true);
-                orderService.saveOrder(order); // Actualizar emailSent
             } catch (Exception e) {
-                logger.error("Error al enviar el correo: ", e);
+                logger.error("Error enviando correo: ", e.getMessage());
                 order.setEmailSent(false);
-                orderService.saveOrder(order); // Guardar estado aunque falle
             }
 
-            logger.debug("Orden creada exitosamente para el usuario: {}", user.getEmail());
+            orderService.saveOrder(order);
 
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(Map.of("success", true, "message", "¡Orden exitosa!, favor de revisar su correo electrónico."));
+                    .body(Map.of(
+                            "success", true,
+                            "orderId", order.getId(),
+                            "message", "¡Orden exitosa!, revisa tu correo electrónico."
+                    ));
 
         } catch (Exception e) {
-            logger.error("Error inesperado al procesar la orden: ", e);
+            logger.error("Error inesperado: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "Error inesperado al procesar la orden"));
+                    .body(Map.of("success", false, "message", "Error inesperado al procesar la orden."));
         }
     }
 
@@ -164,6 +196,8 @@ public class CheckoutController {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors()
                 .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false, "errors", errors));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("success", false, "errors", errors));
     }
 }
