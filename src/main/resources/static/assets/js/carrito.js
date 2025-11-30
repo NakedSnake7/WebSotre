@@ -57,6 +57,13 @@ function updateCart() {
     if (cartTotal) cartTotal.textContent = `$${totalFinal.toFixed(2)}`;
     if (modalTotal) modalTotal.textContent = `$${totalFinal.toFixed(2)}`;
 
+    // Actualizar contador de productos en el botón
+    const cartCounter = document.getElementById('cartCounter');
+    if (cartCounter) {
+        const totalItems = selectedProducts.reduce((sum, p) => sum + p.quantity, 0);
+        cartCounter.textContent = totalItems;
+    }
+
     // Barra de envío gratis
     const envioMensaje = document.getElementById('envioGratisMensaje');
     const envioBarra = document.getElementById('envioGratisBarra');
@@ -83,6 +90,7 @@ function updateCart() {
 
     saveCart(subtotal, envio, totalFinal);
 }
+
 
 function addToCart(name, price, quantityId, stock) {
     const input = document.getElementById(quantityId);
@@ -142,9 +150,13 @@ if (cartItems) {
 }
 
 // Mostrar/Ocultar carrito
-if (cartButton && cartDropdown) cartButton.addEventListener('click', () => {
-    cartDropdown.style.display = cartDropdown.style.display === 'block' ? 'none' : 'block';
-});
+// Mostrar/Ocultar carrito con animación
+if (cartButton && cartDropdown) {
+    cartButton.addEventListener('click', () => {
+        cartDropdown.classList.toggle('open');
+    });
+}
+
 if (checkoutButton && checkoutModal) checkoutButton.addEventListener('click', () => checkoutModal.style.display = 'block');
 
 // Finalizar compra

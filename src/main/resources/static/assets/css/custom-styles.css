@@ -802,61 +802,148 @@ header .display-4 {
     opacity: 1;
 }
 
+/* Contenedor botón */
+#cartButtonContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+}
 
-   /* Estilo para el botón del carrito */
-        #cartButtonContainer {
-            position: fixed;
-            top: 93px;
-            right: 10px;
-            z-index: 1050;
-        }
+/* Botón flotante estilo neón */
+#cartButton {
+    background: rgba(0, 255, 170, 0.1);
+    border: 2px solid #00ffaa;
+    color: #00ffaa;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    cursor: pointer;
+    position: relative;
+    transition: 0.3s;
+}
 
-        /* Estilo para el contenedor desplegable del carrito */
-        .cart-dropdown {
-            z-index: 1040; /* Asegúrate de que el carrito tenga un índice más bajo */
-            position: fixed;
-            top: 130px;
-            right: 10px;
-            z-index: 1051;
-            background: #2a2a2a;
-            color: #f0f0f0;
-            border: 1px solid #444;
-            padding: 10px;
-            width: 300px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
-            display: none;
-            border-radius: 8px;
-        }
+#cartButton:hover {
+    background: #00ffaa;
+    color: #000;
+    box-shadow: 0 0 20px #00ffaa, 0 0 40px #00ffaa;
+}
+#cartButton.cart-animate {
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
+}
 
-        /* Estilo para los productos en la lista */
-        .cart-dropdown ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+/* Contador de productos */
+#cartCounter {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4d4d;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 6px rgba(0,0,0,0.4);
+}
 
-        .cart-dropdown ul li {
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
 
-        .cart-dropdown ul li span {
-            font-size: 14px;
-        }
+/* Contenedor desplegable del carrito */
+.cart-dropdown {
+    position: fixed;
+    top: 60px;      /* justo debajo del botón */
+    right: 20px;
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: rgba(30,30,30,0.95);
+    color: #f0f0f0;
+    border: 1px solid rgba(0,255,170,0.5);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 255, 170, 0.4);
 
-        .cart-dropdown ul li button {
-            background: none;
-            border: none;
-            color: #ff4d4d;
-            cursor: pointer;
-            font-size: 16px;
-        }
+    transform: translateY(-10px); /* empieza un poquito arriba */
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    pointer-events: none; /* evita bloquear el botón cuando está cerrado */
+    z-index: 1049; /* menor que el del botón */
+}
 
-        .cart-dropdown ul li button:hover {
-            color: #ff0000;
-        }
+.cart-dropdown.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#cartButtonContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050; /* más alto que el carrito */
+}
+
+
+/* Título */
+.cart-dropdown h4 {
+    color: #00ffaa;
+    text-shadow: 0 0 6px #00ffaa;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+/* Lista de productos */
+.cart-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cart-dropdown ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.cart-dropdown ul li button {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.cart-dropdown ul li button:hover {
+    color: #ff0000;
+}
+
+/* Botón de checkout estilo neón */
+#checkoutButton {
+    width: 100%;
+    background: #00ffaa;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+#checkoutButton:hover {
+    box-shadow: 0 0 15px #00ffaa;
+}
+
+
+
 
         /* Botón de WhatsApp */
         #whatsappButton {
