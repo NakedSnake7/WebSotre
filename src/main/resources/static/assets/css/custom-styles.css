@@ -23,15 +23,16 @@ h2 {
 
 .tabla-contenedor {
 	background: rgba(255, 255, 255, 0.03);
-	padding: 25px;
+	padding: 25px 0; /* quitar padding lateral que hacía ver + angosto */
 	border-radius: 15px;
 	backdrop-filter: blur(10px);
 	border: 1px solid rgba(0, 255, 170, 0.2);
 	box-shadow: 0 0 25px rgba(0, 255, 170, 0.1);
-
-	/* Hacer scroll horizontal si es necesario */
 	overflow-x: auto;
+	width: 100%;
+	max-width: 100%;
 }
+
 
 table thead {
 	background: rgba(0, 255, 170, 0.15);
@@ -113,6 +114,25 @@ select:focus {
 		padding: 0.25rem 0.5rem;
 	}
 }
+/* Quitar limitación de ancho de Bootstrap */
+body {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* La tabla realmente debe expandirse en pantalla completa */
+.tabla-contenedor {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+table {
+    width: 100% !important;
+}
+/*////////////////////////////////////////////////////
 
     /* GLOW FUTURISTA */
     .maya-card {
