@@ -30,8 +30,9 @@ public class CheckoutController {
 
     private static final Logger logger = LoggerFactory.getLogger(CheckoutController.class);
 
-    private static final double LIMITE_ENVIO_GRATIS = 800.0;
-    private static final double COSTO_ENVIO = 100.0;
+    private static final double LIMITE_ENVIO_GRATIS = 1250.0;
+    private static final double COSTO_ENVIO = 120.0; // O el que estés usando actualmente
+
 
     private final EmailService emailService;
     private final OrderService orderService;
@@ -68,8 +69,14 @@ public class CheckoutController {
             userService.saveUser(user);
 
             // Totales
-            double subtotal = checkoutRequest.getTotalAmount();
+            double subtotal = checkoutRequest.getCart().stream()
+                    .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                    .sum();
+
+            // Envío basado en subtotal real
             double costoEnvio = subtotal >= LIMITE_ENVIO_GRATIS ? 0.0 : COSTO_ENVIO;
+
+            // Total final
             double totalFinal = subtotal + costoEnvio;
 
             logger.info("Subtotal: {}, Envío: {}, Total Final: {}", subtotal, costoEnvio, totalFinal);
@@ -128,15 +135,29 @@ public class CheckoutController {
                 totalSinEnvio += subtotalItem;
 
                 tablaProductos.append("<tr>")
-                        .append("<td>")
-                            .append("<div class='product-row'>")
-                                .append("<img src='").append(item.getProducto().getImageUrl()).append("' class='product-img'>")
-                                .append("<span>").append(item.getProducto().getProductName()).append("</span>")
-                            .append("</div>")
-                        .append("</td>")
-                        .append("<td>").append(item.getQuantity()).append("</td>")
-                        .append("<td>$").append(formatoMoneda.format(subtotalItem)).append("</td>")
-                        .append("</tr>");
+                .append("<td style='padding:10px; border-bottom:1px solid #2f2f2f;'>")
+                    .append("<table cellpadding='0' cellspacing='0' border='0' style='width:100%;'>")
+                        .append("<tr>")
+                            .append("<td width='70' style='width:70px; padding-right:10px;'>")
+                                .append("<img src='").append(item.getProducto().getImageUrl()).append("'")
+                                .append(" width='70' height='70'")
+                                .append(" style='display:block; width:70px !important; height:70px !important;")
+                                .append(" max-width:70px !important; max-height:70px !important; object-fit:cover; border-radius:8px;'>")
+                            .append("</td>")
+                            .append("<td style='color:#fff; font-size:15px;'>")
+                                .append(item.getProducto().getProductName())
+                            .append("</td>")
+                        .append("</tr>")
+                    .append("</table>")
+                .append("</td>")
+                .append("<td style='padding:10px; color:#fff; text-align:center; border-bottom:1px solid #2f2f2f;'>")
+                    .append(item.getQuantity())
+                .append("</td>")
+                .append("<td style='padding:10px; color:#fff; text-align:center; border-bottom:1px solid #2f2f2f;'>")
+                    .append("$").append(formatoMoneda.format(subtotalItem))
+                .append("</td>")
+            .append("</tr>");
+
             }
 
             // Subtotal
@@ -147,10 +168,13 @@ public class CheckoutController {
 
             // Envío
             tablaProductos.append("<tr>")
-                    .append("<td colspan='2' style='font-weight:bold;'>Envío</td>")
-                    .append("<td>")
-                    .append(costoEnvio == 0 ? "GRATIS" : "$" + formatoMoneda.format(costoEnvio))
-                    .append("</td></tr>");
+            .append("<td colspan='2' style='font-weight:bold;'>Envío</td>")
+            .append("<td>")
+            .append(Double.compare(costoEnvio, 0.0) == 0 
+                    ? "GRATIS" 
+                    : "$" + formatoMoneda.format(costoEnvio))
+            .append("</td></tr>");
+
 
             // Total Final
             tablaProductos.append("<tr style='background-color:#2e7d32; color:white; font-weight:bold;'>")
