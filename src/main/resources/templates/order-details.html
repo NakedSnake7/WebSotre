@@ -124,6 +124,38 @@ table tbody tr:hover {
 		</p>
 
 		<hr style="border-color: rgba(0, 255, 170, 0.2)">
+<hr style="border-color: rgba(0, 255, 170, 0.2)">
+
+<!-- Sección para ingresar número de guía y paquetería -->
+<h4 class="mb-3" style="color: #00ffaa; text-shadow: 0 0 6px #00ffaa;">📦 Envío</h4>
+
+<form th:action="@{/orders/update-shipping}" method="post" class="mb-4">
+    <input type="hidden" name="orderId" th:value="${order.id}" />
+
+    <div class="form-group">
+        <label class="label" for="courier">Paquetería</label>
+        <select class="form-control" id="courier" name="courier" required
+                style="background: rgba(255,255,255,0.03); color: #e2e2e2; border: 1px solid #00ffaa;">
+            <option value="">Selecciona la paquetería</option>
+         <option value="DHL" th:selected="${order.carrier == 'DHL'}">DHL</option>
+<option value="FedEx" th:selected="${order.carrier == 'FedEx'}">FedEx</option>
+<option value="UPS" th:selected="${order.carrier == 'UPS'}">UPS</option>
+<option value="Estafeta" th:selected="${order.carrier == 'Estafeta'}">Estafeta</option>
+
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label class="label" for="trackingNumber">Número de Guía</label>
+        <input type="text" class="form-control" id="trackingNumber" name="trackingNumber"
+               th:value="${order.trackingNumber}" placeholder="Ingresa el número de guía"
+               style="background: rgba(255,255,255,0.03); color: #e2e2e2; border: 1px solid #00ffaa;" required>
+    </div>
+
+    <div class="text-center mt-3">
+        <button type="submit" class="btn btn-maya">💾 Guardar</button>
+    </div>
+</form>
 
 		<!-- Tabla de productos -->
 		<h4 class="mb-3" style="color: #00ffaa; text-shadow: 0 0 6px #00ffaa;">🛒

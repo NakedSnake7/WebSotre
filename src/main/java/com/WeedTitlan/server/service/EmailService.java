@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.service;
 
-import com.sendgrid.*;
+import com.sendgrid.*; 
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
@@ -18,7 +18,7 @@ public class EmailService {
     @Value("${sendgrid.from.email}")
     private String fromEmail;  // pedidos@weedtlanmx.com
 
-    @Value("${sendgrid.from.name:WeedTlan Pedidos}")
+    @Value("${sendgrid.from.name:WeedTlan Shops}")
     private String fromName;   // WeedTlan Ventas
 
     @Value("${sendgrid.reply.to}")
@@ -75,7 +75,46 @@ public class EmailService {
                     "❌ Error SendGrid → Código: " + code + " | Respuesta: " + response.getBody()
             );
         }
-
+ 
         System.out.println("✅ Correo enviado correctamente a " + destinatario);
     }
+    /**
+     * Envía el correo de "Tu pedido está en camino" usando un template HTML.
+     */
+    public void enviarCorreoEnvio(
+            String destinatario,
+            String customerName,
+            Long orderId,
+            String shippingDate,
+            String trackingNumber,
+            String carrier
+    ) throws IOException {
+
+        // 1. Cargar template desde resources
+    	String html = cargarTemplate("email/shipping-confirmation.html");
+
+        // 2. Reemplazar variables del template
+        html = html.replace("${customerName}", customerName);
+        html = html.replace("${orderId}", String.valueOf(orderId));
+        html = html.replace("${shippingDate}", shippingDate);
+        html = html.replace("${trackingNumber}", trackingNumber);
+        html = html.replace("${carrier}", carrier);
+        
+
+        // 3. Enviar usando tu método existente
+        enviarCorreoHTML(destinatario, "📦 Tu pedido #" + orderId + " está en camino", html);
+    }
+
+    /**
+     * Lee archivos HTML desde resources como texto.
+     */
+    private String cargarTemplate(String path) throws IOException {
+        try (var inputStream = getClass().getClassLoader().getResourceAsStream(path)) {
+            if (inputStream == null) {
+                throw new IOException("❌ No se encontró el template: " + path);
+            }
+            return new String(inputStream.readAllBytes());
+        }
+    }
+
 }

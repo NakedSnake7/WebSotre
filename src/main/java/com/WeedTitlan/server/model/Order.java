@@ -1,6 +1,7 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.CascadeType;       
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;   
 import jakarta.validation.constraints.Size;
 import jakarta.persistence.GeneratedValue;
@@ -55,6 +56,15 @@ public class Order {
     @NotNull
     private Boolean emailSent = false; // Por defecto falso
 
+    @Column(name = "tracking_number")
+    private String trackingNumber;
+
+    @Column(name = "carrier")
+    private String carrier;
+
+    @Column(name = "stock_reduced")
+    private Boolean stockReduced = false;
+    
     public Boolean getEmailSent() {
         return emailSent;
     }
@@ -88,6 +98,8 @@ public class Order {
         item.setOrder(null);
     }
 
+    
+    
     // Getters y setters
     public Long getId() {
         return id;
@@ -163,4 +175,25 @@ public class Order {
                ", orderDate=" + orderDate + "}";
     }
 
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
+    }
+    public String getTrackingNumber() {
+        return trackingNumber;
+    }
+    public void setCarrier(String carrier) {
+        this.carrier = carrier;
+    }
+    public String getCarrier() {
+        return carrier;
+    }
+    // Getter
+    public Boolean isStockReduced() {
+        return stockReduced != null && stockReduced; // evita null
+    }
+
+    // Setter
+    public void setStockReduced(Boolean stockReduced) {
+        this.stockReduced = stockReduced;
+    }
 }

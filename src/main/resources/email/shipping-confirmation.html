@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<style>
+body {
+	background: #f7f7f7;
+	margin: 0;
+	padding: 20px;
+	font-family: Arial, sans-serif;
+}
+
+.container {
+	width: 100%;
+	max-width: 600px;
+	margin: auto;
+	background: #ffffff;
+	border-radius: 12px;
+	padding: 25px;
+	border: 1px solid #e5e5e5;
+	box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+	color: #2d7d46;
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+p {
+	color: #333;
+	font-size: 15px;
+	line-height: 1.55;
+}
+
+.info-box {
+	background: #f0fff4;
+	padding: 15px;
+	border-radius: 8px;
+	border-left: 5px solid #2d7d46;
+	margin-top: 20px;
+}
+
+.info-box p {
+	margin: 6px 0;
+}
+
+.footer {
+	text-align: center;
+	margin-top: 30px;
+	color: #777;
+	font-size: 13px;
+}
+</style>
+</head>
+<body>
+
+	<div class="container">
+
+		<h2>📦 ¡Tu pedido está en camino!</h2>
+
+		<p>
+			Hola <strong>${customerName}</strong>,
+		</p>
+
+		<p>
+			Nos complace informarte que tu pedido <strong>#${orderId}</strong> ha
+			sido enviado exitosamente. Muy pronto lo recibirás en tu domicilio.
+		</p>
+
+		<div class="info-box">
+			<p>
+				<strong>Detalles del envío:</strong>
+			</p>
+
+			<p>
+				▪ <strong>Fecha de envío:</strong> ${shippingDate}
+			</p>
+			<p>
+				▪ <strong>Número de guía:</strong> ${trackingNumber}
+			</p>
+			<p>
+				▪ <strong>Paquetería:</strong> ${carrier}
+			</p>
+
+			<!-- Si en el futuro quieres agregar link de rastreo, destapa esto:
+        <p style="margin-top:10px;">
+            Puedes rastrear tu pedido aquí:<br>
+            <a th:href="${trackingUrl}" 
+               style="color:#2d7d46; font-weight:bold; text-decoration:none;">
+                Rastrear pedido
+            </a>
+        </p>
+        -->
+		</div>
+
+		<p>
+			Gracias por confiar en <strong>WeedTlan</strong>. Seguimos trabajando
+			con dedicación para ofrecerte productos de calidad y un servicio
+			excepcional.
+		</p>
+
+		<div class="footer">
+			<small>WeedTlan México ·</small>
+		</div>
+
+	</div>
+
+</body>
+</html>
