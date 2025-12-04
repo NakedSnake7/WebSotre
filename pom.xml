@@ -30,6 +30,22 @@
 
     <dependencies>
     
+
+
+    
+    <!-- retry -->
+<dependency>
+  <groupId>org.springframework.retry</groupId>
+  <artifactId>spring-retry</artifactId>
+</dependency>
+
+<!-- AOP necesario para que @Retryable funcione -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
+
+    
     <dependency>
     <groupId>com.sendgrid</groupId>
     <artifactId>sendgrid-java</artifactId>

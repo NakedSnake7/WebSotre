@@ -50,83 +50,100 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="product-wrapper">
                     <div class="d-flex product-scroll">
 
-                        <!-- TARJETA DE PRODUCTO MAYA-FUTURISTA -->
-                        <div th:each="producto : ${productos}"
-                             th:if="${producto.categoria.nombre == categoria}"
-                             class="maya-card text-white mr-3"
-                             style="min-width: 260px; max-width: 260px; flex: 0 0 auto;">
+<!-- TARJETA DE PRODUCTO MAYA-FUTURISTA -->
+<div th:each="producto : ${productos}"
+     th:if="${producto.categoria.nombre == categoria}"
+     class="maya-card text-white mr-3"
+     style="min-width: 260px; max-width: 260px; flex: 0 0 auto; position: relative;">
 
-                            <!-- BADGE DESCUENTO -->
-                            <span th:if="${producto.tienePromocion}"
-                                  class="badge-descuento position-absolute"
-                                  style="top:10px; left:10px; z-index:3;">
-                                -<span th:text="${producto.porcentajeDescuento}"></span>%
-                            </span>
+    <!-- BADGE DESCUENTO -->
+    <span th:if="${producto.tienePromocion}"
+          class="badge-descuento position-absolute"
+          style="top:10px; left:10px; z-index:3;">
+        -<span th:text="${producto.porcentajeDescuento}"></span>%
+    </span>
 
-                            <!-- CARRUSEL -->
-                            <div th:if="${producto.imagenes != null and #lists.size(producto.imagenes) > 0}"
-                                 th:id="'carousel-' + ${producto.id}"
-                                 class="carousel slide maya-carousel mb-3"
-                                 data-bs-ride="carousel" data-bs-interval="3500"
-                                 data-bs-touch="true" data-bs-keyboard="true">
+    <!-- CARRUSEL DE IMÁGENES -->
+    <div th:if="${producto.imagenes != null and #lists.size(producto.imagenes) > 0}"
+         th:id="'carousel-' + ${producto.id}"
+         class="carousel slide maya-carousel mb-3"
+         data-bs-ride="carousel" data-bs-interval="3500"
+         data-bs-touch="true" data-bs-keyboard="true">
 
-                                <div class="carousel-inner" style="min-height: 250px;">
-                                    <div th:each="imagen, iter : ${producto.imagenes}"
-                                         th:classappend="${iter.index == 0} ? 'active'"
-                                         class="carousel-item">
+        <div class="carousel-inner" style="min-height: 250px;">
+            <div th:each="imagen, iter : ${producto.imagenes}"
+                 th:classappend="${iter.index == 0} ? 'active'"
+                 class="carousel-item">
+                <img th:src="${imagen.imageUrl != null} ? @{${imagen.imageUrl}} : @{/imgs/default.png}"
+                     class="d-block w-100" style="object-fit: cover; height:250px;">
+            </div>
+        </div>
+    </div>
 
-                                        <img th:src="${imagen.imageUrl != null} ? @{${imagen.imageUrl}} : @{/imgs/default.png}"
-                                             class="d-block w-100" style="object-fit: cover; height:250px;">
-                                    </div>
-                                </div>
-                            </div>
+    <!-- NOMBRE DEL PRODUCTO -->
+    <h5 class="text-center" style="color:#7affbf;" th:text="${producto.productName}"></h5>
 
-                            <!-- NOMBRE -->
-                            <h5 class="text-center" style="color:#7affbf;" th:text="${producto.productName}"></h5>
+    <!-- PRECIOS -->
+    <div class="text-center mb-1">
+        <span th:if="${producto.tienePromocion}">
+            <del class="text-muted">$<span th:text="${producto.price}"></span></del>
+            <span class="badge badge-success ml-2">
+                $<span th:text="${producto.precioConDescuento}"></span>
+            </span>
+        </span>
 
-                            <!-- PRECIOS -->
-                            <div class="text-center mb-2">
-                                <span th:if="${producto.tienePromocion}">
-                                    <del class="text-muted">$<span th:text="${producto.price}"></span></del>
-                                    <span class="badge badge-success ml-2">
-                                        $<span th:text="${producto.precioConDescuento}"></span>
-                                    </span>
-                                </span>
+        <span th:if="${!producto.tienePromocion}">
+            <span class="badge badge-primary">
+                $<span th:text="${producto.price}"></span>
+            </span>
+        </span>
+    </div>
 
-                                <span th:if="${!producto.tienePromocion}">
-                                    <span class="badge badge-primary">
-                                        $<span th:text="${producto.price}"></span>
-                                    </span>
-                                </span>
-                            </div>
+    <!-- BOTÓN + CANTIDAD + STOCK COLOREADO -->
+    <div class="d-flex align-items-center justify-content-center mb-2">
+        <input type="number"
+               th:id="'quantity-' + ${producto.id}"
+               class="form-control form-control-sm text-center quantity-input"
+               value="1" min="1"
+               th:attr="max=${producto.stock}"
+               style="width:45px;"
+               th:disabled="${producto.stock == 0}">
 
-                            <!-- BOTÓN + CANTIDAD -->
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <input type="number"
-                                       th:id="'quantity-' + ${producto.id}"
-                                       class="form-control form-control-sm text-center"
-                                       value="1" min="1"
-                                       th:attr="max=${producto.stock}"
-                                       style="width:45px;">
+<button class="btn btn-maya btn-sm ms-2 add-to-cart"
+        th:attr="data-product-id=${producto.id}"
+        th:data-name="${producto.productName}"
+        th:data-price="${producto.tienePromocion ? producto.precioConDescuento : producto.price}"
+        th:data-quantity-id="'quantity-' + ${producto.id}"
+        th:data-original-stock="${producto.stock}">
+    <i class="fas fa-cart-plus"></i>
+</button>
 
-                                <button class="btn btn-maya btn-sm ms-2 add-to-cart"
-                                        th:data-name="${producto.productName}"
-                                        th:data-price="${producto.tienePromocion ? producto.precioConDescuento : producto.price}"
-                                        th:data-quantity-id="'quantity-' + ${producto.id}">
-                                    <i class="fas fa-cart-plus"></i>
-                                </button>
-                            </div>
 
-                            <!-- DESCRIPCIÓN -->
-                            <div class="descripcion-corta small text-light mb-2">
-                                <span th:text="${producto.description}"></span>
-                            </div>
 
-                            <!-- VER MÁS -->
-                            <div class="text-right">
-                                <a href="javascript:void(0);" class="text-info ver-mas"
-                                   onclick="toggleDescripcion(this)">Ver más</a>
-                            </div>
+        <!-- STOCK CON COLORES -->
+       <small class="ms-2 stock-label"
+       th:attr="data-product-id=${producto.id}"
+       th:classappend="
+           ${producto.stock > 10} ? 'text-success' :
+           (${producto.stock > 0} ? 'text-warning' : 'text-danger')">
+    <span th:text="${producto.stock > 0 ? 'Stock: ' + producto.stock : 'Agotado'}"></span>
+</small>
+
+    </div>
+
+    <!-- DESCRIPCIÓN -->
+    <div class="descripcion-corta small text-light mb-2">
+        <span th:text="${producto.description}"></span>
+    </div>
+
+    <!-- VER MÁS -->
+    <div class="text-right">
+        <a href="javascript:void(0);" class="text-info ver-mas"
+           onclick="toggleDescripcion(this)">Ver más</a>
+    </div>
+
+</div> <!-- end maya-card -->
+
 
                         </div> <!-- card -->
                     </div>

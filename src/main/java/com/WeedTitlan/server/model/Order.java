@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.CascadeType; 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;   
 import jakarta.validation.constraints.Size;
@@ -17,7 +17,7 @@ import jakarta.persistence.FetchType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,8 +51,10 @@ public class Order {
     private OrderStatus status;
 
     @NotNull(message = "La fecha de la orden no puede ser nula")
-    private LocalDate orderDate;
-
+    private LocalDateTime orderDate;
+     
+    
+    
     @NotNull
     private Boolean emailSent = false; // Por defecto falso
 
@@ -78,14 +80,15 @@ public class Order {
     public Order() {}
 
     // Constructor sin 'phone'
-    public Order(User user, Double total, OrderStatus status, LocalDate orderDate, String address, String customerName) {
+    public Order(User user, Double total, OrderStatus status, String address, String customerName) {
         this.user = user;
         this.total = total;
         this.status = status;
-        this.orderDate = orderDate;
+        this.orderDate = LocalDateTime.now();
         this.address = address;
         this.customerName = customerName;
     }
+
 
     // Métodos para manejar la relación bidireccional
     public void addItem(OrderItem item) {
@@ -149,11 +152,11 @@ public class Order {
         this.status = status;
     }
 
-    public LocalDate getOrderDate() {
+    public @NotNull(message = "La fecha de la orden no puede ser nula") LocalDateTime getOrderDate() {
         return orderDate;
     }
 
-    public void setOrderDate(LocalDate orderDate) {
+    public void setOrderDate(@NotNull(message = "La fecha de la orden no puede ser nula") LocalDateTime orderDate) {
         this.orderDate = orderDate;
     }
 

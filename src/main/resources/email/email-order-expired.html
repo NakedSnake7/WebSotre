@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Orden Expirada</title>
+</head>
+<body style="font-family:Arial,sans-serif; background:#111; color:#fff; padding:20px;">
+    <h2 style="color:#e53935;">Tu orden ha expirado</h2>
+    <p>Hola {NOMBRE},</p>
+    <p>Tu orden <b>#{NUMERO_ORDEN}</b> ha expirado porque no se completó el pago dentro de las 24 horas.</p>
+    <p>Fecha de expiración: {FECHA_EXPIRACION}</p>
+
+    <table cellpadding="0" cellspacing="0" border="0" style="width:100%; margin-top:20px; border-collapse:collapse;">
+        <thead>
+            <tr style="background:#2f2f2f; color:#fff; text-align:center;">
+                <th style="padding:10px;">Producto</th>
+                <th style="padding:10px;">Cantidad</th>
+                <th style="padding:10px;">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {LISTADO_PRODUCTOS}
+            <tr>
+                <td colspan="2" style="font-weight:bold; text-align:right;">Subtotal</td>
+                <td>$ {SUBTOTAL}</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="font-weight:bold; text-align:right;">Envío</td>
+                <td>{ENVIO}</td>
+            </tr>
+            <tr style="background-color:#e53935; color:white; font-weight:bold;">
+                <td colspan="2" style="text-align:right;">Total</td>
+                <td>$ {TOTAL}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>El stock de los productos se ha restaurado y ahora puedes realizar una nueva compra.</p>
+    <br>
+    <p>Gracias por tu preferencia,</p>
+    <p>Equipo WeedTlan</p>
+</body>
+</html>

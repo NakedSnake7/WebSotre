@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.controller;
 
-import com.WeedTitlan.server.dto.CheckoutRequestDTO;
+import com.WeedTitlan.server.dto.CheckoutRequestDTO; 
 import com.WeedTitlan.server.model.*;
 import com.WeedTitlan.server.repository.ProductoRepository;
 import com.WeedTitlan.server.service.EmailService;
@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -86,10 +85,10 @@ public class CheckoutController {
                     user,
                     totalFinal,
                     OrderStatus.PENDING,
-                    LocalDate.now(),
                     direccion,
                     checkoutRequest.getCustomer().getFullName()
             );
+
 
             // Agregar productos
             checkoutRequest.getCart().forEach(cartItem -> {
@@ -106,8 +105,10 @@ public class CheckoutController {
                 order.addItem(item);
             });
 
-            // Guardar la orden
+         // Guardar la orden
             orderService.saveOrder(order);
+
+        
 
             // Cargar plantilla
             InputStream inputStream = getClass().getClassLoader()
@@ -199,7 +200,6 @@ public class CheckoutController {
                 order.setEmailSent(false);
             }
 
-            orderService.saveOrder(order);
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of(
