@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.service;
 
-import com.WeedTitlan.server.exceptions.OrderNotFoundException; 
+import com.WeedTitlan.server.exceptions.OrderNotFoundException;  
 import com.WeedTitlan.server.exceptions.ResourceNotFoundException;
 import com.WeedTitlan.server.dto.OrderItemDTO;
 import com.WeedTitlan.server.dto.OrderRequestDTO;
@@ -114,37 +114,49 @@ this.emailService = emailService;
     // ============================
     @Transactional
     public Order updateOrderStatus(Long orderId, String newStatus) {
-
         Order order = getOrderByIdWithUserAndItems(orderId);
 
         try {
             OrderStatus status = OrderStatus.valueOf(newStatus.toUpperCase());
-
-            
-
             order.setStatus(status);
             Order updatedOrder = orderRepository.save(order);
 
-            // Si cambia a SHIPPED, enviar email automáticamente usando tu método
-            if (status == OrderStatus.SHIPPED) {
-                emailService.enviarCorreoEnvio(
-                    order.getUser().getEmail(),
-                    order.getUser().getFullName(),
-                    order.getId(),
-                    java.time.LocalDate.now().toString(), // fecha de envío
-                    order.getTrackingNumber(),
-                    order.getCarrier()
-                );
+            // ✅ Enviar correo automático según el status
+            try {
+            	if (status == OrderStatus.PROCESSED) {
+            		emailService.enviarCorreoPedidoProcesado(
+            			    order.getUser().getEmail(),
+            			    order.getUser().getFullName(),
+            			    order.getId(),
+            			    order.getItems()
+            			);
+
+                    // Marcar email como enviado
+                    order.setEmailSent(true);
+                    orderRepository.save(order);
+
+                } else if (status == OrderStatus.SHIPPED) {
+                    // Correo de "pedido enviado" (con tracking y paquetería)
+                    emailService.enviarCorreoEnvio(
+                            order.getUser().getEmail(),
+                            order.getUser().getFullName(),
+                            order.getId(),
+                            java.time.LocalDate.now().toString(), // fecha de envío
+                            order.getTrackingNumber(),
+                            order.getCarrier()
+                    );
+                }
+            } catch (IOException e) {
+                System.err.println("Error enviando correo: " + e.getMessage());
             }
 
             return updatedOrder;
 
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Estado no válido: " + newStatus);
-        } catch (IOException e) {
-            throw new RuntimeException("Error al generar el correo de envío: " + e.getMessage());
         }
     }
+
 
     // RESTAR STOCK
     private void restarStock(Order order) {
@@ -345,5 +357,8 @@ this.emailService = emailService;
         }
     }
 
-    
+  
+
+
+
 }

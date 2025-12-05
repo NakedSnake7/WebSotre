@@ -1,5 +1,6 @@
 package com.WeedTitlan.server.service;
 
+import com.WeedTitlan.server.model.OrderItem;
 import com.sendgrid.*; 
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.List;
 
 @Service
 public class EmailService {
@@ -116,5 +119,51 @@ public class EmailService {
             return new String(inputStream.readAllBytes());
         }
     }
+
+ 
+    public void enviarCorreoPedidoProcesado(String destinatario, String nombre, Long orderId, List<OrderItem> items) throws IOException {
+        // 1. Cargar template
+        String template = cargarTemplate("email/order-processed.html");
+
+        // 2. Configurar formato de moneda
+        DecimalFormat df = new DecimalFormat("#,##0.00");
+
+        // 3. Construir tabla de productos
+        StringBuilder listadoProductos = new StringBuilder();
+        double subtotal = 0;
+        for (OrderItem item : items) {
+            double sub = item.getPrice() * item.getQuantity();
+            subtotal += sub;
+            listadoProductos.append("<tr style='background-color:#2a2a2a; color:#fff;'>")
+                .append("<td style='padding:10px; border-bottom:1px solid #333;'>")
+                .append(item.getProducto().getProductName())
+                .append("</td>")
+                .append("<td style='padding:10px; text-align:center; border-bottom:1px solid #333;'>")
+                .append(item.getQuantity())
+                .append("</td>")
+                .append("<td style='padding:10px; text-align:center; border-bottom:1px solid #333;'>$")
+                .append(df.format(sub))
+                .append("</td>")
+                .append("</tr>");
+        }
+
+        // 4. Calcular envío
+        String envio = subtotal >= 1250 ? "GRATIS" : "$120.00";
+        double total = subtotal + (subtotal >= 1250 ? 0 : 120);
+
+        // 5. Reemplazar placeholders en el template
+        String emailHTML = template
+            .replace("{NOMBRE}", nombre)
+            .replace("{NUMERO_ORDEN}", String.valueOf(orderId))
+            .replace("{TOTAL}", df.format(total))
+            .replace("{LISTADO_PRODUCTOS}", listadoProductos.toString())
+            .replace("{ENVIO}", envio)
+            .replace("{SUBTOTAL}", df.format(subtotal));
+
+        // 6. Enviar correo
+        enviarCorreoHTML(destinatario, "✅ Confirmación de tu pedido #" + orderId, emailHTML);
+    }
+
+
 
 }

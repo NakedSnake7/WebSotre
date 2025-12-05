@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedido en proceso</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        .header {
+            background-color: #28a745;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .check-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+        .content {
+            padding: 15px;
+        }
+        .content p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .footer {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+        .highlight {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="check-icon">&#10004;</div>
+            <h1>¡Pago Acreditado!</h1>
+        </div>
+
+        <div class="content">
+            <p>Hola <b>{NOMBRE}</b>,</p>
+            <p>Hemos recibido tu pago y tu pedido <span class="highlight">#{NUMERO_ORDEN}</span> está siendo procesado. Pronto será enviado.</p>
+
+            <h3>Productos en tu pedido:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+               <tbody>
+              {LISTADO_PRODUCTOS}
+              </tbody>
+            </table>
+
+            <p>Gracias por confiar en <span class="highlight">WeedTlanMx</span>. Estamos preparando tu pedido para que lo recibas pronto.</p>
+        </div>
+
+        <div class="footer">
+            WeedTlanMx &copy; 2026 | Todos los derechos reservados
+        </div>
+    </div>
+</body>
+</html>
