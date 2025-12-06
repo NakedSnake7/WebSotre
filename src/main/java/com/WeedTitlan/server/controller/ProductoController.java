@@ -55,7 +55,7 @@ public class ProductoController {
             @Valid @ModelAttribute ProductoDTO dto,
             @RequestParam(value = "imagenes", required = false) List<MultipartFile> nuevasImagenes,
             @RequestParam(value = "eliminarImagenes", required = false) List<Long> eliminarImagenes,
-            @RequestParam(value = "porcentajeDescuento", defaultValue = "0") int porcentajeDescuento) {
+            @RequestParam(value = "porcentajeDescuento", defaultValue = "0") double porcentajeDescuento) {
 
         try {
 

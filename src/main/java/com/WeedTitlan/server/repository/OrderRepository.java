@@ -23,4 +23,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o JOIN FETCH o.user JOIN FETCH o.items i JOIN FETCH i.producto WHERE o.id = :id")
     Optional<Order> findByIdWithUserAndItems(@Param("id") Long id);
 
+    @Query("""
+    	    SELECT DISTINCT o 
+    	    FROM Order o
+    	    LEFT JOIN FETCH o.items i
+    	    LEFT JOIN FETCH i.producto p
+    	    WHERE o.status = 'PENDING'
+    	    """)
+    	List<Order> findPendingOrdersWithItems();
+
+
 }

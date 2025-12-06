@@ -64,21 +64,33 @@ document.addEventListener('DOMContentLoaded', function () {
     </span>
 
     <!-- CARRUSEL DE IMÁGENES -->
-    <div th:if="${producto.imagenes != null and #lists.size(producto.imagenes) > 0}"
-         th:id="'carousel-' + ${producto.id}"
-         class="carousel slide maya-carousel mb-3"
-         data-bs-ride="carousel" data-bs-interval="3500"
-         data-bs-touch="true" data-bs-keyboard="true">
+<!-- SI EL PRODUCTO TIENE IMÁGENES -->
+<div th:if="${producto.imagenes != null and #lists.size(producto.imagenes) > 0}"
+     th:id="'carousel-' + ${producto.id}"
+     class="carousel slide maya-carousel mb-3"
+     data-bs-ride="carousel" data-bs-interval="3500"
+     data-bs-touch="true" data-bs-keyboard="true">
 
-        <div class="carousel-inner" style="min-height: 250px;">
-            <div th:each="imagen, iter : ${producto.imagenes}"
-                 th:classappend="${iter.index == 0} ? 'active'"
-                 class="carousel-item">
-                <img th:src="${imagen.imageUrl != null} ? @{${imagen.imageUrl}} : @{/imgs/default.png}"
-                     class="d-block w-100" style="object-fit: cover; height:250px;">
-            </div>
+    <div class="carousel-inner" style="min-height: 250px;">
+        <div th:each="imagen, iter : ${producto.imagenes}"
+             th:classappend="${iter.index == 0} ? 'active'"
+             class="carousel-item">
+
+            <img th:src="${imagen.imageUrl != null} ? @{${imagen.imageUrl}} : @{/imgs/default.png}"
+                 class="d-block w-100"
+                 style="object-fit: cover; height:250px;">
         </div>
     </div>
+</div>
+
+<!-- SI EL PRODUCTO NO TIENE IMÁGENES → MOSTRAR DEFAULT -->
+<div th:if="${producto.imagenes == null or #lists.isEmpty(producto.imagenes)}"
+     class="mb-3">
+
+    <img src="/imgs/default.png"
+         class="d-block w-100"
+         style="object-fit: cover; height:250px;">
+</div>
 
     <!-- NOMBRE DEL PRODUCTO -->
     <h5 class="text-center" style="color:#7affbf;" th:text="${producto.productName}"></h5>

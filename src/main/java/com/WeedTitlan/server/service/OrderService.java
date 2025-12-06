@@ -287,71 +287,103 @@ this.emailService = emailService;
 
     @Transactional
     public void expirarOrdenSiPendiente(Order order) {
-        // Solo procesar si la orden sigue PENDING
+
+        // 1. Validación de seguridad: si NO está PENDING, NO tocar
         if (order.getStatus() != OrderStatus.PENDING) return;
 
         LocalDateTime limite = order.getOrderDate().plusHours(24);
 
-        // Solo expirar si ya pasó el tiempo
+        // 2. Aún no expira
         if (LocalDateTime.now().isBefore(limite)) return;
 
-        // Restaurar stock si se descontó
+        // 3. Restaurar stock solo si realmente fue reducido
         if (order.isStockReduced()) {
             for (OrderItem item : order.getItems()) {
                 Producto producto = item.getProducto();
-                producto.setStock(producto.getStock() + item.getQuantity());
-                productoRepository.save(producto);
+
+                if (producto != null) {
+                    int nuevoStock = producto.getStock() + item.getQuantity();
+                    producto.setStock(nuevoStock);
+                    productoRepository.save(producto);
+                }
             }
         }
 
+        // 4. Marcar como expirada
         order.setStatus(OrderStatus.EXPIRED);
-        order.setStockReduced(false); // resetear
+        order.setStockReduced(false);
         orderRepository.save(order);
 
-        // Enviar correo de expiración
+        // 5. Evitar correos duplicados (si ya se envió uno antes)
+        if (order.isExpirationEmailSent()) {
+            return;
+        }
+
+        // 6. Enviar correo de expiración
         try {
             InputStream inputStream = getClass().getClassLoader()
                     .getResourceAsStream("email/email-order-expired.html");
 
-            if (inputStream != null) {
-                String template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-
-                DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-                symbols.setDecimalSeparator('.');
-                symbols.setGroupingSeparator(',');
-                DecimalFormat formatoMoneda = new DecimalFormat("#,##0.00", symbols);
-
-                // Construir tabla de productos
-                StringBuilder tablaProductos = new StringBuilder();
-                double subtotal = 0;
-                for (OrderItem item : order.getItems()) {
-                    double sub = item.getPrice() * item.getQuantity();
-                    subtotal += sub;
-
-                    tablaProductos.append("<tr>")
-                        .append("<td style='padding:10px; border-bottom:1px solid #2f2f2f;'>")
-                        .append("<img src='").append(item.getProducto().getImageUrl()).append("' width='50' height='50' style='border-radius:6px; vertical-align:middle; margin-right:10px;'>")
-                        .append(item.getProducto().getProductName())
-                        .append("</td>")
-                        .append("<td style='padding:10px; text-align:center; border-bottom:1px solid #2f2f2f;'>").append(item.getQuantity()).append("</td>")
-                        .append("<td style='padding:10px; text-align:center; border-bottom:1px solid #2f2f2f;'>$").append(formatoMoneda.format(sub)).append("</td>")
-                        .append("</tr>");
-                }
-
-                String envio = subtotal >= 1250 ? "GRATIS" : "$120.00";
-                double total = subtotal + (subtotal >= 1250 ? 0 : 120);
-
-                String emailHTML = template
-                        .replace("{NOMBRE}", order.getCustomerName())
-                        .replace("{NUMERO_ORDEN}", String.valueOf(order.getId()))
-                        .replace("{FECHA_EXPIRACION}", order.getOrderDate().plusHours(24).toString())
-                        .replace("{LISTADO_PRODUCTOS}", tablaProductos.toString())
-                        .replace("{SUBTOTAL}", formatoMoneda.format(subtotal))
-                        .replace("{ENVIO}", envio)
-                        .replace("{TOTAL}", formatoMoneda.format(total));
-
-                emailService.enviarCorreoHTML(order.getUser().getEmail(), "Orden Expirada - WeedTlan", emailHTML);
+            if (inputStream == null) {
+                System.err.println("No se encontró la plantilla de expiración");
+                return;
             }
+
+            String template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+
+            // Formato de moneda
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+            symbols.setDecimalSeparator('.');
+            symbols.setGroupingSeparator(',');
+            DecimalFormat formatoMoneda = new DecimalFormat("#,##0.00", symbols);
+
+            // Tabla de productos
+            StringBuilder tablaProductos = new StringBuilder();
+            double subtotal = 0;
+
+            for (OrderItem item : order.getItems()) {
+                double sub = item.getPrice() * item.getQuantity();
+                subtotal += sub;
+
+                tablaProductos.append("<tr>")
+                    .append("<td style='padding:10px; border-bottom:1px solid #2f2f2f;'>")
+                    .append("<img src='")
+                    .append(item.getProducto() != null ? item.getProducto().getImageUrl() : "/img/default.jpg")
+                    .append("' width='50' height='50' style='border-radius:6px; vertical-align:middle; margin-right:10px;'>")
+                    .append(item.getProducto() != null ? item.getProducto().getProductName() : "Producto")
+                    .append("</td>")
+                    .append("<td style='padding:10px; text-align:center; border-bottom:1px solid #2f2f2f;'>")
+                    .append(item.getQuantity())
+                    .append("</td>")
+                    .append("<td style='padding:10px; text-align:center; border-bottom:1px solid #2f2f2f;'>$")
+                    .append(formatoMoneda.format(sub))
+                    .append("</td>")
+                    .append("</tr>");
+            }
+
+            String envio = subtotal >= 1250 ? "GRATIS" : "$120.00";
+            double total = subtotal + (subtotal >= 1250 ? 0 : 120);
+
+            String emailHTML = template
+                    .replace("{NOMBRE}", order.getCustomerName() != null ? order.getCustomerName() : "Cliente")
+                    .replace("{NUMERO_ORDEN}", String.valueOf(order.getId()))
+                    .replace("{FECHA_EXPIRACION}", limite.toString())
+                    .replace("{LISTADO_PRODUCTOS}", tablaProductos.toString())
+                    .replace("{SUBTOTAL}", formatoMoneda.format(subtotal))
+                    .replace("{ENVIO}", envio)
+                    .replace("{TOTAL}", formatoMoneda.format(total));
+
+            // Validar correo antes de intentar enviarlo
+            if (order.getUser() != null && order.getUser().getEmail() != null) {
+                emailService.enviarCorreoHTML(order.getUser().getEmail(),
+                        "Orden Expirada - WeedTlan",
+                        emailHTML);
+            }
+
+            // 7. Marcar bandera de correo enviado
+            order.setExpirationEmailSent(true);
+            orderRepository.save(order);
+
         } catch (Exception e) {
             System.err.println("Error enviando correo de expiración: " + e.getMessage());
         }

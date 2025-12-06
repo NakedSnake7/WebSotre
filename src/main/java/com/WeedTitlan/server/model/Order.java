@@ -57,6 +57,9 @@ public class Order {
     
     @NotNull
     private Boolean emailSent = false; // Por defecto falso
+    
+    @Column(name = "expiration_email_sent", nullable = false)
+    private boolean expirationEmailSent = false;
 
     @Column(name = "tracking_number")
     private String trackingNumber;
@@ -199,4 +202,12 @@ public class Order {
     public void setStockReduced(Boolean stockReduced) {
         this.stockReduced = stockReduced;
     }
+
+public boolean isExpirationEmailSent() {
+    return expirationEmailSent;
+}
+
+public void setExpirationEmailSent(boolean expirationEmailSent) {
+    this.expirationEmailSent = expirationEmailSent;
+}
 }
