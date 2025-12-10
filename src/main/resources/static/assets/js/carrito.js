@@ -222,87 +222,168 @@ export function configurarCarrito() {
         });
     }
 
-    if (checkoutButton && checkoutModal) checkoutButton.addEventListener('click', () => checkoutModal.style.display = 'block');
+	if (checkoutButton && checkoutModal) {
+	    checkoutButton.addEventListener('click', () => {
+	        $('#checkoutModal').modal('show');
+	    });
+	}
 
-    // Finalizar compra
-    if (finalizeButton && checkoutForm) {
-        finalizeButton.addEventListener('click', async () => {
-            if (isProcessing) return;
-            isProcessing = true;
-            finalizeButton.disabled = true;
-            finalizeButton.textContent = "Procesando...";
+	// =========================
+	// FINALIZAR COMPRA
+	// =========================
+	if (finalizeButton && checkoutForm) {
+	    finalizeButton.addEventListener('click', async (e) => {
+	        e.preventDefault();
+	        if (isProcessing) return;
 
-            if (!validateForm(checkoutForm)) {
-                alert('Corrige los errores en el formulario');
-                resetFinalize();
-                return;
-            }
+	        isProcessing = true;
+	        finalizeButton.disabled = true;
+	        finalizeButton.textContent = "Procesando...";
 
-            const fullName = document.getElementById('fullName').value.trim();
-            const email = document.getElementById('CosEmail').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const address = document.getElementById('address').value.trim();
-            const subtotal = selectedProducts.reduce((s,p)=>s+p.price*p.quantity,0);
-            const envio = subtotal >= LIMITE_ENVIO_GRATIS ? 0 : COSTO_ENVIO;
-            const total = subtotal + envio;
+	        // Limpiar mensajes antiguos
+	        const errorContainer = document.getElementById('checkoutErrors');
+	        if (errorContainer) errorContainer.innerHTML = "";
 
-            if (!/^\d{10}$/.test(phone)) {
-                alert('Teléfono inválido de 10 dígitos');
-                resetFinalize();
-                return;
-            }
-            if (!selectedProducts.length) {
-                alert("Carrito vacío");
-                resetFinalize();
-                return;
-            }
+	        // Obtener campos
+	        const fullName = document.getElementById('fullName').value.trim();
+	        const email = document.getElementById('CosEmail').value.trim();
+	        const phone = document.getElementById('phone').value.trim();
+	        const address = document.getElementById('address').value.trim();
 
-            const orderData = { customer:{fullName,email,phone,address}, cart:selectedProducts, totalAmount:total };
+	        const errors = [];
 
-            try {
-                const res = await fetch('/api/checkout',{
-                    method:'POST',
-                    headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify(orderData)
-                });
-                const data = await res.json();
-                alert(data.success ? 'Compra exitosa' : (data.message || 'Hubo un problema'));
-                if (data.success) {
-                    localStorage.removeItem('cartData');
-                    checkoutForm.reset();
-                    selectedProducts=[];
-                    updateCart();
-                    checkoutModal.style.display="none";
-                    cartDropdown.style.display="none";
+	        // Validaciones
+	        if (!fullName) errors.push("Ingresa tu nombre completo.");
+	        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+	            errors.push("Ingresa un correo electrónico válido.");
+	        }
+	        if (!/^\d{10}$/.test(phone)) {
+	            errors.push("Teléfono inválido. Debe tener 10 dígitos.");
+	        }
+	        if (!address) errors.push("Ingresa tu dirección de envío.");
+	        if (!selectedProducts.length) {
+	            errors.push("Tu carrito está vacío.");
+	        }
 
-                    // Restaurar todos los badges al stock original
-                    document.querySelectorAll('.add-to-cart').forEach(btn => {
-                        const quantityId = btn.dataset.quantityId;
-                        const originalStock = parseInt(btn.dataset.originalStock);
-                        updateStockBadge(quantityId, originalStock);
-                    });
-                }
-            } catch(e){
-                console.error(e);
-                alert('Error en servidor, intenta de nuevo');
-            } finally{ resetFinalize(); }
-        });
-    }
+	        // Mostrar errores
+	        if (errors.length > 0) {
+	            errors.forEach(msg => {
+	                const p = document.createElement('p');
+	                p.textContent = msg;
+	                p.style.color = "#ff6b6b";
+	                p.style.margin = "4px 0";
+	                errorContainer.appendChild(p);
+	            });
 
-    function resetFinalize() {
-        isProcessing=false;
-        finalizeButton.disabled=false;
-        finalizeButton.textContent="Finalizar Compra";
-    }
+	            resetFinalize();
+	            return;
+	        }
 
-    function validateForm(form){
-        let valid=true;
-        form.querySelectorAll('input,textarea').forEach(input=>{
-            if(!input.checkValidity()){ input.classList.add('is-invalid'); valid=false; }
-            else input.classList.remove('is-invalid');
-        });
-        return valid;
-    }
+	        // Si todo OK — calcular totales
+	        const subtotal = selectedProducts.reduce((s,p)=>s+p.price*p.quantity,0);
+	        const envio = subtotal >= LIMITE_ENVIO_GRATIS ? 0 : COSTO_ENVIO;
+	        const total = subtotal + envio;
+
+	        const orderData = {
+	            customer: { fullName, email, phone, address },
+	            cart: selectedProducts,
+	            totalAmount: total
+	        };
+
+	        try {
+	            const res = await fetch('/api/checkout', {
+	                method: 'POST',
+	                headers: { 'Content-Type': 'application/json'},
+	                body: JSON.stringify(orderData)
+	            });
+
+	            const data = await res.json();
+	            if (data.success) {
+	                alert('Compra exitosa');
+	                localStorage.removeItem('cartData');
+	                checkoutForm.reset();
+	                selectedProducts = [];
+	                updateCart();
+	                $('#checkoutModal').modal('hide');
+	                cartDropdown.style.display = 'none';
+	            } else {
+	                alert(data.message || 'Hubo un problema con la compra');
+	            }
+	        } catch (e) {
+	            console.error(e);
+	            alert('Error en servidor, intenta de nuevo');
+	        } finally {
+	            resetFinalize();
+	        }
+	    });
+	}
+
+	// Reset del botón
+	function resetFinalize() {
+	    isProcessing = false;
+	    finalizeButton.disabled = false;
+	    finalizeButton.textContent = "Finalizar Compra";
+	}
+
+
+
+	// ==============================
+	// VALIDACIÓN EN TIEMPO REAL + BLUR
+	// ==============================
+	const realTimeFields = {
+	    fullName: {
+	        validar: value => value.trim().length > 0,
+	        mensaje: "Por favor, ingresa tu nombre completo."
+	    },
+	    CosEmail: {
+	        validar: value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()),
+	        mensaje: "Ingresa un correo válido."
+	    },
+	    phone: {
+	        validar: value => /^\d{10}$/.test(value.trim()),
+	        mensaje: "Número inválido: deben ser 10 dígitos."
+	    },
+	    address: {
+			validar: value => {
+			    const v = value.trim();
+
+			    if (v.length < 15) return false;
+			    if (!/[A-Za-z]{3,}/.test(v)) return false; // mínimo palabras reales
+			    if (!/\d{1,5}/.test(v)) return false; // número de casa
+			    if (!/[,]/.test(v)) return false; // debe separar elementos con coma
+
+			    return true;
+			},
+			mensaje: "Incluye calle, número, colonia, CP y ciudad. Ej: Calle 20 #102, Col. Centro, 01109, CDMX"
+
+	    }
+	};
+
+	// Asignar eventos input + blur
+	Object.keys(realTimeFields).forEach(id => {
+	    const campo = document.getElementById(id);
+
+	    campo.addEventListener("input", () => validarCampo(id));
+	    campo.addEventListener("blur", () => validarCampo(id));
+	});
+
+	function validarCampo(id) {
+	    const campo = document.getElementById(id);
+	    const regla = realTimeFields[id];
+	    const valido = regla.validar(campo.value);
+	    const errorDiv = campo.parentElement.querySelector(".invalid-feedback");
+
+		if (!valido) {
+		    campo.classList.add("is-invalid");
+		    errorDiv.textContent = regla.mensaje;
+		    errorDiv.style.display = "block"; // asegura que se muestre
+		} else {
+		    campo.classList.remove("is-invalid");
+		    errorDiv.textContent = "";
+		    errorDiv.style.display = "none"; // oculta el mensaje
+		}
+
+	}
 
     // Cargar carrito desde localStorage al inicio
     loadCart();

@@ -1,3 +1,62 @@
+/* Modal estilo vidrio ahumado */
+.glass-modal {
+    background: rgba(15, 15, 15, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    color: #fff;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* Inputs estilo vidrio */
+.glass-input {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.glass-input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+/* Caja de total */
+.total-box {
+    background: rgba(0, 0, 0, 0.35);
+    padding: 12px 16px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Botón final */
+.finalize-btn {
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 10px;
+}
+input.is-invalid,
+textarea.is-invalid {
+    border: 2px solid #d00 !important;
+    background-color: transparent !important;
+    box-shadow: 0 0 3px rgba(200, 0, 0, 0.25);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.invalid-feedback {
+    display: none;
+    color: #d00;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+
+input.is-invalid + .invalid-feedback,
+textarea.is-invalid + .invalid-feedback {
+    display: block;
+}
+
 .btn-fixed {
     position: fixed;
     bottom: 20px;

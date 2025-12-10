@@ -105,60 +105,67 @@
 </div>
 
 
-	<!-- Modal para el checkout -->
-	<div id="checkoutModal" class="modal" tabindex="-1" role="dialog"
-		style="display: none;">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content bg-dark text-white">
-				<div class="modal-header">
-					<h5 class="modal-title">Finalizar Compra</h5>
+<!-- Modal para el checkout -->
+<div id="checkoutModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content glass-modal">
 
-				</div>
-				<div class="modal-body">
-					<form id="checkoutForm">
-						<div class="form-group">
-							<label for="fullName" style="text-align: left;">Nombre
-								completo</label> <input type="text" class="form-control" id="fullName"
-								placeholder="Tu nombre completo" required>
-							<div class="invalid-feedback">Por favor, ingresa tu nombre
-								completo.</div>
-						</div>
-						<div class="form-group">
-							<label for="CosEmail" style="text-align: left;">Correo
-								electrónico</label> <input type="email" class="form-control"
-								id="CosEmail" placeholder="Tu correo electrónico" required>
-							<div class="invalid-feedback">Por favor, ingresa un correo
-								electrónico válido.</div>
-						</div>
-						<div class="form-group">
-							<label for="phone" style="text-align: left;">Teléfono</label> <input
-								type="tel" class="form-control" id="phone" name="phone"
-								placeholder="Tu teléfono (10 dígitos)" required pattern="\d{10}"
-								autocomplete="tel">
-							<div class="invalid-feedback">Por favor, ingresa un número
-								de teléfono válido (10 dígitos).</div>
-						</div>
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Finalizar Compra</h5>
+               
+            </div>
 
-						<div class="form-group">
-							<label for="address" style="text-align: left;">Dirección</label>
-							<textarea class="form-control" id="address" name="address"
-								rows="3" placeholder="Tu dirección de envío" required
-								autocomplete="street-address"></textarea>
-							<div class="invalid-feedback">Por favor, ingresa tu
-								dirección de envío.</div>
-						</div>
+            <div class="modal-body">
+                <form id="checkoutForm" novalidate>
 
-					</form>
-					<div class="d-flex justify-content-between mt-3">
-						<span><b>Total:</b></span> <span id="modalTotal"
-							class="font-weight-bold">$0</span>
-					</div>
-				</div>
-				<button type="button" id="finalizeButton" class="btn btn-success">
-					Finalizar Compra</button>
-			</div>
-		</div>
-	</div>
+                    <div class="form-group">
+                        <label for="fullName">Nombre completo</label>
+                        <input type="text" class="form-control glass-input" id="fullName"
+                               placeholder="Tu nombre completo" required>
+                        <div class="invalid-feedback">Por favor, ingresa tu nombre completo.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="CosEmail">Correo electrónico</label>
+                        <input type="email" class="form-control glass-input" id="CosEmail"
+                               placeholder="Tu correo electrónico" required>
+                        <div class="invalid-feedback">Ingresa un correo válido.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Teléfono</label>
+                        <input type="tel" class="form-control glass-input" id="phone"
+                               placeholder="10 dígitos" required pattern="\d{10}">
+                        <div class="invalid-feedback">Número inválido: deben ser 10 dígitos.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Dirección de envío</label>
+                        <textarea class="form-control glass-input" id="address" rows="3"
+                                  placeholder="Calle, número, colonia, ciudad" required></textarea>
+                        <div class="invalid-feedback">Ingresa tu dirección completa.</div>
+                    </div>
+
+                </form>
+
+                <div class="d-flex justify-content-between mt-3 total-box">
+                    <span><b>Total:</b></span>
+                    <span id="modalTotal" class="font-weight-bold">$0</span>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0">
+            <div id="checkoutErrors" style="margin-bottom: 12px;"></div>
+            
+                <button type="button" id="finalizeButton"
+                        class="btn btn-success btn-block finalize-btn">
+                    Finalizar Compra
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 
 
