@@ -234,6 +234,12 @@ export function configurarCarrito() {
 	if (finalizeButton && checkoutForm) {
 	    finalizeButton.addEventListener('click', async (e) => {
 	        e.preventDefault();
+			
+			
+			const loader = document.getElementById("loader");
+			  loader.setAttribute("active", ""); // 🔥 ACTIVA EL LOADER
+			  loader.shadowRoot.querySelector(".loader-text").textContent = "Procesando tu pedido...";
+
 	        if (isProcessing) return;
 
 	        isProcessing = true;
@@ -312,9 +318,14 @@ export function configurarCarrito() {
 	        } catch (e) {
 	            console.error(e);
 	            alert('Error en servidor, intenta de nuevo');
-	        } finally {
-	            resetFinalize();
-	        }
+			} finally {
+			    const loader = document.getElementById("loader");
+			    loader.removeAttribute("active"); // ❎ DESACTIVA EL LOADER
+				loader.shadowRoot.querySelector(".loader-text").textContent = "Cargando nuestros productos...";
+
+			    resetFinalize();
+			}
+
 	    });
 	}
 

@@ -32,14 +32,14 @@
 
 <!-- Estilos personalizados -->
 <link rel="stylesheet" href="/assets/css/custom-styles.css">
-<!-- importa la logica -->
-<script type="module" src="/assets/js/main.js"></script>
+
 <!-- importa la logica -->
 
 
 
 </head>
 <body>
+<maya-loader id="loader"></maya-loader>
 <div id="particles-js"></div>
 
 <!-- Navbar -->
@@ -586,7 +586,8 @@
 
 <script>
 function cargarMenu() {
-    document.getElementById("loader").style.display = "flex";
+    const loader = document.getElementById("loader");
+    loader.setAttribute("active", "");
 
     fetch("/fragmento-menu")
         .then(resp => resp.text())
@@ -596,16 +597,17 @@ function cargarMenu() {
 
             contenedor.scrollIntoView({ behavior: "smooth" });
 
-            document.getElementById("loader").style.display = "none";
+            loader.removeAttribute("active");
         })
         .catch(err => {
             console.error("Error cargando el menú:", err);
-            document.getElementById("loader").style.display = "none";
+            loader.removeAttribute("active");
         });
 }
 
-
 </script>
+
+
 
 
 	<script>
@@ -631,80 +633,7 @@ function cargarMenu() {
 
 	
 	
-<!-- Símbolo Maya de Protección -->
-<svg class="maya-symbol" width="70" height="70" viewBox="0 0 100 100">
-    <!-- Escudo exterior -->
-    <path 
-        d="M50 10 
-           L80 30 
-           L80 60 
-           L50 90 
-           L20 60 
-           L20 30 Z"
-        fill="none"
-        stroke="#00ffbf"
-        stroke-width="4"
-        stroke-linejoin="round"
-    />
-
-    <!-- Anillo protector interior -->
-    <circle 
-        cx="50" cy="50" r="18"
-        fill="none"
-        stroke="#00ffe0"
-        stroke-width="3"
-    />
-
-    <!-- Centro energético -->
-    <circle 
-        cx="50" cy="50" r="6"
-        fill="#00ffd5"
-        stroke="#00fff2"
-        stroke-width="2"
-    />
-
-    <!-- Líneas de energía protectora -->
-    <path 
-        d="M50 32 L50 20
-           M68 50 L80 50
-           M50 68 L50 80
-           M20 50 L32 50"
-        stroke="#00ffbf"
-        stroke-width="3"
-        stroke-linecap="round"
-    />
-</svg>
-<!-- Loader Maya Futurista -->
-<div id="loader" class="loader-overlay" style="display:none;">
-
-    <div class="maya-spinner">
-
-        <!-- Aros giratorios -->
-        <div class="ring"></div>
-        <div class="ring2"></div>
-
-        <!-- Símbolo Maya de Protección -->
-        <svg class="maya-symbol" width="70" height="70" viewBox="0 0 100 100">
-            <path d="M50 10 L80 30 L80 60 L50 90 L20 60 L20 30 Z"
-                fill="none" stroke="#00ffbf" stroke-width="4" stroke-linejoin="round"/>
-
-            <circle cx="50" cy="50" r="18"
-                fill="none" stroke="#00ffe0" stroke-width="3"/>
-
-            <circle cx="50" cy="50" r="6"
-                fill="#00ffd5" stroke="#00fff2" stroke-width="2"/>
-
-            <path d="M50 32 L50 20
-                    M68 50 L80 50
-                    M50 68 L50 80
-                    M20 50 L32 50"
-                stroke="#00ffbf" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-
-    </div>
-
-    <p class="loader-text">Cargando nuestros productos...</p>
-</div>
+ 
 
 <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
@@ -775,6 +704,8 @@ particlesJS("particles-js", {
 </script>
 
 	
-
+<!-- importa la logica -->
+<script src="/assets/js/maya-loader.js"></script>
+<script type="module" src="/assets/js/main.js"></script>
 </body>
 </html>
