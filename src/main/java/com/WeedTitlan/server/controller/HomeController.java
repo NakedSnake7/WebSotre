@@ -57,5 +57,10 @@ public class HomeController {
         // fragmento: menuFragment
         return "fragments/menu :: menu";
     }
+    @GetMapping("/fragments/resenas")
+    public String getResenasFragment() {
+        return "fragments/resenas :: resenas";
+    }
+
 
 }

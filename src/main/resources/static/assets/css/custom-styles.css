@@ -1,3 +1,29 @@
+/* (Grid tipo Masonry) */
+
+.grid-reseñas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-auto-rows: 10px; /* base para Masonry */
+  gap: 20px;
+}
+
+.reseña {
+  background-color: #1c1c1c; /* ejemplo */
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.reseña > .card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Ajuste tipo Masonry */
+.reseña {
+  grid-row-end: span var(--row-span);
+}
+
 /* Modal estilo vidrio ahumado */
 .glass-modal {
     background: rgba(15, 15, 15, 0.55);
