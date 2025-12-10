@@ -161,35 +161,38 @@ class MayaLoader extends HTMLElement {
 
 	    if (name === "active") {
 	        if (newV !== null) {
-	            // Iniciar con volumen 0 y hacer fade in
-	            sound.volume = 0;
+	            sound.volume = 0;          // empieza en 0
 	            sound.currentTime = 0;
 	            sound.play().catch(() => {});
 
 	            const targetVolume = 0.36;
+	            const fadeInStep = 0.005;  // pasos más pequeños
+	            const fadeInInterval = 30; // ms más pequeños
 	            const fadeIn = setInterval(() => {
-	                if (sound.volume < targetVolume - 0.01) {
-	                    sound.volume += 0.02; // sube gradualmente
+	                if (sound.volume < targetVolume - fadeInStep) {
+	                    sound.volume += fadeInStep;
 	                } else {
 	                    sound.volume = targetVolume;
 	                    clearInterval(fadeIn);
 	                }
-	            }, 50); // cada 50ms
+	            }, fadeInInterval);
 	        } else {
-	            // Fade out suave
+	            const fadeOutStep = 0.005;
+	            const fadeOutInterval = 30;
 	            const fadeOut = setInterval(() => {
-	                if (sound.volume > 0.02) {
-	                    sound.volume -= 0.02; // baja gradualmente
+	                if (sound.volume > fadeOutStep) {
+	                    sound.volume -= fadeOutStep;
 	                } else {
 	                    sound.volume = 0;
 	                    sound.pause();
 	                    sound.currentTime = 0;
 	                    clearInterval(fadeOut);
 	                }
-	            }, 50);
+	            }, fadeOutInterval);
 	        }
 	    }
 	}
+
 
 }
 
