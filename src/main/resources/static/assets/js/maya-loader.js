@@ -156,20 +156,41 @@ class MayaLoader extends HTMLElement {
         return ["active"];
     }
 
-    attributeChangedCallback(name, oldV, newV) {
-        const sound = this.shadowRoot.getElementById("portalSound");
+	attributeChangedCallback(name, oldV, newV) {
+	    const sound = this.shadowRoot.getElementById("portalSound");
 
-        if (name === "active") {
-            if (newV !== null) {
-                sound.volume = 0.36;
-                sound.currentTime = 0;
-                sound.play().catch(() => {});
-            } else {
-                sound.pause();
-                sound.currentTime = 0;
-            }
-        }
-    }
+	    if (name === "active") {
+	        if (newV !== null) {
+	            // Iniciar con volumen 0 y hacer fade in
+	            sound.volume = 0;
+	            sound.currentTime = 0;
+	            sound.play().catch(() => {});
+
+	            const targetVolume = 0.36;
+	            const fadeIn = setInterval(() => {
+	                if (sound.volume < targetVolume - 0.01) {
+	                    sound.volume += 0.02; // sube gradualmente
+	                } else {
+	                    sound.volume = targetVolume;
+	                    clearInterval(fadeIn);
+	                }
+	            }, 50); // cada 50ms
+	        } else {
+	            // Fade out suave
+	            const fadeOut = setInterval(() => {
+	                if (sound.volume > 0.02) {
+	                    sound.volume -= 0.02; // baja gradualmente
+	                } else {
+	                    sound.volume = 0;
+	                    sound.pause();
+	                    sound.currentTime = 0;
+	                    clearInterval(fadeOut);
+	                }
+	            }, 50);
+	        }
+	    }
+	}
+
 }
 
 customElements.define("maya-loader", MayaLoader);
