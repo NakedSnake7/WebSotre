@@ -25,14 +25,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <!-- Barra de categorías superior -->
 <div class="categories-bar text-light py-2 px-3 sticky-top" style="z-index: 1000;">
-    <div class="d-flex flex-wrap justify-content-center category-scroll">
+    <div class="category-scroll">
+
         <a th:each="categoria : ${categorias}"
-        th:classappend="${categoria eq activeCategoria} ? 'active' : ''"
-           class="btn btn-outline-light btn-sm mx-2 mb-2"
+           th:classappend="${categoria eq activeCategoria} ? 'active' : ''"
+           class="btn btn-outline-light btn-sm"
            th:href="'#cat-' + ${#strings.replace(categoria, ' ', '-')}"
-           th:text="${categoria}"></a>
+           th:text="${categoria}">
+        </a>
+
+        <!-- Indicador animado -->
+        <div class="category-indicator" id="catIndicator"></div>
+
     </div>
 </div>
+
+
 
 <!-- Contenedor principal -->
 <div class="container-fluid mt-4">

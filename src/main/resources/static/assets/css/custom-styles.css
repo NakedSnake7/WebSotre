@@ -353,38 +353,7 @@ background: rgba(255, 255, 255, 0.02);
     transform: scale(1.1);
     transition: transform 0.2s;
 }
-/* Scroll horizontal suave */
-.category-scroll {
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-}
 
-/* Botones de categoría */
-.category-scroll .btn {
-    transition: all 0.2s;
-}
-
-.category-scroll .btn:hover {
-    background: #ff0000;
-    color: #fff;
-    box-shadow: 0 0 10px #ff4d4d;
-    transform: scale(1.05);
-}
-
-/* Categoría activa */
-.category-scroll .btn.active {
-    background: #ff4d4d;
-    color: #fff;
-    box-shadow: 0 0 12px #ff6666;
-}
-.categories-bar.sticky-top {
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(5px);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    transition: all 0.3s;
-}
 
 /* Ajuste del tamaño del título y subtítulo */
 .glow-aura.display-2 {
@@ -834,40 +803,127 @@ header .display-4 {
         background: linear-gradient(to left, rgba(0, 0, 0, 0.6), transparent);
     }
 
-    .category-scroll {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        flex-wrap: nowrap;
+/* === CATEGORÍAS – SCROLL COMPACTO Y HORIZONTAL === */
+.categories-bar.sticky-top {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    padding: 8px 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    z-index: 1000;
+}
+
+/* Container scroll */
+.category-scroll {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    gap: 8px;
+    padding: 6px 4px;
+    scrollbar-width: none;
+    position: relative;
+}
+
+.category-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* Botones estilo chips */
+.category-scroll .btn {
+    padding: 5px 12px !important;
+    font-size: 13px !important;
+    border-radius: 18px !important;
+    margin: 0 !important;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+/* Hover futurista */
+.category-scroll .btn:hover {
+    background: #ff0000;
+    color: #fff;
+    box-shadow: 0 0 12px #ff4d4d;
+    transform: scale(1.05);
+}
+
+/* Activa */
+.category-scroll .btn.active {
+    background: #ff4d4d !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 0 12px #ff6666;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .category-scroll .btn {
+        padding: 4px 10px !important;
+        font-size: 12px !important;
+        border-radius: 16px !important;
     }
+}
 
-    .category-scroll::-webkit-scrollbar {
-        display: none;
+/* Línea animada bajo la categoría activa */
+.category-indicator {
+    position: absolute;
+    bottom: -2px;
+    height: 3px;
+    background: #ff4d4d;
+    border-radius: 2px;
+    transition: width 0.25s ease;
+    box-shadow: 0 0 10px #ff4d4d;
+    will-change: transform;
+}
+/* === GLOW PULSANTE EN LA CATEGORÍA ACTIVA === */
+@keyframes glowPulse {
+    0% {
+        box-shadow: 0 0 6px #ff4d4d, 0 0 12px rgba(255, 77, 77, 0.6);
+        transform: scale(1);
     }
-
-    .category-scroll .active {
-        background-color: #28a745 !important;
-        color: white !important;
-        border: none;
-    }
-
-    @media (max-width: 768px) {
-        .product-scroll {
-            gap: 0.5rem;
-        }
-
-        .card {
-            min-width: 200px;
-            max-width: 200px;
-        }
-    }
-
-    .card:hover {
+    50% {
+        box-shadow: 0 0 10px #ff4d4d, 0 0 18px rgba(255, 77, 77, 0.8);
         transform: scale(1.03);
-        transition: transform 0.2s ease-in-out;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
-    /* Por defecto sin sombras */
+    100% {
+        box-shadow: 0 0 6px #ff4d4d, 0 0 12px rgba(255, 77, 77, 0.6);
+        transform: scale(1);
+    }
+}
+
+.category-scroll .btn.active {
+    animation: glowPulse 1.8s infinite ease-in-out;
+}
+
+/* Animación de rebote tipo Instagram/TikTok */
+@keyframes bounceSlide {
+    0% { transform: translateX(var(--from)) scaleX(1); }
+    60% { transform: translateX(var(--to)) scaleX(1.15); }
+    100% { transform: translateX(var(--to)) scaleX(1); }
+}
+
+
+
+/* === PRODUCTOS === */
+@media (max-width: 768px) {
+    .product-scroll {
+        gap: 0.5rem;
+    }
+
+    .card {
+        min-width: 200px;
+        max-width: 200px;
+    }
+}
+
+.card:hover {
+    transform: scale(1.03);
+    transition: transform 0.2s ease-in-out;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+
+/* === SOMBRAS LATERALES DE SCROLL === */
 .product-wrapper {
     position: relative;
 }
@@ -885,14 +941,15 @@ header .display-4 {
 
 .product-wrapper.scrollable::before {
     left: 0;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.6), transparent);
+    background: linear-gradient(to right, rgba(0,0,0,0.6), transparent);
 }
 
 .product-wrapper.scrollable::after {
     right: 0;
-    background: linear-gradient(to left, rgba(0, 0, 0, 0.6), transparent);
+    background: linear-gradient(to left, rgba(0,0,0,0.6), transparent);
 }
-    /* Desactivamos sombras si no hay scroll o estamos en el borde */
+
+/* Inicialmente ocultas */
 .product-wrapper::before,
 .product-wrapper::after {
     opacity: 0;
@@ -906,6 +963,7 @@ header .display-4 {
 .product-wrapper.sombra-derecha::after {
     opacity: 1;
 }
+  
 
 /* Contenedor botón */
 #cartButtonContainer {
