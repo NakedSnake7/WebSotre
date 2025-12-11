@@ -910,7 +910,7 @@ header .display-4 {
 /* Contenedor botón */
 #cartButtonContainer {
     position: fixed;
-    top: 20px;
+    top: 05px;
     right: 20px;
     z-index: 1050;
 }
@@ -991,7 +991,7 @@ header .display-4 {
 
 #cartButtonContainer {
     position: fixed;
-    top: 20px;
+    top: 05px;
     right: 20px;
     z-index: 1050; /* más alto que el carrito */
 }
