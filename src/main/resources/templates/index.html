@@ -153,7 +153,29 @@
                     <span id="modalTotal" class="font-weight-bold">$0</span>
                 </div>
             </div>
+            
+           <!-- seleccion de metodo de pago  -->
+           <div class="form-group mt-3">
+    <label><b>Método de pago</b></label>
 
+    <div class="custom-control custom-radio">
+        <input type="radio" id="payManual" name="paymentMethod"
+               class="custom-control-input" value="manual" checked>
+        <label class="custom-control-label" for="payManual">
+            Transferencia
+        </label>
+    </div>
+
+    <div class="custom-control custom-radio mt-2">
+        <input type="radio" id="payStripe" name="paymentMethod"
+               class="custom-control-input" value="stripe">
+        <label class="custom-control-label" for="payStripe">
+            Tarjeta de crédito / débito
+        </label>
+    </div>
+</div>
+           
+           
             <div class="modal-footer border-0">
             <div id="checkoutErrors" style="margin-bottom: 12px;"></div>
             

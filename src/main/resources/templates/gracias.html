@@ -1,0 +1,7 @@
+<script>
+const params = new URLSearchParams(window.location.search);
+const sessionId = params.get('session_id');
+
+fetch(`/api/stripe/payment-success?session_id=${sessionId}`);
+localStorage.removeItem('cart');
+</script>

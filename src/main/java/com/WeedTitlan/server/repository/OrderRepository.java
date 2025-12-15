@@ -31,6 +31,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     	    WHERE o.status = 'PENDING'
     	    """)
     	List<Order> findPendingOrdersWithItems();
+    
+    Optional<Order> findByStripeSessionId(String stripeSessionId);
 
 
 }

@@ -5,5 +5,6 @@ public enum OrderStatus {
     PROCESSED, // Cambiado de PAGADO a PROCESSED
     DELIVERED, // Cambiado de CONFIRMADO a DELIVERED
     SHIPPED,    // Cambiado de CANCELADO a SHIPPED
-    EXPIRED
+    PENDING_PAYMENT,
+    EXPIRED, PAID
 }

@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.CascadeType; 
+import jakarta.persistence.CascadeType;  
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;   
 import jakarta.validation.constraints.Size;
@@ -52,7 +52,9 @@ public class Order {
 
     @NotNull(message = "La fecha de la orden no puede ser nula")
     private LocalDateTime orderDate;
-     
+
+    
+
     
     
     @NotNull
@@ -69,6 +71,21 @@ public class Order {
 
     @Column(name = "stock_reduced")
     private Boolean stockReduced = false;
+    
+    
+    @Column(name = "stripe_session_id")
+    private String stripeSessionId;
+
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
+    private PaymentMethod paymentMethod;
+
+    public enum PaymentMethod {
+        CARD,
+        TRANSFER
+    }
+
     
     public Boolean getEmailSent() {
         return emailSent;
@@ -105,6 +122,7 @@ public class Order {
     }
 
     
+
     
     // Getters y setters
     public Long getId() {
@@ -210,4 +228,20 @@ public boolean isExpirationEmailSent() {
 public void setExpirationEmailSent(boolean expirationEmailSent) {
     this.expirationEmailSent = expirationEmailSent;
 }
+public String getStripeSessionId() {
+    return stripeSessionId;
+}
+
+public void setStripeSessionId(String stripeSessionId) {
+    this.stripeSessionId = stripeSessionId;
+}
+public PaymentMethod getPaymentMethod() {
+    return paymentMethod;
+}
+
+public void setPaymentMethod(PaymentMethod paymentMethod) {
+    this.paymentMethod = paymentMethod;
+}
+
+
 }

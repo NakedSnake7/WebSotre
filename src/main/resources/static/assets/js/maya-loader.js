@@ -22,14 +22,13 @@ class MayaLoader extends HTMLElement {
                     display: flex;
                 }
 
-                /* CONTENEDOR PRINCIPAL */
                 .holo-container {
                     position: relative;
-                    width: 220px; height: 220px;
+                    width: 220px;
+                    height: 220px;
                     filter: drop-shadow(0 0 25px #00fff5);
                 }
 
-                /* CAPA DE LUZ VOLUMÉTRICA REAL */
                 .god-rays {
                     position: absolute;
                     inset: -40px;
@@ -50,7 +49,6 @@ class MayaLoader extends HTMLElement {
                     to   { transform: rotate(360deg); }
                 }
 
-                /* AROS PRINCIPALES */
                 .ring {
                     position: absolute;
                     inset: 0;
@@ -59,7 +57,7 @@ class MayaLoader extends HTMLElement {
 
                 .ring.main {
                     border: 4px solid rgba(0,255,245,0.8);
-                    box-shadow: 
+                    box-shadow:
                         0 0 25px #00fff0,
                         0 0 55px rgba(0,255,255,0.4) inset;
                     animation: mainSpin 4s cubic-bezier(.6,.15,.45,.9) infinite;
@@ -81,7 +79,6 @@ class MayaLoader extends HTMLElement {
                     to   { transform: rotate(0deg); opacity: .5; }
                 }
 
-                /* ANILLO GLASS */
                 .ring.glass {
                     inset: 45px;
                     border: 3px solid rgba(0,255,255,0.35);
@@ -94,28 +91,64 @@ class MayaLoader extends HTMLElement {
                     50%     { opacity: .75; transform: scale(1.08); }
                 }
 
-                /* SÍMBOLO MAYA HOLOGRÁFICO */
-                svg.maya-symbol {
+                /* LOGO HOLOGRÁFICO */
+                img.maya-symbol.logo {
                     position: absolute;
-                    top: 50%; left: 50%;
+                    top: 50%;
+                    left: 50%;
                     transform: translate(-50%, -50%);
-                    filter: drop-shadow(0 0 8px #00fff0);
-                    animation: symbolGlow 2.4s ease-in-out infinite,
-                               hologramShift 1.2s steps(2, end) infinite;
+
+                    width: 92px;
+                    height: 92px;
+                    object-fit: contain;
+
+                    opacity: 0.95;
+
+                    filter:
+                        drop-shadow(0 0 6px rgba(0,255,240,0.6))
+                        drop-shadow(0 0 14px rgba(0,255,255,0.75))
+                        drop-shadow(0 0 28px rgba(0,200,255,0.35));
+
+                    animation:
+                        symbolGlow 2.6s ease-in-out infinite,
+                        hologramShift 1.2s steps(2, end) infinite,
+                        logoPulse 3.2s ease-in-out infinite;
                 }
 
                 @keyframes symbolGlow {
-                    0%,100% { opacity: .85; filter: drop-shadow(0 0 8px #00fff0); }
-                    50%     { opacity: 1; filter: drop-shadow(0 0 18px #00ffff); }
+                    0%,100% {
+                        opacity: .85;
+                        filter:
+                            drop-shadow(0 0 6px rgba(0,255,240,0.6))
+                            drop-shadow(0 0 14px rgba(0,255,255,0.75))
+                            drop-shadow(0 0 28px rgba(0,200,255,0.35));
+                    }
+                    50% {
+                        opacity: 1;
+                        filter:
+                            drop-shadow(0 0 10px rgba(0,255,255,0.9))
+                            drop-shadow(0 0 24px rgba(0,255,255,0.8))
+                            drop-shadow(0 0 40px rgba(0,255,255,0.45));
+                    }
                 }
 
                 @keyframes hologramShift {
-                    0% { transform: translate(-50%, -50%) translateX(0px); }
-                    50% { transform: translate(-50%, -50%) translateX(1px); }
-                    100% { transform: translate(-50%, -50%) translateX(0px); }
+                    0%   { transform: translate(-50%, -50%) translateX(0); }
+                    50%  { transform: translate(-50%, -50%) translateX(1px); }
+                    100% { transform: translate(-50%, -50%) translateX(0); }
                 }
 
-                /* TEXTO */
+                @keyframes logoPulse {
+                    0%,100% {
+                        transform: translate(-50%, -50%) scale(1);
+                        opacity: 0.88;
+                    }
+                    50% {
+                        transform: translate(-50%, -50%) scale(1.07);
+                        opacity: 1;
+                    }
+                }
+
                 .loader-text {
                     margin-top: 25px;
                     font-size: 22px;
@@ -126,11 +159,6 @@ class MayaLoader extends HTMLElement {
                 }
             </style>
 
-            <!-- AUDIO -->
-			<audio id="portalSound" src="/assets/sounds/portal_multidimensional.wav" preload="auto" loop></audio>
-
-
-
             <div class="holo-container">
                 <div class="god-rays"></div>
 
@@ -138,14 +166,11 @@ class MayaLoader extends HTMLElement {
                 <div class="ring inner"></div>
                 <div class="ring glass"></div>
 
-                <svg class="maya-symbol" width="90" height="90" viewBox="0 0 100 100">
-                    <path d="M50 10 L80 30 L80 60 L50 90 L20 60 L20 30 Z"
-                        fill="none" stroke="#00fff7" stroke-width="4" stroke-linejoin="round"/>
-                    <circle cx="50" cy="50" r="20"
-                        fill="none" stroke="#00eaff" stroke-width="3"/>
-                    <circle cx="50" cy="50" r="7"
-                        fill="#00ffea" stroke="#00fff7" stroke-width="2"/>
-                </svg>
+                <img
+                    class="maya-symbol logo"
+                    src="/assets/imgs/logoweed.png"
+                    alt="WeedTlanMx Logo"
+                />
             </div>
 
             <p class="loader-text">Cargando nuestros productos...</p>
@@ -156,44 +181,9 @@ class MayaLoader extends HTMLElement {
         return ["active"];
     }
 
-	attributeChangedCallback(name, oldV, newV) {
-	    const sound = this.shadowRoot.getElementById("portalSound");
-
-	    if (name === "active") {
-	        if (newV !== null) {
-	            sound.volume = 0;          // empieza en 0
-	            sound.currentTime = 0;
-	            sound.play().catch(() => {});
-
-	            const targetVolume = 0.36;
-	            const fadeInStep = 0.005;  // pasos más pequeños
-	            const fadeInInterval = 30; // ms más pequeños
-	            const fadeIn = setInterval(() => {
-	                if (sound.volume < targetVolume - fadeInStep) {
-	                    sound.volume += fadeInStep;
-	                } else {
-	                    sound.volume = targetVolume;
-	                    clearInterval(fadeIn);
-	                }
-	            }, fadeInInterval);
-	        } else {
-	            const fadeOutStep = 0.005;
-	            const fadeOutInterval = 30;
-	            const fadeOut = setInterval(() => {
-	                if (sound.volume > fadeOutStep) {
-	                    sound.volume -= fadeOutStep;
-	                } else {
-	                    sound.volume = 0;
-	                    sound.pause();
-	                    sound.currentTime = 0;
-	                    clearInterval(fadeOut);
-	                }
-	            }, fadeOutInterval);
-	        }
-	    }
-	}
-
-
+    attributeChangedCallback(name, oldV, newV) {
+        // Solo controla visibilidad
+    }
 }
 
 customElements.define("maya-loader", MayaLoader);

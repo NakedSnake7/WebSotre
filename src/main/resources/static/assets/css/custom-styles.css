@@ -571,6 +571,39 @@ header .display-4 {
     text-shadow: 0 0 5px #00ffb2;
 }
 
+img.maya-symbol.logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 92px;
+    height: 92px;
+    object-fit: contain;
+
+    opacity: 0.95;
+
+    filter:
+        drop-shadow(0 0 6px rgba(0,255,240,0.6))
+        drop-shadow(0 0 14px rgba(0,255,255,0.75))
+        drop-shadow(0 0 28px rgba(0,200,255,0.35));
+
+    animation:
+        symbolGlow 2.6s ease-in-out infinite,
+        hologramShift 1.2s steps(2, end) infinite,
+        logoPulse 3.2s ease-in-out infinite;
+}
+@keyframes logoPulse {
+    0%,100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.88;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.07);
+        opacity: 1;
+    }
+}
+
 
 #reseñas-container {
     flex-wrap: wrap;

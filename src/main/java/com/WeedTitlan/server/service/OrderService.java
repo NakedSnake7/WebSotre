@@ -1,11 +1,12 @@
 package com.WeedTitlan.server.service;
 
-import com.WeedTitlan.server.exceptions.OrderNotFoundException;  
+import com.WeedTitlan.server.exceptions.OrderNotFoundException;   
 import com.WeedTitlan.server.exceptions.ResourceNotFoundException;
 import com.WeedTitlan.server.dto.OrderItemDTO;
 import com.WeedTitlan.server.dto.OrderRequestDTO;
 import com.WeedTitlan.server.exceptions.InsufficientStockException;
 import com.WeedTitlan.server.model.Order;
+import com.WeedTitlan.server.model.Order.PaymentMethod;
 import com.WeedTitlan.server.model.OrderItem;
 import com.WeedTitlan.server.model.OrderStatus;
 import com.WeedTitlan.server.model.Producto;
@@ -28,6 +29,7 @@ import java.text.DecimalFormatSymbols;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -70,10 +72,10 @@ this.emailService = emailService;
         // Guardar orden
         Order saved = orderRepository.save(order);
 
-        // Descontar stock
-        descontarStock(saved);
-        
-        
+        // 🔥 SOLO TRANSFERENCIA APARTA STOCK
+        if (order.getPaymentMethod() == PaymentMethod.TRANSFER) {
+            descontarStock(saved);
+        }
 
         return saved;
     }
@@ -157,23 +159,6 @@ this.emailService = emailService;
         }
     }
 
-
-    // RESTAR STOCK
-    private void restarStock(Order order) {
-        for (OrderItem item : order.getItems()) {
-            Producto producto = item.getProducto();
-            int cantidad = item.getQuantity();
-
-            if (producto.getStock() < cantidad) {
-                throw new InsufficientStockException(
-                        "Stock insuficiente para: " + producto.getProductName()
-                );
-            }
-
-            producto.setStock(producto.getStock() - cantidad);
-            productoRepository.save(producto);
-        }
-    }
     @Transactional
     public void descontarStock(Order order) {
 
@@ -389,6 +374,9 @@ this.emailService = emailService;
         }
     }
 
+    public Optional<Order> findByStripeSessionId(String sessionId) {
+        return orderRepository.findByStripeSessionId(sessionId);
+    }
   
 
 
