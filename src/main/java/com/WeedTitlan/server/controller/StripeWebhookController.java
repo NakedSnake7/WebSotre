@@ -1,7 +1,8 @@
 package com.WeedTitlan.server.controller;
 
-import java.io.IOException;
+import java.io.IOException;  
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.WeedTitlan.server.model.Order;
 import com.WeedTitlan.server.model.OrderStatus;
+import com.WeedTitlan.server.model.PaymentStatus;
 import com.WeedTitlan.server.service.EmailService;
 import com.WeedTitlan.server.service.OrderService;
-import com.google.api.client.util.Value;
 import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
@@ -72,6 +73,10 @@ public class StripeWebhookController {
                 orderService.findByStripeSessionId(session.getId())
                         .ifPresent(orderService::expirarOrdenSiPendiente);
             }
+            
+            case "payment_intent.payment_failed" -> {
+                // log, analytics, o dejar en PENDING
+            }
 
         }
 
@@ -83,11 +88,24 @@ public class StripeWebhookController {
         Order order = orderService.findByStripeSessionId(session.getId())
                 .orElseThrow();
 
-        if (order.getStatus() == OrderStatus.PAID) return;
+        // 🔐 Seguridad: si el pago ya fue procesado, salir
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            return;
+        }
 
-        order.setStatus(OrderStatus.PAID);
+        // 1️⃣ Marcar pago como confirmado
+        order.setPaymentStatus(PaymentStatus.PAID);
+
+        // 2️⃣ Avanzar estado de la orden
+        order.setOrderStatus(OrderStatus.PROCESSED);
+
+        // 3️⃣ Descontar stock SOLO UNA VEZ
+        orderService.descontarStock(order);
+
+        // 4️⃣ Guardar cambios
         orderService.save(order);
 
+        // 5️⃣ Enviar correo de confirmación
         try {
             emailService.enviarCorreoPedidoProcesado(
                     order.getUser().getEmail(),
@@ -99,6 +117,4 @@ public class StripeWebhookController {
             System.err.println("❌ Error enviando correo de pago: " + e.getMessage());
         }
     }
-
 }
-

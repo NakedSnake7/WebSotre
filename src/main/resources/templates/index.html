@@ -104,7 +104,6 @@
     <button id="checkoutButton" class="btn btn-maya mt-3">Ir al pago</button>
 </div>
 
-
 <!-- Modal para el checkout -->
 <div id="checkoutModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -112,38 +111,96 @@
 
             <div class="modal-header border-0">
                 <h5 class="modal-title">Finalizar Compra</h5>
-               
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
             </div>
 
             <div class="modal-body">
                 <form id="checkoutForm" novalidate>
 
+                    <!-- Campo oculto para orderId -->
+                    <input type="hidden" id="orderId" name="orderId">
+
                     <div class="form-group">
                         <label for="fullName">Nombre completo</label>
-                        <input type="text" class="form-control glass-input" id="fullName"
-                               placeholder="Tu nombre completo" required>
-                        <div class="invalid-feedback">Por favor, ingresa tu nombre completo.</div>
+                        <input type="text"
+                               class="form-control glass-input"
+                               id="fullName"
+                               name="fullName"
+                               placeholder="Tu nombre completo"
+                               required>
+                        <div class="invalid-feedback">
+                            Por favor, ingresa tu nombre completo.
+                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="CosEmail">Correo electrónico</label>
-                        <input type="email" class="form-control glass-input" id="CosEmail"
-                               placeholder="Tu correo electrónico" required>
-                        <div class="invalid-feedback">Ingresa un correo válido.</div>
+                        <label for="email">Correo electrónico</label>
+                        <input type="email"
+                               class="form-control glass-input"
+                               id="email"
+                               name="email"
+                               placeholder="Tu correo electrónico"
+                               required>
+                        <div class="invalid-feedback">
+                            Ingresa un correo válido.
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label for="phone">Teléfono</label>
-                        <input type="tel" class="form-control glass-input" id="phone"
-                               placeholder="10 dígitos" required pattern="\d{10}">
-                        <div class="invalid-feedback">Número inválido: deben ser 10 dígitos.</div>
+                        <input type="tel"
+                               class="form-control glass-input"
+                               id="phone"
+                               name="phone"
+                               placeholder="10 dígitos"
+                               required
+                               pattern="\d{10}">
+                        <div class="invalid-feedback">
+                            Número inválido: deben ser 10 dígitos.
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label for="address">Dirección de envío</label>
-                        <textarea class="form-control glass-input" id="address" rows="3"
-                                  placeholder="Calle, número, colonia, ciudad" required></textarea>
-                        <div class="invalid-feedback">Ingresa tu dirección completa.</div>
+                        <textarea class="form-control glass-input"
+                                  id="address"
+                                  name="address"
+                                  rows="3"
+                                  placeholder="Calle, número, colonia, ciudad"
+                                  required></textarea>
+                        <div class="invalid-feedback">
+                            Ingresa tu dirección completa.
+                        </div>
+                    </div>
+
+                    <!-- MÉTODO DE PAGO (YA DENTRO DEL FORM) -->
+                    <div class="form-group mt-3">
+                        <label><b>Método de pago</b></label>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio"
+                                   id="payTransfer"
+                                   name="paymentMethod"
+                                   class="custom-control-input"
+                                   value="TRANSFER"
+                                   checked>
+                            <label class="custom-control-label" for="payTransfer">
+                                Transferencia
+                            </label>
+                        </div>
+
+                        <div class="custom-control custom-radio mt-2">
+                            <input type="radio"
+                                   id="payStripe"
+                                   name="paymentMethod"
+                                   class="custom-control-input"
+                                   value="STRIPE">
+                            <label class="custom-control-label" for="payStripe">
+                                Tarjeta de crédito / débito
+                            </label>
+                        </div>
                     </div>
 
                 </form>
@@ -153,33 +210,12 @@
                     <span id="modalTotal" class="font-weight-bold">$0</span>
                 </div>
             </div>
-            
-           <!-- seleccion de metodo de pago  -->
-           <div class="form-group mt-3">
-    <label><b>Método de pago</b></label>
 
-    <div class="custom-control custom-radio">
-        <input type="radio" id="payManual" name="paymentMethod"
-               class="custom-control-input" value="manual" checked>
-        <label class="custom-control-label" for="payManual">
-            Transferencia
-        </label>
-    </div>
-
-    <div class="custom-control custom-radio mt-2">
-        <input type="radio" id="payStripe" name="paymentMethod"
-               class="custom-control-input" value="stripe">
-        <label class="custom-control-label" for="payStripe">
-            Tarjeta de crédito / débito
-        </label>
-    </div>
-</div>
-           
-           
             <div class="modal-footer border-0">
-            <div id="checkoutErrors" style="margin-bottom: 12px;"></div>
-            
-                <button type="button" id="finalizeButton"
+                <div id="checkoutErrors" style="margin-bottom: 12px;"></div>
+
+                <button type="button"
+                        id="finalizeButton"
                         class="btn btn-success btn-block finalize-btn">
                     Finalizar Compra
                 </button>
@@ -188,8 +224,6 @@
         </div>
     </div>
 </div>
-
-
 
 	<!-- header -->
 	<header id="home" class="header">

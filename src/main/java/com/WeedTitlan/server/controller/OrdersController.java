@@ -1,10 +1,10 @@
 package com.WeedTitlan.server.controller;
 
-import com.WeedTitlan.server.model.Order;
+import com.WeedTitlan.server.model.Order; 
 import com.WeedTitlan.server.model.OrderStatus;
+import com.WeedTitlan.server.model.PaymentStatus;
 import com.WeedTitlan.server.service.OrderService;
 import com.WeedTitlan.server.service.EmailService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ public class OrdersController {
     private final OrderService orderService;
     private final EmailService emailService;
 
-    @Autowired
+    
     public OrdersController(OrderService orderService, EmailService emailService) {
         this.orderService = orderService;
         this.emailService = emailService;
@@ -90,11 +90,24 @@ public class OrdersController {
     @PostMapping("/orders/{id}/status")
     public String cambiarStatus(
             @PathVariable("id") Long id,
-            @RequestParam("status") String status) {
+            @RequestParam("status") String status,
+            RedirectAttributes redirectAttributes) {
+
+        Order order = orderService.getOrderById(id);
+
+        if (order.getPaymentStatus() != PaymentStatus.PAID) {
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "No puedes cambiar el estado de una orden no pagada"
+            );
+            return "redirect:/orders/" + id;
+        }
+        
 
         orderService.updateOrderStatus(id, status);
         return "redirect:/orders";
     }
+
 
     // ================================
     // 🟩 ENVIAR CORREO DE ENVÍO
@@ -104,6 +117,7 @@ public class OrdersController {
             @PathVariable Long id,
             @RequestParam("trackingNumber") String trackingNumber,
             Model model
+            
     ) {
 
         try {
@@ -119,10 +133,18 @@ public class OrdersController {
                 model.addAttribute("error", "Orden no encontrada");
                 return "redirect:/orders";
             }
+            if (order.getPaymentStatus() != PaymentStatus.PAID) {
+                model.addAttribute("error", "No se puede enviar una orden no pagada");
+                return "redirect:/orders/" + id;
+            }
+            if (order.getOrderStatus() == OrderStatus.DELIVERED) {
+                model.addAttribute("error", "La orden ya fue entregada");
+                return "redirect:/orders/" + id;
+            }
 
             // Guardar tracking y status
             order.setTrackingNumber(trackingNumber);
-            order.setStatus(OrderStatus.SHIPPED);
+            order.setOrderStatus(OrderStatus.SHIPPED);
             orderService.save(order);
 
             // Datos del correo
@@ -154,9 +176,23 @@ public class OrdersController {
     // ELIMINAR
     // ================================
     @GetMapping("/orders/{id}/delete")
-    public String eliminarOrden(@PathVariable("id") Long id) {
+    public String eliminarOrden(
+            @PathVariable("id") Long id,
+            RedirectAttributes redirectAttributes) {
+
+        Order order = orderService.getOrderById(id);
+
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "No se puede eliminar una orden ya pagada"
+            );
+            return "redirect:/orders";
+        }
+
         orderService.deleteOrder(id);
         return "redirect:/orders";
     }
+
   
 }

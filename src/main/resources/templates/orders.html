@@ -41,35 +41,66 @@
 					<td th:text="${order.user?.phone} ?: 'Sin teléfono'"></td>
 
 
-					<td class="glow" th:text="${order.status}"></td>
-					<td>$<span th:text="${order.total}"></span></td>
+<td>
+    <span class="badge badge-info"
+          th:text="${order.orderStatus}">
+    </span>
+    <br>
+    <span class="badge"
+          th:classappend="${order.paymentStatus == 'PAID'} ? 'badge-success' : 'badge-warning'"
+          th:text="${order.paymentStatus}">
+    </span>
+</td>					<td>$<span th:text="${order.total}"></span></td>
 					<td th:text="${order.orderDate}"></td>
 
 					<td><a class="btn btn-maya btn-sm"
 						th:href="@{/orders/{id}(id=${order.id})}"> Ver </a>
 
 						<form th:action="@{/orders/{id}/status(id=${order.id})}"
-							method="post" style="display: inline-block;">
+      method="post"
+      th:if="${order.paymentStatus == 'PAID'}"
+      style="display: inline-block;">
+      
+      <span class="badge badge-info"
+      th:text="${order.orderStatus == 'CREATED' ? 'Creada' :
+                order.orderStatus == 'PROCESSED' ? 'Procesada' :
+                order.orderStatus == 'SHIPPED' ? 'Enviada' :
+                order.orderStatus == 'DELIVERED' ? 'Entregada' :
+                order.orderStatus}">
+</span>
 
-							<select name="status"
-								class="form-control form-control-sm d-inline-block"
-								style="width: 140px;">
-								<option th:selected="${order.status == 'PENDING'}"
-									th:value="PENDING">Pendiente</option>
-								<option th:selected="${order.status == 'PROCESSED'}"
-									th:value="PROCESSED">Procesada</option>
-								<option th:selected="${order.status == 'DELIVERED'}"
-									th:value="DELIVERED">Entregada</option>
-								<option th:selected="${order.status == 'SHIPPED'}"
-									th:value="SHIPPED">Envío</option>
-							</select>
+    <select name="status"
+            class="form-control form-control-sm d-inline-block"
+            style="width: 140px;">
+        <option th:selected="${order.orderStatus == 'PROCESSED'}"
+                th:value="PROCESSED">Procesada</option>
+        <option th:selected="${order.orderStatus == 'SHIPPED'}"
+                th:value="SHIPPED">Envío</option>
+        <option th:selected="${order.orderStatus == 'DELIVERED'}"
+                th:value="DELIVERED">Entregada</option>
+                
+    </select>
+              th:if="${order.paymentStatus == 'PAID' and order.orderStatus != 'DELIVERED'}"
 
-
-							<button class="btn btn-success btn-sm">✔</button>
-						</form> <a class="btn btn-danger btn-sm"
-						th:href="@{/orders/{id}/delete(id=${order.id})}"
-						onclick="return confirm('¿Seguro que deseas eliminar esta orden?');">
-							✖ </a></td>
+    <button class="btn btn-success btn-sm">✔</button>
+</form>
+<span th:if="${order.paymentStatus != 'PAID'}"
+      class="text-warning">
+    ⏳ Esperando pago
+</span>
+			<span class="badge"
+      th:classappend="
+        ${order.orderStatus == 'DELIVERED'} ? 'badge-success' :
+        ${order.orderStatus == 'SHIPPED'} ? 'badge-primary' :
+        'badge-info'"
+      th:text="${order.orderStatus}">
+</span>			
+						 <a class="btn btn-danger btn-sm"
+   th:if="${order.paymentStatus != 'PAID'}"
+   th:href="@{/orders/{id}/delete(id=${order.id})}"
+   onclick="return confirm('¿Seguro que deseas eliminar esta orden?');">
+    ✖
+</a></td>
 				</tr>
 			</tbody>
 

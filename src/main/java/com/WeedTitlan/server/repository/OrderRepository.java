@@ -11,28 +11,44 @@ import org.springframework.data.repository.query.Param;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
+    // =========================
+    // SINGLE ORDER
+    // =========================
     @Query("SELECT o FROM Order o JOIN FETCH o.user WHERE o.id = :id")
     Optional<Order> findByIdWithUser(@Param("id") Long id);
 
-    // Buscar órdenes por estado (como String)
-    List<Order> findByStatus(OrderStatus status);
-    
-    @Query("SELECT o FROM Order o JOIN FETCH o.user")
-    List<Order> findAllWithUser();
-    
-    @Query("SELECT o FROM Order o JOIN FETCH o.user JOIN FETCH o.items i JOIN FETCH i.producto WHERE o.id = :id")
+    @Query("""
+        SELECT o 
+        FROM Order o 
+        JOIN FETCH o.user 
+        JOIN FETCH o.items i 
+        JOIN FETCH i.producto 
+        WHERE o.id = :id
+    """)
     Optional<Order> findByIdWithUserAndItems(@Param("id") Long id);
 
+    // =========================
+    // LISTS
+    // =========================
+    List<Order> findByOrderStatus(OrderStatus orderStatus);
+
+    @Query("SELECT o FROM Order o JOIN FETCH o.user")
+    List<Order> findAllWithUser();
+
+    // =========================
+    // 🔥 ÓRDENES PENDIENTES (CREATED) PARA EXPIRAR
+    // =========================
     @Query("""
-    	    SELECT DISTINCT o 
-    	    FROM Order o
-    	    LEFT JOIN FETCH o.items i
-    	    LEFT JOIN FETCH i.producto p
-    	    WHERE o.status = 'PENDING'
-    	    """)
-    	List<Order> findPendingOrdersWithItems();
-    
+        SELECT DISTINCT o
+        FROM Order o
+        LEFT JOIN FETCH o.items i
+        LEFT JOIN FETCH i.producto
+        WHERE o.orderStatus = com.WeedTitlan.server.model.OrderStatus.CREATED
+    """)
+    List<Order> findPendingOrdersWithItems();
+
+    // =========================
+    // STRIPE
+    // =========================
     Optional<Order> findByStripeSessionId(String stripeSessionId);
-
-
 }

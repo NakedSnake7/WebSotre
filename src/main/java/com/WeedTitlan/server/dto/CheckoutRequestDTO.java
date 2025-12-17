@@ -21,6 +21,10 @@ public class CheckoutRequestDTO {
     private Double totalAmount; // Monto total del pedido
     // ✅ Nuevo campo: código de cupón
     private String couponCode;
+    
+    
+    
+    
     // Getters y Setters
     public CustomerDTO getCustomer() {
         return customer;

@@ -46,9 +46,7 @@ public class Order {
     @Size(min = 5, max = 255, message = "La dirección debe tener entre 5 y 255 caracteres")
     private String address;
 
-    @NotNull(message = "El estado de la orden no puede estar vacío")
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+   
 
     @NotNull(message = "La fecha de la orden no puede ser nula")
     private LocalDateTime orderDate;
@@ -75,6 +73,15 @@ public class Order {
     
     @Column(name = "stripe_session_id")
     private String stripeSessionId;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false)
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", nullable = false)
+    private OrderStatus orderStatus = OrderStatus.CREATED;
+
 
     
     @Enumerated(EnumType.STRING)
@@ -103,7 +110,7 @@ public class Order {
     public Order(User user, Double total, OrderStatus status, String address, String customerName) {
         this.user = user;
         this.total = total;
-        this.status = status;
+        this.paymentStatus = PaymentStatus.PENDING;
         this.orderDate = LocalDateTime.now();
         this.address = address;
         this.customerName = customerName;
@@ -165,13 +172,6 @@ public class Order {
         this.address = address;
     }
 
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
 
     public @NotNull(message = "La fecha de la orden no puede ser nula") LocalDateTime getOrderDate() {
         return orderDate;
@@ -195,9 +195,11 @@ public class Order {
         return "Order{id=" + id +
                ", user=" + (user != null ? user.getFullName() : "null") +
                ", total=" + total +
-               ", status=" + status +
+               ", orderStatus=" + orderStatus +
+               ", paymentStatus=" + paymentStatus +
                ", orderDate=" + orderDate + "}";
     }
+
 
     public void setTrackingNumber(String trackingNumber) {
         this.trackingNumber = trackingNumber;
@@ -241,6 +243,22 @@ public PaymentMethod getPaymentMethod() {
 
 public void setPaymentMethod(PaymentMethod paymentMethod) {
     this.paymentMethod = paymentMethod;
+}
+
+public PaymentStatus getPaymentStatus() {
+    return paymentStatus;
+}
+
+public void setPaymentStatus(PaymentStatus paymentStatus) {
+    this.paymentStatus = paymentStatus;
+}
+
+public OrderStatus getOrderStatus() {
+    return orderStatus;
+}
+
+public void setOrderStatus(OrderStatus orderStatus) {
+    this.orderStatus = orderStatus;
 }
 
 

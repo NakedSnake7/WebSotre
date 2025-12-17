@@ -84,7 +84,7 @@ public class CheckoutController {
             Order order = new Order(
                     user,
                     totalFinal,
-                    OrderStatus.PENDING,
+                    OrderStatus.CREATED,
                     direccion,
                     checkoutRequest.getCustomer().getFullName()
             );
@@ -199,15 +199,20 @@ public class CheckoutController {
                 logger.error("Error enviando correo: ", e.getMessage());
                 order.setEmailSent(false);
             }
-
-
+            orderService.saveOrder(order);
+          
+               
+            
+            
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of(
                             "success", true,
                             "orderId", order.getId(),
                             "message", "¡Orden exitosa!, revisa tu correo electrónico."
                     ));
-
+  
+            
+            
         } catch (Exception e) {
             logger.error("Error inesperado: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

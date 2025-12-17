@@ -1,6 +1,7 @@
 package com.WeedTitlan.server.service;
 
-import com.WeedTitlan.server.exceptions.OrderNotFoundException;   
+import com.WeedTitlan.server.exceptions.OrderNotFoundException;    
+
 import com.WeedTitlan.server.exceptions.ResourceNotFoundException;
 import com.WeedTitlan.server.dto.OrderItemDTO;
 import com.WeedTitlan.server.dto.OrderRequestDTO;
@@ -30,7 +31,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
 @Service
 public class OrderService {
 
@@ -45,6 +45,10 @@ this.orderRepository = orderRepository;
 this.productoRepository = productoRepository;
 this.emailService = emailService;
 }
+    
+    public Optional<Order> findById(Long id) {
+        return orderRepository.findById(id);
+    }
 
     // ============================
     // GUARDAR ORDEN COMPLETA
@@ -104,7 +108,7 @@ this.emailService = emailService;
     public List<Order> findOrdersByStatus(String status) {
         try {
             OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
-            return orderRepository.findByStatus(orderStatus);
+            return orderRepository.findByOrderStatus(orderStatus);
 
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Estado inválido: " + status);
@@ -120,7 +124,7 @@ this.emailService = emailService;
 
         try {
             OrderStatus status = OrderStatus.valueOf(newStatus.toUpperCase());
-            order.setStatus(status);
+            order.setOrderStatus(status);
             Order updatedOrder = orderRepository.save(order);
 
             // ✅ Enviar correo automático según el status
@@ -186,8 +190,6 @@ this.emailService = emailService;
         order.setStockReduced(true);
         orderRepository.save(order);
     }
-
-
     // ============================
     // ACTUALIZAR INFO DE ENVÍO
     // ============================
@@ -202,7 +204,6 @@ this.emailService = emailService;
 
         return orderRepository.save(order);
     }
-
     // ============================
     // ELIMINAR ORDEN
     // ============================
@@ -242,69 +243,40 @@ this.emailService = emailService;
     	        }
     	}
     @Transactional
-    public void restaurarStockSiExpirado(Order order) {
-
-        if (order.getStatus() != OrderStatus.PENDING) {
-            return;
-        }
-
-        LocalDateTime limite = order.getOrderDate().plusHours(24);
-
-        if (LocalDateTime.now().isBefore(limite)) {
-            return;
-        }
-
-        // Solo restaurar si realmente se descontó
-        if (order.isStockReduced()) {
-            for (OrderItem item : order.getItems()) {
-                Producto producto = item.getProducto();
-                producto.setStock(producto.getStock() + item.getQuantity());
-                productoRepository.save(producto);
-            }
-        }
-
-        order.setStatus(OrderStatus.EXPIRED);
-        order.setStockReduced(false); // restablecer
-        orderRepository.save(order);
-
-        System.out.println("✔ Orden " + order.getId() + " expirada y stock restaurado.");
-    }
-
-    @Transactional
     public void expirarOrdenSiPendiente(Order order) {
 
-        // 1. Validación de seguridad: si NO está PENDING, NO tocar
-        if (order.getStatus() != OrderStatus.PENDING) return;
+        // 1. Solo órdenes CREADAS pueden expirar
+        if (order.getOrderStatus() != OrderStatus.CREATED) return;
+
+        // 2. SOLO transferencias apartan stock 24h
+        if (order.getPaymentMethod() != PaymentMethod.TRANSFER) return;
 
         LocalDateTime limite = order.getOrderDate().plusHours(24);
 
-        // 2. Aún no expira
+        // 3. Aún no expira
         if (LocalDateTime.now().isBefore(limite)) return;
 
-        // 3. Restaurar stock solo si realmente fue reducido
+        // 4. Restaurar stock SOLO si fue descontado
         if (order.isStockReduced()) {
             for (OrderItem item : order.getItems()) {
                 Producto producto = item.getProducto();
 
                 if (producto != null) {
-                    int nuevoStock = producto.getStock() + item.getQuantity();
-                    producto.setStock(nuevoStock);
+                    producto.setStock(producto.getStock() + item.getQuantity());
                     productoRepository.save(producto);
                 }
             }
         }
 
-        // 4. Marcar como expirada
-        order.setStatus(OrderStatus.EXPIRED);
+        // 5. Marcar como CANCELADA
+        order.setOrderStatus(OrderStatus.CANCELLED);
         order.setStockReduced(false);
         orderRepository.save(order);
 
-        // 5. Evitar correos duplicados (si ya se envió uno antes)
-        if (order.isExpirationEmailSent()) {
-            return;
-        }
+        // 6. Evitar correos duplicados
+        if (order.isExpirationEmailSent()) return;
 
-        // 6. Enviar correo de expiración
+        // 7. Enviar correo de expiración
         try {
             InputStream inputStream = getClass().getClassLoader()
                     .getResourceAsStream("email/email-order-expired.html");
@@ -316,13 +288,11 @@ this.emailService = emailService;
 
             String template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
-            // Formato de moneda
             DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
             symbols.setDecimalSeparator('.');
             symbols.setGroupingSeparator(',');
             DecimalFormat formatoMoneda = new DecimalFormat("#,##0.00", symbols);
 
-            // Tabla de productos
             StringBuilder tablaProductos = new StringBuilder();
             double subtotal = 0;
 
@@ -331,16 +301,13 @@ this.emailService = emailService;
                 subtotal += sub;
 
                 tablaProductos.append("<tr>")
-                    .append("<td style='padding:10px; border-bottom:1px solid #2f2f2f;'>")
-                    .append("<img src='")
-                    .append(item.getProducto() != null ? item.getProducto().getImageUrl() : "/img/default.jpg")
-                    .append("' width='50' height='50' style='border-radius:6px; vertical-align:middle; margin-right:10px;'>")
+                    .append("<td style='padding:10px;'>")
                     .append(item.getProducto() != null ? item.getProducto().getProductName() : "Producto")
                     .append("</td>")
-                    .append("<td style='padding:10px; text-align:center; border-bottom:1px solid #2f2f2f;'>")
+                    .append("<td style='text-align:center;'>")
                     .append(item.getQuantity())
                     .append("</td>")
-                    .append("<td style='padding:10px; text-align:center; border-bottom:1px solid #2f2f2f;'>$")
+                    .append("<td style='text-align:center;'>$")
                     .append(formatoMoneda.format(sub))
                     .append("</td>")
                     .append("</tr>");
@@ -358,14 +325,14 @@ this.emailService = emailService;
                     .replace("{ENVIO}", envio)
                     .replace("{TOTAL}", formatoMoneda.format(total));
 
-            // Validar correo antes de intentar enviarlo
             if (order.getUser() != null && order.getUser().getEmail() != null) {
-                emailService.enviarCorreoHTML(order.getUser().getEmail(),
-                        "Orden Expirada - WeedTlan",
-                        emailHTML);
+                emailService.enviarCorreoHTML(
+                    order.getUser().getEmail(),
+                    "Orden Expirada - WeedTlan",
+                    emailHTML
+                );
             }
 
-            // 7. Marcar bandera de correo enviado
             order.setExpirationEmailSent(true);
             orderRepository.save(order);
 
@@ -373,12 +340,8 @@ this.emailService = emailService;
             System.err.println("Error enviando correo de expiración: " + e.getMessage());
         }
     }
-
     public Optional<Order> findByStripeSessionId(String sessionId) {
         return orderRepository.findByStripeSessionId(sessionId);
     }
-  
-
-
-
+    
 }

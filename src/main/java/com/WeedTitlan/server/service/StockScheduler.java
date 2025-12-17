@@ -1,12 +1,12 @@
 package com.WeedTitlan.server.service;
 
-import java.util.List;
+import java.util.List; 
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.WeedTitlan.server.model.Order;
-import com.WeedTitlan.server.model.OrderStatus;
 import com.WeedTitlan.server.repository.OrderRepository;
 
 @Service
@@ -20,13 +20,16 @@ public class StockScheduler {
         this.orderService = orderService;
     }
 
-    @Scheduled(fixedRate = 3600000) // cada 1 hora
+    // ⏱ cada 1 hora
+    @Scheduled(fixedRate = 3600000)
+    @Transactional
     public void revisarOrdenesPendientes() {
 
-        List<Order> pendientes = orderRepository.findByStatus(OrderStatus.PENDING);
+        List<Order> ordenes = orderRepository.findPendingOrdersWithItems();
 
-        for (Order order : pendientes) {
-            orderService.restaurarStockSiExpirado(order);
+        for (Order order : ordenes) {
+            orderService.expirarOrdenSiPendiente(order);
         }
     }
+
 }

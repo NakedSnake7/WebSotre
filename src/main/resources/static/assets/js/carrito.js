@@ -235,14 +235,19 @@ export function configurarCarrito() {
 	    finalizeButton.addEventListener('click', async (e) => {
 	        e.preventDefault();
 			
-			
+			const paymentMethod = document.querySelector(
+			    'input[name="paymentMethod"]:checked'
+			)?.value;
+
+			if (isProcessing) return;
+            isProcessing = true;
+
+
 			const loader = document.getElementById("loader");
 			  loader.setAttribute("active", ""); // 🔥 ACTIVA EL LOADER
 			  loader.shadowRoot.querySelector(".loader-text").textContent = "Procesando tu pedido...";
 
-	        if (isProcessing) return;
-
-	        isProcessing = true;
+	       
 	        finalizeButton.disabled = true;
 	        finalizeButton.textContent = "Procesando...";
 
@@ -252,7 +257,7 @@ export function configurarCarrito() {
 
 	        // Obtener campos
 	        const fullName = document.getElementById('fullName').value.trim();
-	        const email = document.getElementById('CosEmail').value.trim();
+			const email = document.getElementById('email').value.trim();
 	        const phone = document.getElementById('phone').value.trim();
 	        const address = document.getElementById('address').value.trim();
 
@@ -270,6 +275,10 @@ export function configurarCarrito() {
 	        if (!selectedProducts.length) {
 	            errors.push("Tu carrito está vacío.");
 	        }
+			if (!paymentMethod) {
+			    errors.push("Selecciona un método de pago.");
+			}
+
 
 	        // Mostrar errores
 	        if (errors.length > 0) {
@@ -282,6 +291,9 @@ export function configurarCarrito() {
 	            });
 
 	            resetFinalize();
+				loader.removeAttribute("active");
+				loader.shadowRoot.querySelector(".loader-text").textContent =
+				    "Cargando nuestros productos...";
 	            return;
 	        }
 
@@ -290,43 +302,99 @@ export function configurarCarrito() {
 	        const envio = subtotal >= LIMITE_ENVIO_GRATIS ? 0 : COSTO_ENVIO;
 	        const total = subtotal + envio;
 
-	        const orderData = {
-	            customer: { fullName, email, phone, address },
-	            cart: selectedProducts,
-	            totalAmount: total
-	        };
+			const orderData = {
+			  customer: {
+			    fullName,
+			    email,
+			    phone,
+			    address
+			  },
+			  cart: selectedProducts.map(p => ({
+			    name: p.name,
+			    price: p.price,
+			    quantity: p.quantity
+			  })),
+			  totalAmount: total
+			};
 
+
+			console.log("ORDER DATA ENVIADO:", JSON.stringify(orderData, null, 2));
 	        try {
-	            const res = await fetch('/api/checkout', {
-	                method: 'POST',
-	                headers: { 'Content-Type': 'application/json'},
-	                body: JSON.stringify(orderData)
-	            });
+				// ==========================
+				// FLUJO SEGÚN MÉTODO DE PAGO
+				// ==========================
+				
+  
+				   if (paymentMethod === "TRANSFER") {
 
-	            const data = await res.json();
-	            if (data.success) {
-	                alert('Compra exitosa');
-	                localStorage.removeItem('cartData');
-	                checkoutForm.reset();
-	                selectedProducts = [];
-	                updateCart();
-	                $('#checkoutModal').modal('hide');
-	                cartDropdown.style.display = 'none';
-	            } else {
-	                alert(data.message || 'Hubo un problema con la compra');
-	            }
-	        } catch (e) {
-	            console.error(e);
-	            alert('Error en servidor, intenta de nuevo');
-			} finally {
-			    const loader = document.getElementById("loader");
-			    loader.removeAttribute("active"); // ❎ DESACTIVA EL LOADER
-				loader.shadowRoot.querySelector(".loader-text").textContent = "Cargando nuestros productos...";
+				        const res = await fetch('/api/checkout', {
+				            method: 'POST',
+				            headers: { 'Content-Type': 'application/json' },
+				            body: JSON.stringify(orderData)
+				        });
 
-			    resetFinalize();
-			}
+				        const data = await res.json();
+				        if (!res.ok) {
+				            throw new Error(data.message || "Error al crear la orden");
+				        }
 
-	    });
+				        alert("¡Orden creada excitosamente, revisa tu correo!.");
+
+				        localStorage.removeItem('cartData');
+				        checkoutForm.reset();
+				        selectedProducts = [];
+				        updateCart();
+				        $('#checkoutModal').modal('hide');
+				        cartDropdown.style.display = 'none';
+
+					} else if (paymentMethod === "STRIPE") {
+
+					    const res = await fetch('/api/checkout', {
+					        method: 'POST',
+					        headers: { 'Content-Type': 'application/json' },
+					        body: JSON.stringify(orderData)
+					    });
+
+					    const order = await res.json();
+					    if (!res.ok) {
+							console.error("Respuesta backend:", order);
+
+							throw new Error(
+							  order.message ||
+							  JSON.stringify(order.errors || order)
+							);
+					    }
+
+					    const stripeRes = await fetch(`/api/stripe/create-session/${order.orderId}`, {
+					        method: 'POST'
+					    });
+
+					    const stripeData = await stripeRes.json();
+					    if (!stripeRes.ok) {
+					        throw new Error(stripeData.error || "Error en Stripe");
+					    }
+
+					    window.location.href = stripeData.url;
+					    return; // 🔒 CIERRE TOTAL DEL FLUJO
+					}
+
+				} catch (e) {
+				    console.error(e);
+				    alert(e.message || 'Error en servidor, intenta de nuevo');
+				}
+				
+				 
+				finally {
+				    if (paymentMethod !== "STRIPE") {
+				        loader.removeAttribute("active");
+				        loader.shadowRoot.querySelector(".loader-text").textContent =
+				            "Cargando nuestros productos...";
+				        resetFinalize();
+				    }
+				}
+
+	    }
+	);
 	}
 
 	// Reset del botón
@@ -346,7 +414,7 @@ export function configurarCarrito() {
 	        validar: value => value.trim().length > 0,
 	        mensaje: "Por favor, ingresa tu nombre completo."
 	    },
-	    CosEmail: {
+	    email: {
 	        validar: value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()),
 	        mensaje: "Ingresa un correo válido."
 	    },
