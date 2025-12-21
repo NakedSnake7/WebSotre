@@ -1,25 +1,38 @@
 package com.WeedTitlan.server.dto;
 
-import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.DecimalMin; 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class CartItemDTO {
 
-    @NotBlank(message = "El nombre del producto no puede estar vacío") // Solo @NotBlank es suficiente
-    private String name; // El nombre del producto
+    @NotNull(message = "El ID del producto no puede ser nulo")
+    private Long productId; // 
+
+    @NotBlank(message = "El nombre del producto no puede estar vacío")
+    private String name;
 
     @NotNull(message = "La cantidad no puede ser nula")
     @Min(value = 1, message = "La cantidad mínima debe ser 1")
-    @DecimalMin(value = "1", message = "La cantidad debe ser al menos 1")
-    private Integer quantity; // Cantidad de productos
+    private Integer quantity;
 
     @NotNull(message = "El precio no puede ser nulo")
     @DecimalMin(value = "0.01", message = "El precio debe ser mayor a 0")
-    private Double price; // Precio del producto
+    private Double price;
 
-    // Getters y Setters
+    // =====================
+    // GETTERS Y SETTERS
+    // =====================
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
     public String getName() {
         return name;
     }

@@ -1,8 +1,9 @@
 package com.WeedTitlan.server.service;
 
-import com.WeedTitlan.server.exceptions.OrderNotFoundException;    
+import com.WeedTitlan.server.exceptions.OrderNotFoundException;     
 
 import com.WeedTitlan.server.exceptions.ResourceNotFoundException;
+import com.WeedTitlan.server.dto.CheckoutRequestDTO;
 import com.WeedTitlan.server.dto.OrderItemDTO;
 import com.WeedTitlan.server.dto.OrderRequestDTO;
 import com.WeedTitlan.server.exceptions.InsufficientStockException;
@@ -10,6 +11,7 @@ import com.WeedTitlan.server.model.Order;
 import com.WeedTitlan.server.model.Order.PaymentMethod;
 import com.WeedTitlan.server.model.OrderItem;
 import com.WeedTitlan.server.model.OrderStatus;
+import com.WeedTitlan.server.model.PaymentStatus;
 import com.WeedTitlan.server.model.Producto;
 import com.WeedTitlan.server.repository.OrderRepository;
 import com.WeedTitlan.server.repository.ProductoRepository;
@@ -23,13 +25,8 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 @Service
 public class OrderService {
@@ -45,30 +42,15 @@ this.orderRepository = orderRepository;
 this.productoRepository = productoRepository;
 this.emailService = emailService;
 }
+    public Optional<Order> findByStripeSessionId(String stripeSessionId) {
+        return orderRepository.findByStripeSessionId(stripeSessionId);
+    }
     
     public Optional<Order> findById(Long id) {
         return orderRepository.findById(id);
     }
 
-    // ============================
-    // GUARDAR ORDEN COMPLETA
-    // ============================
-    @Transactional
-    public Order saveOrderWithItems(Order order, List<OrderItem> orderItems) {
-
-        for (OrderItem item : orderItems) {
-            item.setOrder(order);
-            order.addItem(item);
-        }
-
-        // Primero guardar la orden
-        Order saved = orderRepository.save(order);
-
-        // Ahora sí descontar el stock
-        descontarStock(saved);
-
-        return saved;
-    }
+  
 
 
     @Transactional
@@ -248,100 +230,141 @@ this.emailService = emailService;
         // 1. Solo órdenes CREADAS pueden expirar
         if (order.getOrderStatus() != OrderStatus.CREATED) return;
 
-        // 2. SOLO transferencias apartan stock 24h
+        // 2. Solo transferencias tienen vencimiento de 24h
         if (order.getPaymentMethod() != PaymentMethod.TRANSFER) return;
+        
+        if (order.getPaidAt() != null || order.getPaymentStatus() == PaymentStatus.PAID) {
+            return;
+        }
+
 
         LocalDateTime limite = order.getOrderDate().plusHours(24);
 
         // 3. Aún no expira
         if (LocalDateTime.now().isBefore(limite)) return;
+        
+        
 
-        // 4. Restaurar stock SOLO si fue descontado
+        // ============================
+        // 4. RESTAURAR STOCK (SAFE)
+        // ============================
         if (order.isStockReduced()) {
-            for (OrderItem item : order.getItems()) {
-                Producto producto = item.getProducto();
 
-                if (producto != null) {
-                    producto.setStock(producto.getStock() + item.getQuantity());
+            for (OrderItem item : order.getItems()) {
+
+                Producto producto = productoRepository
+                        .findByIdForUpdate(item.getProducto().getId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Producto no encontrado al restaurar stock"
+                                )
+                        );
+
+                int cantidad = item.getQuantity();
+
+                if (cantidad > 0) {
+                    producto.setStock(producto.getStock() + cantidad);
                     productoRepository.save(producto);
                 }
             }
+
+            // 🔄 Marcar como stock restaurado
+            order.setStockReduced(false);
         }
 
-        // 5. Marcar como CANCELADA
+        // ============================
+        // 5. MARCAR ORDEN COMO CANCELADA
+        // ============================
         order.setOrderStatus(OrderStatus.CANCELLED);
-        order.setStockReduced(false);
         orderRepository.save(order);
 
-        // 6. Evitar correos duplicados
-        if (order.isExpirationEmailSent()) return;
+        // ============================
+        // 6. EVITAR CORREO DUPLICADO
+        // ============================
+        if (order.getExpirationEmailSent()) return;
 
-        // 7. Enviar correo de expiración
+        // ============================
+        // 7. ENVIAR CORREO (EmailService)
+        // ============================
         try {
-            InputStream inputStream = getClass().getClassLoader()
-                    .getResourceAsStream("email/email-order-expired.html");
-
-            if (inputStream == null) {
-                System.err.println("No se encontró la plantilla de expiración");
-                return;
-            }
-
-            String template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-
-            DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-            symbols.setDecimalSeparator('.');
-            symbols.setGroupingSeparator(',');
-            DecimalFormat formatoMoneda = new DecimalFormat("#,##0.00", symbols);
-
-            StringBuilder tablaProductos = new StringBuilder();
-            double subtotal = 0;
-
-            for (OrderItem item : order.getItems()) {
-                double sub = item.getPrice() * item.getQuantity();
-                subtotal += sub;
-
-                tablaProductos.append("<tr>")
-                    .append("<td style='padding:10px;'>")
-                    .append(item.getProducto() != null ? item.getProducto().getProductName() : "Producto")
-                    .append("</td>")
-                    .append("<td style='text-align:center;'>")
-                    .append(item.getQuantity())
-                    .append("</td>")
-                    .append("<td style='text-align:center;'>$")
-                    .append(formatoMoneda.format(sub))
-                    .append("</td>")
-                    .append("</tr>");
-            }
-
-            String envio = subtotal >= 1250 ? "GRATIS" : "$120.00";
-            double total = subtotal + (subtotal >= 1250 ? 0 : 120);
-
-            String emailHTML = template
-                    .replace("{NOMBRE}", order.getCustomerName() != null ? order.getCustomerName() : "Cliente")
-                    .replace("{NUMERO_ORDEN}", String.valueOf(order.getId()))
-                    .replace("{FECHA_EXPIRACION}", limite.toString())
-                    .replace("{LISTADO_PRODUCTOS}", tablaProductos.toString())
-                    .replace("{SUBTOTAL}", formatoMoneda.format(subtotal))
-                    .replace("{ENVIO}", envio)
-                    .replace("{TOTAL}", formatoMoneda.format(total));
-
-            if (order.getUser() != null && order.getUser().getEmail() != null) {
-                emailService.enviarCorreoHTML(
-                    order.getUser().getEmail(),
-                    "Orden Expirada - WeedTlan",
-                    emailHTML
-                );
-            }
+            emailService.enviarCorreoOrdenExpirada(order, limite);
 
             order.setExpirationEmailSent(true);
             orderRepository.save(order);
 
         } catch (Exception e) {
-            System.err.println("Error enviando correo de expiración: " + e.getMessage());
+            System.err.println("❌ Error enviando correo de expiración: " + e.getMessage());
+        }
+        
+    }
+
+    
+    
+    @Transactional
+    public void validarStockCheckout(CheckoutRequestDTO request) {
+
+        if (request.getCart() == null || request.getCart().isEmpty()) {
+            throw new IllegalArgumentException("El carrito está vacío");
+        }
+
+        request.getCart().forEach(item -> {
+            Producto producto = productoRepository
+                    .findByIdForUpdate(item.getProductId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "Producto no encontrado: " + item.getProductId()
+                            ));
+
+            if (producto.getStock() < item.getQuantity()) {
+                throw new InsufficientStockException(
+                        "Stock insuficiente para " + producto.getProductName() +
+                        ". Disponibles: " + producto.getStock()
+                );
+            }
+        });
+    }
+    @Transactional
+    public void confirmarPagoTransferencia(Order order) {
+
+        // ============================
+        // 0. VALIDACIONES
+        // ============================
+        if (order.getOrderStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("La orden está expirada");
+        }
+
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            return; // ya confirmada
+        }
+
+        // ============================
+        // 1. ACTUALIZAR ESTADOS
+        // ============================
+        order.setPaymentStatus(PaymentStatus.PAID);
+        order.setOrderStatus(OrderStatus.PROCESSED);
+        order.setPaidAt(LocalDateTime.now()); // ✅ AHORA SÍ
+
+        orderRepository.save(order);
+
+        // ============================
+        // 2. ENVIAR CORREO
+        // ============================
+        if (order.getUser() == null || order.getUser().getEmail() == null) return;
+
+        try {
+            emailService.enviarCorreoPedidoProcesado(
+                    order.getUser().getEmail(),
+                    order.getCustomerName(),
+                    order.getId(),
+                    order.getItems()
+            );
+        } catch (Exception e) {
+            System.err.println("❌ Error enviando correo de pago confirmado: " + e.getMessage());
         }
     }
-    public Optional<Order> findByStripeSessionId(String sessionId) {
-        return orderRepository.findByStripeSessionId(sessionId);
-    }
+
+
+
+
     
 }

@@ -60,11 +60,11 @@ p {
 		<h2>📦 ¡Tu pedido está en camino!</h2>
 
 		<p>
-			Hola <strong>${customerName}</strong>,
+			Hola <strong>{CUSTOMER_NAME}</strong>,
 		</p>
 
 		<p>
-			Nos complace informarte que tu pedido <strong>#${orderId}</strong> ha
+			Nos complace informarte que tu pedido <strong>#{ORDER_ID}</strong> ha
 			sido enviado exitosamente. Muy pronto lo recibirás en tu domicilio.
 		</p>
 
@@ -74,13 +74,13 @@ p {
 			</p>
 
 			<p>
-				▪ <strong>Fecha de envío:</strong> ${shippingDate}
+				▪ <strong>Fecha de envío:</strong> {SHIPPING_DATE}
 			</p>
 			<p>
-				▪ <strong>Número de guía:</strong> ${trackingNumber}
+				▪ <strong>Número de guía:</strong> {TRACKING_NUMBER}
 			</p>
 			<p>
-				▪ <strong>Paquetería:</strong> ${carrier}
+				▪ <strong>Paquetería:</strong> {CARRIER}
 			</p>
 
 			<!-- Si en el futuro quieres agregar link de rastreo, destapa esto:

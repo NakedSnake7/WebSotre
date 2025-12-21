@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.model;
 
-import jakarta.persistence.CascadeType;  
+import jakarta.persistence.CascadeType;   
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;   
 import jakarta.validation.constraints.Size;
@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -55,8 +56,9 @@ public class Order {
 
     
     
-    @NotNull
-    private Boolean emailSent = false; // Por defecto falso
+    @Column(name = "email_sent", nullable = false)
+    private boolean emailSent = false;
+
     
     @Column(name = "expiration_email_sent", nullable = false)
     private boolean expirationEmailSent = false;
@@ -71,8 +73,12 @@ public class Order {
     private Boolean stockReduced = false;
     
     
-    @Column(name = "stripe_session_id")
+    @Column(name = "stripe_session_id", unique = true)
     private String stripeSessionId;
+
+    @Column(name = "payment_intent_id", unique = true)
+    private String paymentIntentId;
+
     
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
@@ -81,12 +87,22 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false)
     private OrderStatus orderStatus = OrderStatus.CREATED;
+    
+    @Transient
+    public boolean isPaid() {
+        return paymentStatus == PaymentStatus.PAID;
+    }
 
+    @Transient
+    public boolean isDelivered() {
+        return orderStatus == OrderStatus.DELIVERED;
+    }
 
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method")
+    @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod;
+
 
     public enum PaymentMethod {
         CARD,
@@ -94,14 +110,10 @@ public class Order {
     }
 
     
-    public Boolean getEmailSent() {
-        return emailSent;
-    }
+ 
 
-    public void setEmailSent(Boolean emailSent) {
-        this.emailSent = emailSent;
-    }
-
+@Column(name = "paid_at")
+private LocalDateTime paidAt;
     
     // Constructor vacío necesario para JPA
     public Order() {}
@@ -128,10 +140,53 @@ public class Order {
         item.setOrder(null);
     }
 
-    
+    public String getOrderStatusBadge() {
+        if (orderStatus == null) return "badge-secondary";
+
+        return switch (orderStatus) {
+            case CREATED -> "badge-info";
+            case PROCESSED -> "badge-warning";
+            case SHIPPED -> "badge-primary";
+            case DELIVERED -> "badge-success";
+            default -> "badge-secondary";
+        };
+    }
+
+
+    public String getOrderStatusLabel() {
+        if (orderStatus == null) return "Desconocido";
+
+        return switch (orderStatus) {
+            case CREATED -> "Creada";
+            case PROCESSED -> "Procesada";
+            case SHIPPED -> "Enviada";
+            case DELIVERED -> "Entregada";
+            default -> "Desconocido";
+        };
+    }
+
+
+
+    public String getPaymentStatusLabel() {
+        if (paymentStatus == null) return "Desconocido";
+
+        return switch (paymentStatus) {
+            case PAID -> "Pagado";
+            case PENDING -> "Pendiente";
+            case FAILED -> "Fallido";
+            case EXPIRED -> "Expirado";
+        };
+    }
 
     
-    // Getters y setters
+    public LocalDateTime getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(LocalDateTime paidAt) {
+        this.paidAt = paidAt;
+    }
+
     public Long getId() {
         return id;
     }
@@ -223,13 +278,14 @@ public class Order {
         this.stockReduced = stockReduced;
     }
 
-public boolean isExpirationEmailSent() {
-    return expirationEmailSent;
-}
+    public boolean getEmailSent() {
+        return emailSent;
+    }
+    
+    public void setEmailSent(boolean emailSent) {
+        this.emailSent = emailSent;
+    }
 
-public void setExpirationEmailSent(boolean expirationEmailSent) {
-    this.expirationEmailSent = expirationEmailSent;
-}
 public String getStripeSessionId() {
     return stripeSessionId;
 }
@@ -259,6 +315,22 @@ public OrderStatus getOrderStatus() {
 
 public void setOrderStatus(OrderStatus orderStatus) {
     this.orderStatus = orderStatus;
+}
+
+public String getPaymentIntentId() {
+    return paymentIntentId;
+}
+
+public void setPaymentIntentId(String paymentIntentId) {
+    this.paymentIntentId = paymentIntentId;
+}
+
+public boolean getExpirationEmailSent() {
+    return expirationEmailSent;
+}
+
+public void setExpirationEmailSent(boolean expirationEmailSent) {
+    this.expirationEmailSent = expirationEmailSent;
 }
 
 

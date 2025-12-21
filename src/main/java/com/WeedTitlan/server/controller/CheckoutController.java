@@ -1,7 +1,8 @@
 package com.WeedTitlan.server.controller;
 
-import com.WeedTitlan.server.dto.CheckoutRequestDTO; 
+import com.WeedTitlan.server.dto.CheckoutRequestDTO;
 import com.WeedTitlan.server.model.*;
+import com.WeedTitlan.server.model.Order.PaymentMethod;
 import com.WeedTitlan.server.repository.ProductoRepository;
 import com.WeedTitlan.server.service.EmailService;
 import com.WeedTitlan.server.service.OrderService;
@@ -30,16 +31,19 @@ public class CheckoutController {
     private static final Logger logger = LoggerFactory.getLogger(CheckoutController.class);
 
     private static final double LIMITE_ENVIO_GRATIS = 1250.0;
-    private static final double COSTO_ENVIO = 120.0; // O el que estés usando actualmente
-
+    private static final double COSTO_ENVIO = 120.0;
 
     private final EmailService emailService;
     private final OrderService orderService;
     private final UserService userService;
     private final ProductoRepository productoRepository;
 
-    public CheckoutController(EmailService emailService, OrderService orderService,
-                              UserService userService, ProductoRepository productoRepository) {
+    public CheckoutController(
+            EmailService emailService,
+            OrderService orderService,
+            UserService userService,
+            ProductoRepository productoRepository
+    ) {
         this.emailService = emailService;
         this.orderService = orderService;
         this.userService = userService;
@@ -48,18 +52,31 @@ public class CheckoutController {
 
     @PostMapping("/checkout")
     @CrossOrigin(origins = {"http://localhost:8080", "https://weedtitlan.com"})
-    public ResponseEntity<?> processCheckout(@Valid @RequestBody CheckoutRequestDTO checkoutRequest) {
-        try {
+    public ResponseEntity<?> processCheckout(
+            @Valid @RequestBody CheckoutRequestDTO checkoutRequest
+    ) {
 
-            // Validación mínima de dirección
+        try {
+            // ============================
+            // 1. VALIDAR STOCK (LOCK)
+            // ============================
+            orderService.validarStockCheckout(checkoutRequest);
+
+            // ============================
+            // 2. VALIDAR DIRECCIÓN
+            // ============================
             String direccion = checkoutRequest.getCustomer().getAddress();
             if (direccion == null || direccion.trim().length() < 5) {
-                logger.error("Dirección inválida: {}", direccion);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error: La dirección debe tener al menos 5 caracteres.");
+                return ResponseEntity.badRequest()
+                        .body(Map.of(
+                                "success", false,
+                                "message", "La dirección debe tener al menos 5 caracteres"
+                        ));
             }
 
-            // Buscar o crear usuario
+            // ============================
+            // 3. USUARIO
+            // ============================
             User user = userService.findOrCreateUserByEmail(
                     checkoutRequest.getCustomer().getEmail(),
                     checkoutRequest.getCustomer().getFullName(),
@@ -67,20 +84,19 @@ public class CheckoutController {
             );
             userService.saveUser(user);
 
-            // Totales
+            // ============================
+            // 4. TOTALES
+            // ============================
             double subtotal = checkoutRequest.getCart().stream()
-                    .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                    .mapToDouble(i -> i.getPrice() * i.getQuantity())
                     .sum();
 
-            // Envío basado en subtotal real
             double costoEnvio = subtotal >= LIMITE_ENVIO_GRATIS ? 0.0 : COSTO_ENVIO;
-
-            // Total final
             double totalFinal = subtotal + costoEnvio;
 
-            logger.info("Subtotal: {}, Envío: {}, Total Final: {}", subtotal, costoEnvio, totalFinal);
-
-            // Crear Orden
+            // ============================
+            // 5. CREAR ORDEN
+            // ============================
             Order order = new Order(
                     user,
                     totalFinal,
@@ -89,11 +105,18 @@ public class CheckoutController {
                     checkoutRequest.getCustomer().getFullName()
             );
 
+            // 🔥 IMPORTANTE: definir método y estado de pago
+            order.setPaymentMethod(PaymentMethod.TRANSFER); // o STRIPE
+            order.setPaymentStatus(PaymentStatus.PENDING);
 
-            // Agregar productos
+            // ============================
+            // 6. ITEMS
+            // ============================
             checkoutRequest.getCart().forEach(cartItem -> {
-                Producto producto = productoRepository.findByProductNameConTodo(cartItem.getName())
-                        .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + cartItem.getName()));
+                Producto producto = productoRepository
+                        .findByProductNameConTodo(cartItem.getName())
+                        .orElseThrow(() ->
+                                new RuntimeException("Producto no encontrado: " + cartItem.getName()));
 
                 OrderItem item = new OrderItem(
                         producto,
@@ -101,122 +124,80 @@ public class CheckoutController {
                         cartItem.getPrice(),
                         order
                 );
-
                 order.addItem(item);
             });
 
-         // Guardar la orden
+            // ============================
+            // 7. GUARDAR ORDEN
+            // 👉 El Service maneja:
+            // - Descuento de stock (si aplica)
+            // - Flags
+            // - Expiración automática
+            // ============================
             orderService.saveOrder(order);
 
-        
-
-            // Cargar plantilla
-            InputStream inputStream = getClass().getClassLoader()
-                    .getResourceAsStream("email/email-template.html");
-            if (inputStream == null) {
-                logger.error("No se encontró la plantilla email/email-template.html");
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Error al cargar la plantilla de correo.");
-            }
-
-            String template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-
-            // Formato de moneda
-            DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-            symbols.setDecimalSeparator('.');
-            symbols.setGroupingSeparator(',');
-            DecimalFormat formatoMoneda = new DecimalFormat("#,##0.00", symbols);
-
-            // Construir tabla de productos
-            StringBuilder tablaProductos = new StringBuilder();
-            double totalSinEnvio = 0;
-
-            for (OrderItem item : order.getItems()) {
-                double subtotalItem = item.getPrice() * item.getQuantity();
-                totalSinEnvio += subtotalItem;
-
-                tablaProductos.append("<tr>")
-                .append("<td style='padding:10px; border-bottom:1px solid #2f2f2f;'>")
-                    .append("<table cellpadding='0' cellspacing='0' border='0' style='width:100%;'>")
-                        .append("<tr>")
-                            .append("<td width='70' style='width:70px; padding-right:10px;'>")
-                                .append("<img src='").append(item.getProducto().getImageUrl()).append("'")
-                                .append(" width='70' height='70'")
-                                .append(" style='display:block; width:70px !important; height:70px !important;")
-                                .append(" max-width:70px !important; max-height:70px !important; object-fit:cover; border-radius:8px;'>")
-                            .append("</td>")
-                            .append("<td style='color:#fff; font-size:15px;'>")
-                                .append(item.getProducto().getProductName())
-                            .append("</td>")
-                        .append("</tr>")
-                    .append("</table>")
-                .append("</td>")
-                .append("<td style='padding:10px; color:#fff; text-align:center; border-bottom:1px solid #2f2f2f;'>")
-                    .append(item.getQuantity())
-                .append("</td>")
-                .append("<td style='padding:10px; color:#fff; text-align:center; border-bottom:1px solid #2f2f2f;'>")
-                    .append("$").append(formatoMoneda.format(subtotalItem))
-                .append("</td>")
-            .append("</tr>");
-
-            }
-
-            // Subtotal
-            tablaProductos.append("<tr>")
-                    .append("<td colspan='2' style='font-weight:bold;'>Subtotal</td>")
-                    .append("<td>$").append(formatoMoneda.format(totalSinEnvio)).append("</td>")
-                    .append("</tr>");
-
-            // Envío
-            tablaProductos.append("<tr>")
-            .append("<td colspan='2' style='font-weight:bold;'>Envío</td>")
-            .append("<td>")
-            .append(Double.compare(costoEnvio, 0.0) == 0 
-                    ? "GRATIS" 
-                    : "$" + formatoMoneda.format(costoEnvio))
-            .append("</td></tr>");
-
-
-            // Total Final
-            tablaProductos.append("<tr style='background-color:#2e7d32; color:white; font-weight:bold;'>")
-                    .append("<td colspan='2'>Total Final</td>")
-                    .append("<td>$").append(formatoMoneda.format(totalFinal)).append("</td>")
-                    .append("</tr>");
-
-            // Reemplazar datos
-            String emailHTML = template
-                    .replace("{NOMBRE}", user.getFullName())
-                    .replace("{NUMERO_ORDEN}", String.valueOf(order.getId()))
-                    .replace("{LISTADO_PRODUCTOS}", tablaProductos.toString())
-                    .replace("{TOTAL}", "$" + formatoMoneda.format(totalFinal));
-
-            // Enviar correo
+            // ============================
+            // 8. CORREO (NO CRÍTICO)
+            // ============================
             try {
-                logger.info("Enviando correo a {}", user.getEmail());
-                emailService.enviarCorreoHTML(user.getEmail(), "Confirmación de Compra", emailHTML);
-                order.setEmailSent(true);
+                InputStream inputStream = getClass().getClassLoader()
+                        .getResourceAsStream("email/email-template.html");
+
+                if (inputStream != null) {
+                    String template = new String(
+                            inputStream.readAllBytes(),
+                            StandardCharsets.UTF_8
+                    );
+
+                    DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+                    DecimalFormat formato = new DecimalFormat("#,##0.00", symbols);
+
+                    StringBuilder tablaProductos = new StringBuilder();
+
+                    for (OrderItem item : order.getItems()) {
+                        double sub = item.getPrice() * item.getQuantity();
+
+                        tablaProductos.append("<tr>")
+                                .append("<td>").append(item.getProducto().getProductName()).append("</td>")
+                                .append("<td>").append(item.getQuantity()).append("</td>")
+                                .append("<td>$").append(formato.format(sub)).append("</td>")
+                                .append("</tr>");
+                    }
+
+                    String emailHTML = template
+                            .replace("{NOMBRE}", user.getFullName())
+                            .replace("{NUMERO_ORDEN}", String.valueOf(order.getId()))
+                            .replace("{LISTADO_PRODUCTOS}", tablaProductos.toString())
+                            .replace("{TOTAL}", "$" + formato.format(totalFinal));
+
+                    emailService.enviarCorreoHTML(
+                            user.getEmail(),
+                            "Confirmación de Compra",
+                            emailHTML
+                    );
+
+                    order.setEmailSent(true);
+                    orderService.save(order); // solo flag
+                }
+
             } catch (Exception e) {
-                logger.error("Error enviando correo: ", e.getMessage());
-                order.setEmailSent(false);
+                logger.error("Error enviando correo", e);
             }
-            orderService.saveOrder(order);
-          
-               
-            
-            
+
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of(
                             "success", true,
                             "orderId", order.getId(),
-                            "message", "¡Orden exitosa!, revisa tu correo electrónico."
+                            "message", "¡Orden creada correctamente!"
                     ));
-  
-            
-            
+
         } catch (Exception e) {
-            logger.error("Error inesperado: ", e);
+            logger.error("Error en checkout", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "Error inesperado al procesar la orden."));
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Error al procesar la orden"
+                    ));
         }
     }
 
@@ -224,9 +205,14 @@ public class CheckoutController {
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors()
-                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+                .forEach(error ->
+                        errors.put(error.getField(), error.getDefaultMessage())
+                );
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("success", false, "errors", errors));
+        return ResponseEntity.badRequest()
+                .body(Map.of(
+                        "success", false,
+                        "errors", errors
+                ));
     }
 }

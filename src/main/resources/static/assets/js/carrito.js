@@ -11,6 +11,9 @@ export function configurarCarrito() {
     const LIMITE_ENVIO_GRATIS = 1250;
     const COSTO_ENVIO = 120;
 
+	
+	let appliedCoupon = null;
+	
     let selectedProducts = [];
     let isProcessing = false;
 
@@ -53,8 +56,20 @@ export function configurarCarrito() {
             li.innerHTML = `
                 <div><b>${p.name}</b> - $${p.price} x ${p.quantity}</div>
                 <div class="d-flex align-items-center">
-                    <input type="number" class="remove-quantity" min="1" max="${p.quantity}" value="1" data-product="${p.name}" style="width: 3rem; text-align: center; margin-right: 5px;">
-                    <button class="btn btn-danger btn-sm remove-button" data-product="${p.name}">Eliminar</button>
+				<input
+				  type="number"
+				  class="remove-quantity"
+				  min="1"
+				  max="${p.quantity}"
+				  value="1"
+				  data-product-id="${p.id}"
+				  style="width: 3rem; text-align: center; margin-right: 5px;">
+					<button
+					  class="btn btn-danger btn-sm remove-button"
+					  data-product-id="${p.id}">
+					  Eliminar
+					</button>
+
                 </div>
             `;
             cartItems.appendChild(li);
@@ -97,42 +112,43 @@ export function configurarCarrito() {
     }
 
 	// FUNCION: agregar al carrito
-	function addToCart(name, price, quantityId, originalStock) {
+	function addToCart(id, name, price, quantityId, originalStock) {
+	    if (!id) return alert("Error: ID del producto no definido");
+
 	    const input = document.getElementById(quantityId);
 	    const qty = parseInt(input?.value) || 0;
 	    if (qty <= 0) return alert('Cantidad inválida');
 
-	    const existing = selectedProducts.find(p => p.name === name);
+	    const existing = selectedProducts.find(p => p.id === id);
 	    const inCartQty = existing ? existing.quantity : 0;
 	    const availableStock = originalStock - inCartQty;
 	    if (qty > availableStock) return alert(`Solo hay ${availableStock} unidades disponibles`);
 
 	    if (existing) existing.quantity += qty;
-	    else selectedProducts.push({ name, price, quantity: qty, quantityId });
+	    else selectedProducts.push({ id, name, price, quantity: qty, quantityId });
 
-	    // Animación carrito
 	    cartButton.classList.add('cart-animate');
 	    setTimeout(() => cartButton.classList.remove('cart-animate'), 500);
 
-	    // Actualizar badge
 	    updateStockBadge(quantityId, originalStock);
 	    updateCart();
 	}
 
+
 	// FUNCION: eliminar del carrito
-	function removeFromCart(name, qty) {
-	    const existing = selectedProducts.find(p => p.name === name);
+	function removeFromCart(productId, qty) {
+	    const existing = selectedProducts.find(p => p.id === productId);
 	    if (!existing) return;
 
 	    existing.quantity -= qty;
 	    if (existing.quantity <= 0) {
 	        // Guardamos quantityId antes de eliminarlo
 	        const quantityId = existing.quantityId;
-	        selectedProducts = selectedProducts.filter(p => p.name !== name);
+	        selectedProducts = selectedProducts.filter(p => p.id !== productId);
 	        // Restaurar badge usando quantityId
 			const input = document.getElementById(quantityId);
 			if (input) {
-			    const btn = input.nextElementSibling; // botón add-to-cart
+				const btn = input.closest('.product-card').querySelector('.add-to-cart'); // botón add-to-cart
 			    const originalStock = parseInt(btn.dataset.originalStock);
 			    updateStockBadge(quantityId, originalStock);
 			}
@@ -157,11 +173,15 @@ export function configurarCarrito() {
 	    const input = document.getElementById(quantityId);
 	    if (!input) return;
 
-	    const btn = input.nextElementSibling; // botón add-to-cart
-	    const name = btn.dataset.name;
+	    const productId = Number(input.dataset.productId);
 
-	    // Cantidad actual en carrito
-	    const inCartQtyObj = selectedProducts.find(p => p.name === name);
+	    const btn = document.querySelector(
+	        `.add-to-cart[data-product-id="${productId}"]`
+	    );
+	    if (!btn) return;
+
+	    // Cantidad actual en carrito (POR ID)
+	    const inCartQtyObj = selectedProducts.find(p => p.id === productId);
 	    const inCartQty = inCartQtyObj ? inCartQtyObj.quantity : 0;
 
 	    const availableStock = originalStock - inCartQty;
@@ -173,7 +193,7 @@ export function configurarCarrito() {
 	        input.parentElement.appendChild(badge);
 	    }
 
-	    // Actualizar badge según stock
+	    // Actualizar badge
 	    if (availableStock > 10) {
 	        badge.className = "ms-2 text-success";
 	        badge.textContent = `Stock: ${availableStock}`;
@@ -185,33 +205,44 @@ export function configurarCarrito() {
 	        badge.textContent = "Agotado";
 	    }
 
-	    // Actualizar input y botón
-	    input.max = availableStock;
+	    // Input y botón
+	    input.max = Math.max(availableStock, 0);
 	    input.disabled = availableStock <= 0;
 	    btn.disabled = availableStock <= 0;
 	}
 
 
 
+
     // Delegación de eventos para botones "Agregar al carrito"
-    document.body.addEventListener('click', function(e){
-        const btn = e.target.closest('.add-to-cart');
-        if (!btn) return;
-        const name = btn.dataset.name;
-        const price = parseFloat(btn.dataset.price);
-        const quantityId = btn.dataset.quantityId;
-        const stock = parseInt(btn.dataset.originalStock);
-        addToCart(name, price, quantityId, stock);
-    });
+	document.body.addEventListener('click', function(e){
+	    const btn = e.target.closest('.add-to-cart');
+	    if (!btn) return;
+
+        const id = Number(btn.dataset.productId); // 🔥 id como Long		
+		const name = btn.getAttribute('data-name');
+		const price = parseFloat(btn.getAttribute('data-price'));
+		const quantityId = btn.getAttribute('data-quantity-id');
+		const stock = parseInt(btn.getAttribute('data-original-stock'));
+		
+		//borrar despues
+		console.log("DATA:", btn.dataset, btn.dataset.productId);
+
+	    addToCart(id, name, price, quantityId, stock);
+	});
 
     // Remover productos del carrito
     if (cartItems) {
         cartItems.addEventListener('click', e => {
-            if (e.target.classList.contains('remove-button')) {
-                const name = e.target.dataset.product;
-                const qty = parseInt(e.target.previousElementSibling.value);
-                if (qty > 0) removeFromCart(name, qty);
-            }
+			if (e.target.classList.contains('remove-button')) {
+			    const productId = Number(e.target.dataset.productId);
+			    const qty = parseInt(
+			        e.target.previousElementSibling.value
+			    ) || 1;
+
+			    removeFromCart(productId, qty);
+			}
+
         });
     }
 
@@ -310,12 +341,15 @@ export function configurarCarrito() {
 			    address
 			  },
 			  cart: selectedProducts.map(p => ({
+			    productId: p.id,          // 🔥 ID REAL DEL PRODUCTO
 			    name: p.name,
 			    price: p.price,
 			    quantity: p.quantity
 			  })),
-			  totalAmount: total
+			  paymentMethod: paymentMethod,
+			  couponCode: appliedCoupon ?? null   // ✅ asegura que no falle aunque appliedCoupon sea undefined
 			};
+
 
 
 			console.log("ORDER DATA ENVIADO:", JSON.stringify(orderData, null, 2));

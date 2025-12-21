@@ -1,115 +1,131 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Gestión de Órdenes | WeedTlan</title>
+    <meta charset="UTF-8">
+    <title>Gestión de Órdenes | WeedTlan</title>
 
-<!-- Bootstrap -->
-<link rel="stylesheet"
-	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-<!-- GOOGLE FONT & ESTILOS -->
-<link rel="stylesheet" href="/assets/css/custom-styles.css">
-
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
 </head>
 
-<body class="mt-5">
+<body class="mt-5 container-fluid">
 
-	<h2>📦 Gestión de Órdenes – WeedTlan</h2>
+<h2 class="mb-4">📦 Gestión de Órdenes – WeedTlan</h2>
 
-	<div class="tabla-contenedor">
-<table class="table table-dark table-hover table-lg">
-			<thead>
-				<tr>
-					<th>ID</th>
-					<th>Cliente</th>
-					<th>Correo</th>
-					<th>Telefono</th>
-					<th>Estado</th>
-					<th>Total</th>
-					<th>Fecha</th>
-					<th>Acciones</th>
-				</tr>
-			</thead>
+<div class="tabla-contenedor">
+    <table class="table table-dark table-hover table-lg">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
 
-			<tbody>
-				<tr th:each="order : ${orders}">
-					<td th:text="${order.id}"></td>
+        <tbody>
+        <tr th:each="order : ${orders}">
 
-					<td th:text="${order.user?.fullName} ?: 'Sin nombre'"></td>
-					<td th:text="${order.user?.email} ?: 'Sin correo'"></td>
-					<td th:text="${order.user?.phone} ?: 'Sin teléfono'"></td>
+            <!-- ID -->
+            <td th:text="${order.id}"></td>
 
+            <!-- Cliente -->
+            <td th:text="${order.user?.fullName} ?: 'Sin nombre'"></td>
+            <td th:text="${order.user?.email} ?: 'Sin correo'"></td>
+            <td th:text="${order.user?.phone} ?: 'Sin teléfono'"></td>
 
-<td>
-    <span class="badge badge-info"
-          th:text="${order.orderStatus}">
-    </span>
-    <br>
-    <span class="badge"
-          th:classappend="${order.paymentStatus == 'PAID'} ? 'badge-success' : 'badge-warning'"
-          th:text="${order.paymentStatus}">
-    </span>
-</td>					<td>$<span th:text="${order.total}"></span></td>
-					<td th:text="${order.orderDate}"></td>
-
-					<td><a class="btn btn-maya btn-sm"
-						th:href="@{/orders/{id}(id=${order.id})}"> Ver </a>
-
-						<form th:action="@{/orders/{id}/status(id=${order.id})}"
-      method="post"
-      th:if="${order.paymentStatus == 'PAID'}"
-      style="display: inline-block;">
-      
-      <span class="badge badge-info"
-      th:text="${order.orderStatus == 'CREATED' ? 'Creada' :
-                order.orderStatus == 'PROCESSED' ? 'Procesada' :
-                order.orderStatus == 'SHIPPED' ? 'Enviada' :
-                order.orderStatus == 'DELIVERED' ? 'Entregada' :
-                order.orderStatus}">
+            <!-- Estado -->
+            <td>
+                <!-- Estado de la orden -->
+             <span class="badge"
+      th:classappend="${order.orderStatusBadge}"
+      th:text="${order.orderStatusLabel}">
 </span>
 
-    <select name="status"
-            class="form-control form-control-sm d-inline-block"
-            style="width: 140px;">
-        <option th:selected="${order.orderStatus == 'PROCESSED'}"
-                th:value="PROCESSED">Procesada</option>
-        <option th:selected="${order.orderStatus == 'SHIPPED'}"
-                th:value="SHIPPED">Envío</option>
-        <option th:selected="${order.orderStatus == 'DELIVERED'}"
-                th:value="DELIVERED">Entregada</option>
-                
-    </select>
-              th:if="${order.paymentStatus == 'PAID' and order.orderStatus != 'DELIVERED'}"
 
-    <button class="btn btn-success btn-sm">✔</button>
-</form>
-<span th:if="${order.paymentStatus != 'PAID'}"
-      class="text-warning">
-    ⏳ Esperando pago
+                <br>
+
+                <!-- Estado de pago -->
+               <span class="badge"
+      th:classappend="${order.paymentStatus == T(com.WeedTitlan.server.model.PaymentStatus).PAID ? 'badge-success' : 'badge-warning'}"
+      th:text="${order.paymentStatusLabel}">
 </span>
-			<span class="badge"
-      th:classappend="
-        ${order.orderStatus == 'DELIVERED'} ? 'badge-success' :
-        ${order.orderStatus == 'SHIPPED'} ? 'badge-primary' :
-        'badge-info'"
-      th:text="${order.orderStatus}">
-</span>			
-						 <a class="btn btn-danger btn-sm"
-   th:if="${order.paymentStatus != 'PAID'}"
-   th:href="@{/orders/{id}/delete(id=${order.id})}"
-   onclick="return confirm('¿Seguro que deseas eliminar esta orden?');">
-    ✖
-</a></td>
-				</tr>
-			</tbody>
+            </td>
 
+            <!-- Total -->
+            <td>$<span th:text="${order.total}"></span></td>
 
+            <!-- Fecha -->
+            <td th:text="${order.orderDate}"></td>
 
-		</table>
-	</div>
-    <!-- Botón para regresar a servicio.html -->
-    <a href="/servicio" class="btn btn-maya btn-fixed">⬅ Volver a Servicios</a>
+            <!-- Acciones -->
+            <td>
+
+                <!-- Ver orden -->
+                <a class="btn btn-maya btn-sm mb-1"
+                   th:href="@{/orders/{id}(id=${order.id})}">
+                    Ver
+                </a>
+
+                <!-- Cambiar estado: solo si está PAGADA y NO ENTREGADA -->
+                <form th:if="${order.paymentStatus == 'PAID' and order.orderStatus != 'DELIVERED'}"
+                      th:action="@{/orders/{id}/status(id=${order.id})}"
+                      method="post"
+                      style="display:inline-block;">
+
+                    <select name="status"
+                            class="form-control form-control-sm d-inline-block"
+                            style="width: 140px;">
+                        <option th:value="PROCESSED"
+                                th:selected="${order.orderStatus == 'PROCESSED'}">
+                            Procesada
+                        </option>
+                        <option th:value="SHIPPED"
+                                th:selected="${order.orderStatus == 'SHIPPED'}">
+                            Envío
+                        </option>
+                        <option th:value="DELIVERED"
+                                th:selected="${order.orderStatus == 'DELIVERED'}">
+                            Entregada
+                        </option>
+                    </select>
+
+                    <button class="btn btn-success btn-sm ml-1">✔</button>
+                </form>
+
+                <!-- Esperando pago -->
+                <span th:if="${order.paymentStatus != 'PAID'}"
+                      class="text-warning d-block mt-1">
+                    ⏳ Esperando pago
+                </span>
+
+                <!-- Eliminar: solo si NO está pagada -->
+                <a class="btn btn-danger btn-sm mt-1"
+                   th:if="${order.paymentStatus != 'PAID'}"
+                   th:href="@{/orders/{id}/delete(id=${order.id})}"
+                   onclick="return confirm('¿Seguro que deseas eliminar esta orden?');">
+                    ✖
+                </a>
+
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Volver -->
+<a href="/servicio" class="btn btn-maya btn-fixed">
+    ⬅ Volver a Servicios
+</a>
 
 </body>
 </html>

@@ -39,13 +39,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // 🔥 ÓRDENES PENDIENTES (CREATED) PARA EXPIRAR
     // =========================
     @Query("""
-        SELECT DISTINCT o
-        FROM Order o
-        LEFT JOIN FETCH o.items i
-        LEFT JOIN FETCH i.producto
-        WHERE o.orderStatus = com.WeedTitlan.server.model.OrderStatus.CREATED
-    """)
-    List<Order> findPendingOrdersWithItems();
+    	    SELECT DISTINCT o
+    	    FROM Order o
+    	    LEFT JOIN FETCH o.items i
+    	    LEFT JOIN FETCH i.producto
+    	    WHERE o.orderStatus = com.WeedTitlan.server.model.OrderStatus.CREATED
+    	      AND o.paymentMethod = com.WeedTitlan.server.model.Order.PaymentMethod.TRANSFER
+    	""")
+    	List<Order> findPendingOrdersWithItems();
+
 
     // =========================
     // STRIPE

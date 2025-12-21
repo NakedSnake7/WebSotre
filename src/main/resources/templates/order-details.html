@@ -5,188 +5,189 @@
 <title>Detalles de Orden | WeedTlan</title>
 
 <link rel="stylesheet"
-	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
 <style>
 body {
-	background: #0f1115;
-	font-family: 'Poppins', sans-serif;
-	color: #e2e2e2;
+    background: #0f1115;
+    font-family: 'Poppins', sans-serif;
+    color: #e2e2e2;
 }
-
 h2 {
-	text-align: center;
-	color: #00ffaa;
-	text-shadow: 0 0 12px #00ffaa;
-	letter-spacing: 2px;
-	margin-bottom: 30px;
+    text-align: center;
+    color: #00ffaa;
+    text-shadow: 0 0 12px #00ffaa;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
 }
-
 .card-maya {
-	background: rgba(255, 255, 255, 0.03);
-	padding: 25px;
-	border-radius: 20px;
-	border: 1px solid rgba(0, 255, 170, 0.25);
-	backdrop-filter: blur(12px);
-	box-shadow: 0 0 25px rgba(0, 255, 170, 0.15);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 255, 170, 0.25);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 25px rgba(0, 255, 170, 0.15);
 }
-
 .label {
-	color: #00ffaa;
-	font-weight: bold;
-	text-shadow: 0 0 6px #00ffaa;
+    color: #00ffaa;
+    font-weight: bold;
 }
-
 .valor {
-	color: #e2e2e2;
+    color: #e2e2e2;
 }
-
 .btn-maya {
-	border: 1px solid #00ffaa;
-	color: #00ffaa;
-	background: transparent;
-	transition: 0.25s;
+    border: 1px solid #00ffaa;
+    color: #00ffaa;
+    background: transparent;
 }
-
 .btn-maya:hover {
-	background: #00ffaa;
-	color: #000;
-	box-shadow: 0 0 12px #00ffaa;
+    background: #00ffaa;
+    color: #000;
 }
-
-table thead {
-	background: rgba(0, 255, 170, 0.15);
-}
-
-table thead th {
-	color: #00ffaa;
-	border-bottom: 2px solid #00ffaa;
-}
-
-table tbody tr:hover {
-	background: rgba(0, 255, 170, 0.07);
+.alert-maya {
+    background: rgba(255, 170, 0, 0.08);
+    border: 1px solid rgba(255, 170, 0, 0.5);
+    color: #ffcc66;
 }
 </style>
 </head>
 
 <body class="container mt-5">
 
-	<h2>📄 Detalles de la Orden</h2>
+<h2>📄 Detalles de la Orden</h2>
 
-	<div class="card-maya">
+<div class="card-maya">
 
-		<!-- Info del cliente -->
-		<h4 class="mb-3" style="color: #00ffaa; text-shadow: 0 0 6px #00ffaa;">👤
-			Información del Cliente</h4>
+    <!-- CLIENTE -->
+    <h4 class="mb-3">👤 Información del Cliente</h4>
 
-		<p>
-			<span class="label">Nombre:</span> <span class="valor"
-				th:text="${order.user != null ? order.user.fullName : 'Sin nombre'}"></span>
-		</p>
+    <p><span class="label">Nombre:</span>
+        <span class="valor"
+              th:text="${order.user != null ? order.user.fullName : 'Sin nombre'}"></span>
+    </p>
 
-		<p>
-			<span class="label">Correo:</span> <span class="valor"
-				th:text="${order.user != null ? order.user.email : 'Sin correo'}"></span>
-		</p>
+    <p><span class="label">Correo:</span>
+        <span class="valor"
+              th:text="${order.user != null ? order.user.email : 'Sin correo'}"></span>
+    </p>
 
-		<p>
-			<span class="label">Teléfono:</span> <span class="valor"
-				th:text="${order.user != null ? order.user.phone : 'Sin teléfono'}"></span>
-		</p>
+    <p><span class="label">Teléfono:</span>
+        <span class="valor"
+              th:text="${order.user != null ? order.user.phone : 'Sin teléfono'}"></span>
+    </p>
 
-		<p>
-			<span class="label">Dirección:</span> <span class="valor"
-				th:text="${order.address}"></span>
-		</p>
+    <p><span class="label">Dirección:</span>
+        <span class="valor" th:text="${order.address}"></span>
+    </p>
 
+    <hr>
 
-		<hr style="border-color: rgba(0, 255, 170, 0.2)">
+    <!-- ORDEN -->
+    <h4 class="mb-3">🧾 Información de la Orden</h4>
 
-		<!-- Info de la orden -->
-		<h4 class="mb-3" style="color: #00ffaa; text-shadow: 0 0 6px #00ffaa;">🧾
-			Información de la Orden</h4>
+    <p><span class="label">ID:</span> <span th:text="${order.id}"></span></p>
+    <p><span class="label">Fecha:</span> <span th:text="${order.orderDate}"></span></p>
 
-		<p>
-			<span class="label">ID:</span> <span class="valor"
-				th:text="${order.id}"></span>
-		</p>
-		<p>
-			<span class="label">Fecha:</span> <span class="valor"
-				th:text="${order.orderDate}"></span>
-		</p>
-		<p>
-			<span class="label">Estado:</span> <span class="valor"
-				th:text="${order.status}"></span>
-		</p>
-		<p>
-			<span class="label">Total:</span> $<span class="valor"
-				th:text="${order.total}"></span>
-		</p>
+    <p>
+        <span class="label">Estado:</span>
+        <span class="badge"
+              th:classappend="${order.orderStatusBadge}"
+              th:text="${order.orderStatusLabel}">
+        </span>
+    </p>
 
-		<hr style="border-color: rgba(0, 255, 170, 0.2)">
-<hr style="border-color: rgba(0, 255, 170, 0.2)">
+    <p><span class="label">Método de pago:</span>
+        <span th:text="${order.paymentMethod}"></span>
+    </p>
 
-<!-- Sección para ingresar número de guía y paquetería -->
-<h4 class="mb-3" style="color: #00ffaa; text-shadow: 0 0 6px #00ffaa;">📦 Envío</h4>
+    <p><span class="label">Total:</span> $<span th:text="${order.total}"></span></p>
 
-<form th:action="@{/orders/update-shipping}" method="post" class="mb-4">
-    <input type="hidden" name="orderId" th:value="${order.id}" />
+    <hr>
 
-    <div class="form-group">
-        <label class="label" for="courier">Paquetería</label>
-        <select class="form-control" id="courier" name="courier" required
-                style="background: rgba(255,255,255,0.03); color: #e2e2e2; border: 1px solid #00ffaa;">
-            <option value="">Selecciona la paquetería</option>
-         <option value="DHL" th:selected="${order.carrier == 'DHL'}">DHL</option>
-<option value="FedEx" th:selected="${order.carrier == 'FedEx'}">FedEx</option>
-<option value="UPS" th:selected="${order.carrier == 'UPS'}">UPS</option>
-<option value="Estafeta" th:selected="${order.carrier == 'Estafeta'}">Estafeta</option>
+    <!-- CONFIRMAR PAGO TRANSFERENCIA -->
+    <div th:if="${order.paymentMethod == 'TRANSFERENCIA' and !order.paid}"
+         class="alert alert-maya text-center">
 
-        </select>
+        <p class="mb-3">
+            ⏳ <strong>Pago por transferencia pendiente de confirmación</strong>
+        </p>
+
+        <form th:action="@{/orders/confirm-transfer-payment}" method="post">
+            <input type="hidden" name="orderId" th:value="${order.id}">
+            <button class="btn btn-maya">
+                ✅ Confirmar pago recibido
+            </button>
+        </form>
     </div>
 
-    <div class="form-group">
-        <label class="label" for="trackingNumber">Número de Guía</label>
-        <input type="text" class="form-control" id="trackingNumber" name="trackingNumber"
-               th:value="${order.trackingNumber}" placeholder="Ingresa el número de guía"
-               style="background: rgba(255,255,255,0.03); color: #e2e2e2; border: 1px solid #00ffaa;" required>
+    <hr>
+
+    <!-- ENVÍO -->
+    <h4 class="mb-3">📦 Envío</h4>
+
+    <!-- Editable solo si está PAGADA y NO entregada -->
+    <form th:if="${order.paid and !order.delivered}"
+          th:action="@{/orders/update-shipping}"
+          method="post">
+
+        <input type="hidden" name="orderId" th:value="${order.id}"/>
+
+        <div class="form-group">
+            <label class="label">Paquetería</label>
+            <select class="form-control" name="courier" required>
+                <option value="">Selecciona</option>
+                <option value="DHL" th:selected="${order.carrier == 'DHL'}">DHL</option>
+                <option value="FedEx" th:selected="${order.carrier == 'FedEx'}">FedEx</option>
+                <option value="UPS" th:selected="${order.carrier == 'UPS'}">UPS</option>
+                <option value="Estafeta" th:selected="${order.carrier == 'Estafeta'}">Estafeta</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="label">Número de guía</label>
+            <input type="text" class="form-control"
+                   name="trackingNumber"
+                   th:value="${order.trackingNumber}" required>
+        </div>
+
+        <button class="btn btn-maya">💾 Guardar</button>
+    </form>
+
+    <!-- SOLO LECTURA -->
+    <div th:if="${order.delivered}">
+        <p><span class="label">Paquetería:</span> <span th:text="${order.carrier}"></span></p>
+        <p><span class="label">Guía:</span> <span th:text="${order.trackingNumber}"></span></p>
     </div>
 
-    <div class="text-center mt-3">
-        <button type="submit" class="btn btn-maya">💾 Guardar</button>
+    <hr>
+
+    <!-- PRODUCTOS -->
+    <h4 class="mb-3">🛒 Productos Comprados</h4>
+
+    <table class="table table-dark table-hover">
+        <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Subtotal</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${order.items}">
+            <td th:text="${item.producto.productName}"></td>
+            <td th:text="${item.quantity}"></td>
+            <td>$<span th:text="${item.producto.price}"></span></td>
+            <td>$<span th:text="${item.quantity * item.producto.price}"></span></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="text-center mt-4">
+        <a href="/orders" class="btn btn-maya">⬅ Volver</a>
     </div>
-</form>
 
-		<!-- Tabla de productos -->
-		<h4 class="mb-3" style="color: #00ffaa; text-shadow: 0 0 6px #00ffaa;">🛒
-			Productos Comprados</h4>
-
-		<table class="table table-dark table-hover">
-			<thead>
-				<tr>
-					<th>Producto</th>
-					<th>Cantidad</th>
-					<th>Precio</th>
-					<th>Subtotal</th>
-				</tr>
-			</thead>
-
-			<tbody>
-				<tr th:each="item : ${order.items}">
-					<td th:text="${item.producto.productName}"></td>
-					<td th:text="${item.quantity}"></td>
-					<td>$<span th:text="${item.producto.price}"></span></td>
-					<td>$<span th:text="${item.quantity * item.producto.price}"></span>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-
-		<div class="text-center mt-4">
-			<a href="/orders" class="btn btn-maya">⬅ Volver</a>
-		</div>
-
-	</div>
+</div>
 
 </body>
 </html>

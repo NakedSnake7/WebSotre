@@ -1,31 +1,29 @@
 package com.WeedTitlan.server.dto;
 
-import java.util.List;  
-
+import java.util.List;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public class CheckoutRequestDTO {
-    
+
     @NotNull(message = "El cliente no puede ser nulo")
     @Valid
-    private CustomerDTO customer; // Información del cliente
+    private CustomerDTO customer;
+
     @NotNull(message = "El carrito no puede ser nulo")
     @NotEmpty(message = "El carrito no puede estar vacío")
     @Valid
-    private List<CartItemDTO> cart; // Productos en el carrito
-    @DecimalMin(value = "0.01", message = "El monto total debe ser mayor a 0")
-    @NotNull(message = "El monto total no puede ser nulo")
-    private Double totalAmount; // Monto total del pedido
-    // ✅ Nuevo campo: código de cupón
+    private List<CartItemDTO> cart;
+
+    // Opcional
     private String couponCode;
-    
-    
-    
-    
-    // Getters y Setters
+
+    @NotNull(message = "El método de pago es obligatorio")
+    private String paymentMethod;
+
+    // ===== Getters y Setters =====
+
     public CustomerDTO getCustomer() {
         return customer;
     }
@@ -42,13 +40,6 @@ public class CheckoutRequestDTO {
         this.cart = cart;
     }
 
-    public Double getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(Double totalAmount) {
-        this.totalAmount = totalAmount;
-    }
     public String getCouponCode() {
         return couponCode;
     }
@@ -57,10 +48,17 @@ public class CheckoutRequestDTO {
         this.couponCode = couponCode;
     }
 
-    // Método para derivar los nombres de productos
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
     public List<String> getProductNames() {
         return cart.stream()
-                   .map(CartItemDTO::getName) // Suponiendo que CartItemDTO tiene un campo productName
+                   .map(CartItemDTO::getName)
                    .toList();
     }
 }

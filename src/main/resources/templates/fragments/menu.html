@@ -121,13 +121,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <!-- BOTÓN + CANTIDAD + STOCK COLOREADO -->
     <div class="d-flex align-items-center justify-content-center mb-2">
-        <input type="number"
-               th:id="'quantity-' + ${producto.id}"
-               class="form-control form-control-sm text-center quantity-input"
-               value="1" min="1"
-               th:attr="max=${producto.stock}"
-               style="width:45px;"
-               th:disabled="${producto.stock == 0}">
+       <input type="number"
+       th:id="'quantity-' + ${producto.id}"
+       class="form-control form-control-sm text-center quantity-input"
+       value="1" min="1"
+       th:attr="max=${producto.stock}"
+       th:data-product-id="${producto.id}"
+       style="width:45px;"
+       th:disabled="${producto.stock == 0}">
+
 
 <button class="btn btn-maya btn-sm ms-2 add-to-cart"
         th:attr="data-product-id=${producto.id}"
@@ -137,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
         th:data-original-stock="${producto.stock}">
     <i class="fas fa-cart-plus"></i>
 </button>
+
 
 
 

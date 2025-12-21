@@ -10,59 +10,31 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 
 @Controller
+@RequestMapping("/orders")
 public class OrdersController {
 
     private final OrderService orderService;
-    private final EmailService emailService;
-
-    
     public OrdersController(OrderService orderService, EmailService emailService) {
         this.orderService = orderService;
-        this.emailService = emailService;
-    }
- // ================================
-    // LISTAR ÓRDENES
-    // ================================
-    @PostMapping("/orders/update-shipping")
-    public String updateShipping(
-            @RequestParam("orderId") Long orderId,
-            @RequestParam("courier") String courier,
-            @RequestParam("trackingNumber") String trackingNumber,
-            RedirectAttributes redirectAttributes
-    ) {
-        try {
-            orderService.updateShippingInfo(orderId, trackingNumber, courier);
-            redirectAttributes.addFlashAttribute("success", "Datos de envío actualizados correctamente");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al actualizar los datos de envío");
-        }
-
-        return "redirect:/orders/" + orderId; // vuelve a la página de detalles
     }
 
     // ================================
     // LISTAR ÓRDENES
     // ================================
-    @GetMapping("/orders")
+    @GetMapping
     public String listarOrders(
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "search", required = false) String search,
             Model model) {
 
-        List<Order> orders;
+        List<Order> orders = (status != null && !status.isBlank())
+                ? orderService.findOrdersByStatus(status)
+                : orderService.findAllOrders();
 
-        if (status != null && !status.isEmpty()) {
-            orders = orderService.findOrdersByStatus(status);
-        } else {
-            orders = orderService.findAllOrders();
-        }
-
-        if (search != null && !search.isEmpty()) {
+        if (search != null && !search.isBlank()) {
             String text = search.toLowerCase();
             orders = orders.stream()
                     .filter(o -> o.getCustomerName() != null &&
@@ -77,122 +49,97 @@ public class OrdersController {
     // ================================
     // DETALLES
     // ================================
-    @GetMapping("/orders/{id}")
-    public String verDetalles(@PathVariable("id") Long id, Model model) {
+    @GetMapping("/{id}")
+    public String verDetalles(@PathVariable Long id, Model model) {
         Order order = orderService.getOrderByIdWithUserAndItems(id);
         model.addAttribute("order", order);
         return "order-details";
     }
 
     // ================================
-    // CAMBIAR STATUS
+    // CONFIRMAR PAGO (TRANSFERENCIA)
     // ================================
-    @PostMapping("/orders/{id}/status")
-    public String cambiarStatus(
-            @PathVariable("id") Long id,
-            @RequestParam("status") String status,
+    @PostMapping("/{id}/confirm-payment")
+    public String confirmarPagoTransferencia(
+            @PathVariable Long id,
             RedirectAttributes redirectAttributes) {
 
-        Order order = orderService.getOrderById(id);
+        Order order = orderService.getOrderByIdWithUserAndItems(id);
 
-        if (order.getPaymentStatus() != PaymentStatus.PAID) {
+        // 🔴 1. ORDEN EXPIRADA O CANCELADA
+        if (order.getOrderStatus() == OrderStatus.CANCELLED) {
             redirectAttributes.addFlashAttribute(
                     "error",
-                    "No puedes cambiar el estado de una orden no pagada"
+                    "La orden está expirada y el stock fue liberado"
             );
             return "redirect:/orders/" + id;
         }
-        
 
-        orderService.updateOrderStatus(id, status);
-        return "redirect:/orders";
+        // 🟡 2. YA PAGADA
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            redirectAttributes.addFlashAttribute(
+                    "info",
+                    "La orden ya había sido confirmada previamente"
+            );
+            return "redirect:/orders/" + id;
+        }
+
+        // 🟢 3. CONFIRMAR PAGO (SERVICE)
+        orderService.confirmarPagoTransferencia(order);
+
+        redirectAttributes.addFlashAttribute(
+                "success",
+                "Pago confirmado correctamente. Orden aprobada."
+        );
+
+        return "redirect:/orders/" + id;
     }
 
 
     // ================================
-    // 🟩 ENVIAR CORREO DE ENVÍO
+    // ACTUALIZAR ENVÍO
     // ================================
-    @PostMapping("/orders/{id}/send-shipping-email")
-    public String enviarCorreoEnvio(
-            @PathVariable Long id,
-            @RequestParam("trackingNumber") String trackingNumber,
-            Model model
-            
-    ) {
+    @PostMapping("/update-shipping")
+    public String updateShipping(
+            @RequestParam Long orderId,
+            @RequestParam String courier,
+            @RequestParam String trackingNumber,
+            RedirectAttributes redirectAttributes) {
 
         try {
-            // Validación simple
-            if (trackingNumber == null || trackingNumber.isBlank()) {
-                model.addAttribute("error", "Debes ingresar un número de guía.");
-                return "redirect:/orders/" + id;
-            }
-
-            Order order = orderService.getOrderByIdWithUserAndItems(id);
-
-            if (order == null) {
-                model.addAttribute("error", "Orden no encontrada");
-                return "redirect:/orders";
-            }
-            if (order.getPaymentStatus() != PaymentStatus.PAID) {
-                model.addAttribute("error", "No se puede enviar una orden no pagada");
-                return "redirect:/orders/" + id;
-            }
-            if (order.getOrderStatus() == OrderStatus.DELIVERED) {
-                model.addAttribute("error", "La orden ya fue entregada");
-                return "redirect:/orders/" + id;
-            }
-
-            // Guardar tracking y status
-            order.setTrackingNumber(trackingNumber);
-            order.setOrderStatus(OrderStatus.SHIPPED);
-            orderService.save(order);
-
-            // Datos del correo
-            String nombre = order.getCustomerName();
-            String email = order.getUser().getEmail();
-            String fechaEnvio = LocalDate.now().toString();
-            String carrier = "Paquetería";
-
-            // Enviar correo
-            emailService.enviarCorreoEnvio(
-                    email,
-                    nombre,
-                    order.getId(),
-                    fechaEnvio,
-                    trackingNumber,
-                    carrier
-            );
-
-            return "redirect:/orders";
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            model.addAttribute("error", "Error al enviar correo: " + e.getMessage());
-            return "redirect:/orders";
+            orderService.updateShippingInfo(orderId, trackingNumber, courier);
+            orderService.updateOrderStatus(orderId, "SHIPPED");
+            redirectAttributes.addFlashAttribute("success", "Envío actualizado");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar envío");
         }
+
+        return "redirect:/orders/" + orderId;
     }
 
     // ================================
-    // ELIMINAR
+    // ELIMINAR ORDEN
     // ================================
-    @GetMapping("/orders/{id}/delete")
+    @GetMapping("/{id}/delete")
     public String eliminarOrden(
-            @PathVariable("id") Long id,
+            @PathVariable Long id,
             RedirectAttributes redirectAttributes) {
 
         Order order = orderService.getOrderById(id);
 
-        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+        if (order.getPaymentStatus() == PaymentStatus.PAID ||
+            order.getOrderStatus() == OrderStatus.CANCELLED) {
+
             redirectAttributes.addFlashAttribute(
                     "error",
-                    "No se puede eliminar una orden ya pagada"
+                    "No se puede eliminar esta orden"
             );
             return "redirect:/orders";
         }
 
         orderService.deleteOrder(id);
+        redirectAttributes.addFlashAttribute("success", "Orden eliminada");
+
         return "redirect:/orders";
     }
-
-  
 }

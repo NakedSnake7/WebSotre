@@ -1,5 +1,6 @@
 package com.WeedTitlan.server.service;
 
+import com.WeedTitlan.server.model.Order;
 import com.WeedTitlan.server.model.OrderItem;
 import com.sendgrid.*; 
 import com.sendgrid.helpers.mail.Mail;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -84,29 +86,36 @@ public class EmailService {
     /**
      * Envía el correo de "Tu pedido está en camino" usando un template HTML.
      */
-    public void enviarCorreoEnvio(
+    public void enviarCorreoPagoConfirmado(
             String destinatario,
-            String customerName,
+            String nombre,
             Long orderId,
-            String shippingDate,
-            String trackingNumber,
-            String carrier
+            List<OrderItem> items
     ) throws IOException {
 
-        // 1. Cargar template desde resources
-    	String html = cargarTemplate("email/shipping-confirmation.html");
+        String template = cargarTemplate("email/order-processed.html");
 
-        // 2. Reemplazar variables del template
-        html = html.replace("${customerName}", customerName);
-        html = html.replace("${orderId}", String.valueOf(orderId));
-        html = html.replace("${shippingDate}", shippingDate);
-        html = html.replace("${trackingNumber}", trackingNumber);
-        html = html.replace("${carrier}", carrier);
-        
+        StringBuilder listadoProductos = new StringBuilder();
 
-        // 3. Enviar usando tu método existente
-        enviarCorreoHTML(destinatario, "📦 Tu pedido #" + orderId + " está en camino", html);
+        for (OrderItem item : items) {
+            listadoProductos.append("<tr>")
+                    .append("<td>").append(item.getProducto().getProductName()).append("</td>")
+                    .append("<td style='text-align:center;'>").append(item.getQuantity()).append("</td>")
+                    .append("</tr>");
+        }
+
+        String html = template
+                .replace("{NOMBRE}", nombre)
+                .replace("{NUMERO_ORDEN}", String.valueOf(orderId))
+                .replace("{LISTADO_PRODUCTOS}", listadoProductos.toString());
+
+        enviarCorreoHTML(
+                destinatario,
+                "✅ Pago confirmado - Pedido #" + orderId,
+                html
+        );
     }
+
 
     /**
      * Lee archivos HTML desde resources como texto.
@@ -162,6 +171,89 @@ public class EmailService {
 
         // 6. Enviar correo
         enviarCorreoHTML(destinatario, "✅ Confirmación de tu pedido #" + orderId, emailHTML);
+    }
+    
+    public void enviarCorreoOrdenExpirada(Order order, LocalDateTime fechaLimite) throws IOException {
+
+        if (order.getUser() == null || order.getUser().getEmail() == null) return;
+
+        String template = cargarTemplate("email/email-order-expired.html");
+
+        DecimalFormat df = new DecimalFormat("#,##0.00");
+
+        StringBuilder tablaProductos = new StringBuilder();
+        double subtotal = 0;
+
+        for (OrderItem item : order.getItems()) {
+            double sub = item.getPrice() * item.getQuantity();
+            subtotal += sub;
+
+            tablaProductos.append("<tr>")
+                    .append("<td style='padding:10px;'>")
+                    .append(item.getProducto() != null
+                            ? item.getProducto().getProductName()
+                            : "Producto")
+                    .append("</td>")
+                    .append("<td style='text-align:center;'>")
+                    .append(item.getQuantity())
+                    .append("</td>")
+                    .append("<td style='text-align:center;'>$")
+                    .append(df.format(sub))
+                    .append("</td>")
+                    .append("</tr>");
+        }
+
+        String envio = subtotal >= 1250 ? "GRATIS" : "$120.00";
+        double total = subtotal + (subtotal >= 1250 ? 0 : 120);
+
+        String html = template
+                .replace("{NOMBRE}",
+                        order.getCustomerName() != null
+                                ? order.getCustomerName()
+                                : "Cliente")
+                .replace("{NUMERO_ORDEN}", String.valueOf(order.getId()))
+                .replace("{FECHA_EXPIRACION}", fechaLimite.toString())
+                .replace("{LISTADO_PRODUCTOS}", tablaProductos.toString())
+                .replace("{SUBTOTAL}", df.format(subtotal))
+                .replace("{ENVIO}", envio)
+                .replace("{TOTAL}", df.format(total));
+
+        enviarCorreoHTML(
+                order.getUser().getEmail(),
+                "⏰ Orden expirada - WeedTlan",
+                html
+        );
+    }
+
+    /**
+     * Envía el correo de "Pedido enviado" con tracking
+     */
+    /**
+     * 📦 Correo: Pedido enviado con tracking
+     */
+    public void enviarCorreoEnvio(
+            String destinatario,
+            String customerName,
+            Long orderId,
+            String shippingDate,
+            String trackingNumber,
+            String carrier
+    ) throws IOException {
+
+        String template = cargarTemplate("email/shipping-confirmation.html");
+
+        String html = template
+                .replace("{CUSTOMER_NAME}", customerName)
+                .replace("{ORDER_ID}", String.valueOf(orderId))
+                .replace("{SHIPPING_DATE}", shippingDate)
+                .replace("{TRACKING_NUMBER}", trackingNumber)
+                .replace("{CARRIER}", carrier);
+
+        enviarCorreoHTML(
+                destinatario,
+                "📦 Tu pedido está en camino - Orden #" + orderId,
+                html
+        );
     }
 
 

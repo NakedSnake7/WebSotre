@@ -1,6 +1,6 @@
 package com.WeedTitlan.server.controller;
 
-import java.io.IOException;  
+import java.io.IOException;    
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
